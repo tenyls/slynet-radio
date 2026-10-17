@@ -11,6 +11,7 @@ type Group = NonNullable<Catalog['exclusive']>[number];
 export const ExclusiveSection: React.FC = () => {
   const [groups, setGroups] = useState<Group[]>([]);
   const [active, setActive] = useState('');
+  const [showAll, setShowAll] = useState(false);
   const { currentStation, isPlaying, playStation } = useAudio();
   const { isFavorite, toggleFavorite } = useFavorites();
 
@@ -35,7 +36,10 @@ export const ExclusiveSection: React.FC = () => {
         {groups.map((g) => (
           <button
             key={g.id}
-            onClick={() => setActive(g.id)}
+            onClick={() => {
+              setActive(g.id);
+              setShowAll(false);
+            }}
             className={`shrink-0 px-3 py-2 rounded-xl text-xs font-bold border ${g.id === group.id ? 'bg-amber-500/15 text-amber-200 border-amber-500/40' : 'bg-zinc-900 text-zinc-300 border-zinc-800'}`}
           >
             {g.name} <span className="text-zinc-500 font-semibold">{g.stations.length}</span>
@@ -44,7 +48,7 @@ export const ExclusiveSection: React.FC = () => {
       </div>
       <p className="text-[11px] text-zinc-500 mb-3">{group.note}</p>
       <StationGrid
-        stations={group.stations}
+        stations={showAll ? group.stations : group.stations.slice(0, 8)}
         currentStation={currentStation}
         isPlaying={isPlaying}
         isLoading={false}
@@ -52,6 +56,14 @@ export const ExclusiveSection: React.FC = () => {
         onPlayStation={(st) => playStation(st, group.stations)}
         onToggleFavorite={toggleFavorite}
       />
+      {group.stations.length > 8 && (
+        <button
+          onClick={() => setShowAll((v) => !v)}
+          className="mt-3 w-full sm:w-auto px-4 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-amber-500/40 text-sm font-semibold text-amber-200"
+        >
+          {showAll ? 'Свернуть' : `Показать все ${group.stations.length} станций ${group.name}`}
+        </button>
+      )}
     </section>
   );
 };

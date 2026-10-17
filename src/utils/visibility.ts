@@ -10,6 +10,7 @@ export const TOGGLABLE_SECTIONS: { id: string; label: string }[] = [
   { id: 'search', label: '🔍 Поиск' },
   { id: 'history', label: '🕘 История' },
   { id: 'pro', label: '👑 Оформление' },
+  { id: 'apps', label: '📱 Mobile Apps' },
 ];
 
 export const isSectionHidden = (s: Pick<SlyNetSettings, 'hiddenSections'>, id: string) =>

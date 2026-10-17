@@ -257,7 +257,7 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Filters Group Row (Hidden on Webcams, TV, Info tabs to keep clear view) */}
-        {!(currentTab === 'webcams' || currentTab === 'tv' || currentTab === 'info') && (
+        {!(currentTab === 'webcams' || currentTab === 'tv' || currentTab === 'info' || currentTab === 'apps') && (
           <div className="flex items-center justify-between gap-2 overflow-x-auto pb-0.5 scrollbar-none animate-fade-in">
             <div className="flex items-center gap-2">
               {/* Country Selector with reliable modal */}

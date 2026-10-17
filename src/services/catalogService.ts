@@ -30,7 +30,7 @@ let promise: Promise<Catalog> | null = null;
 
 export function loadCatalog(): Promise<Catalog> {
   if (!promise) {
-    promise = fetch(`${DATA_BASE}catalog.json?d=${new Date().toISOString().slice(0, 13)}`)
+    promise = fetch(`${DATA_BASE}catalog.json?d=${new Date().toISOString().slice(0, 13)}`, { cache: 'no-cache' })
       .then((r) => (r.ok ? r.json() : EMPTY))
       .then((j) => ({ ...EMPTY, ...j }))
       .catch(() => EMPTY);

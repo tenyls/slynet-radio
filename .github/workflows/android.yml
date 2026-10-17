@@ -25,19 +25,23 @@ jobs:
       - run: npx cap add android
       - name: Иконки и заставка
         run: npx --yes @capacitor/assets@3 generate --android --iconBackgroundColor '#09090b' --iconBackgroundColorDark '#09090b' --splashBackgroundColor '#09090b' --splashBackgroundColorDark '#09090b'
+      - name: Поддержка Android TV
+        run: python3 scripts/android-tv-patch.py
       - run: npx cap sync android
       - name: Сборка APK
         run: cd android && chmod +x gradlew && ./gradlew assembleDebug --no-daemon
-      - run: cp android/app/build/outputs/apk/debug/app-debug.apk SlyNetRadio.apk
+      - run: cp android/app/build/outputs/apk/debug/app-debug.apk SlyNetRadio.apk && cp SlyNetRadio.apk SlyNetRadio-TV.apk
       - uses: actions/upload-artifact@v4
         with:
           name: SlyNetRadio-apk
-          path: SlyNetRadio.apk
+          path: |
+            SlyNetRadio.apk
+            SlyNetRadio-TV.apk
       - name: Выложить в Releases
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release delete android-latest -y --cleanup-tag || true
-          gh release create android-latest SlyNetRadio.apk --prerelease \
+          gh release create android-latest SlyNetRadio.apk SlyNetRadio-TV.apk --prerelease \
             --title "SlyNet Radio для Android (тестовая сборка)" \
-            --notes "Тестовая сборка из ветки main. Скачайте SlyNetRadio.apk на телефон и установите (разрешите установку из этого источника)."
+            --notes "Тестовая сборка из ветки main. SlyNetRadio.apk — для телефонов и планшетов, SlyNetRadio-TV.apk — для Android TV (это одно и то же приложение, оно работает и там, и там)."

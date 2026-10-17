@@ -47,6 +47,7 @@ export type MainTab =
   | 'favorites'
   | 'history'
   | 'pro'
+  | 'apps'
   | 'info';
 
 export interface RecognizedTrack {

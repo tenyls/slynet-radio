@@ -1,0 +1,147 @@
+import React, { useEffect, useState } from 'react';
+import { Smartphone, Tv, Apple, Download, Share, PlusSquare, Compass, Check, Clock } from 'lucide-react';
+import { isNativeApp } from '../utils/platform';
+
+const REPO = 'https://github.com/tenyls/slynet-radio';
+const APK_PHONE = `${REPO}/releases/download/android-latest/SlyNetRadio.apk`;
+const APK_TV = `${REPO}/releases/download/android-latest/SlyNetRadio-TV.apk`;
+const SITE = 'https://tenyls.github.io/slynet-radio/';
+
+const Soon: React.FC<{ store: string }> = ({ store }) => (
+  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold bg-amber-500/15 text-amber-200 border border-amber-500/30">
+    <Clock className="w-3.5 h-3.5" /> Скоро в {store}
+  </span>
+);
+
+const Step: React.FC<{ n: number; icon: React.ReactNode; children: React.ReactNode }> = ({ n, icon, children }) => (
+  <li className="flex items-start gap-3">
+    <span className="w-8 h-8 shrink-0 rounded-full bg-sky-500/20 border border-sky-400/40 text-sky-200 font-extrabold text-sm flex items-center justify-center">{n}</span>
+    <span className="text-sm text-zinc-200 leading-relaxed pt-1">
+      <span className="inline-flex align-middle mr-1.5 text-sky-300">{icon}</span>
+      {children}
+    </span>
+  </li>
+);
+
+/** «Mobile Apps»: Android (телефон и ТВ), iPhone / iPad */
+export const AppsView: React.FC = () => {
+  const [qr, setQr] = useState('');
+  useEffect(() => {
+    import('qrcode').then((QR) => QR.toDataURL(SITE, { margin: 1, width: 220, color: { dark: '#09090b', light: '#ffffff' } }).then(setQr)).catch(() => {});
+  }, []);
+
+  return (
+    <div className="flex flex-col gap-6 animate-fade-in">
+      {/* Шапка */}
+      <div className="relative overflow-hidden rounded-3xl p-6 sm:p-8 bg-gradient-to-br from-emerald-950 via-zinc-950 to-sky-950 border border-emerald-500/25">
+        <div className="absolute -top-16 -right-16 w-72 h-72 bg-emerald-500/20 rounded-full blur-[90px] pointer-events-none" />
+        <div className="absolute -bottom-20 -left-10 w-72 h-72 bg-sky-500/20 rounded-full blur-[90px] pointer-events-none" />
+        <div className="relative flex flex-col sm:flex-row sm:items-center gap-6">
+          <div className="flex-1">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-500/15 text-emerald-200 border border-emerald-500/30 mb-3">
+              <Smartphone className="w-3.5 h-3.5" /> Mobile Apps
+            </span>
+            <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">SlyNet Radio в кармане</h1>
+            <p className="text-sm text-zinc-300 mt-2 max-w-xl">
+              Радио со всего мира на телефоне, планшете и телевизоре. Бесплатно, без рекламы и регистрации. Избранное переносится через «Вход и синхронизация».
+            </p>
+          </div>
+          {qr && (
+            <div className="hidden sm:flex flex-col items-center gap-2 shrink-0">
+              <img src={qr} alt="QR-код сайта" className="w-36 h-36 rounded-2xl border-4 border-white shadow-xl" />
+              <span className="text-[11px] text-zinc-400">Наведите камеру телефона</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="grid lg:grid-cols-2 gap-5">
+        {/* Android */}
+        <section className="rounded-3xl p-5 sm:p-6 bg-zinc-900/80 border border-emerald-500/25 flex flex-col gap-4">
+          <div className="flex items-center gap-3">
+            <span className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-400 to-lime-500 flex items-center justify-center shadow-lg shadow-emerald-500/30">
+              <Smartphone className="w-6 h-6 text-zinc-950" />
+            </span>
+            <div>
+              <h2 className="text-lg font-extrabold text-white">Android</h2>
+              <p className="text-xs text-zinc-400">Телефоны и планшеты · Android 7+</p>
+            </div>
+          </div>
+          <a
+            href={APK_PHONE}
+            className="flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-extrabold text-sm shadow-lg shadow-emerald-500/30 active:scale-[0.98]"
+          >
+            <Download className="w-5 h-5" /> Скачать APK для Android
+          </a>
+          <ol className="space-y-2 text-xs text-zinc-400 list-decimal pl-5">
+            <li>Скачайте файл и откройте его.</li>
+            <li>Разрешите установку из браузера, если телефон спросит.</li>
+            <li>Нажмите «Установить» (Play Защита может предупредить — это тестовая версия).</li>
+          </ol>
+          <div className="flex flex-wrap items-center gap-2">
+            <Soon store="Google Play" />
+          </div>
+        </section>
+
+        {/* Android TV */}
+        <section className="rounded-3xl p-5 sm:p-6 bg-zinc-900/80 border border-violet-500/25 flex flex-col gap-4">
+          <div className="flex items-center gap-3">
+            <span className="w-12 h-12 rounded-2xl bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center shadow-lg shadow-violet-500/30">
+              <Tv className="w-6 h-6 text-white" />
+            </span>
+            <div>
+              <h2 className="text-lg font-extrabold text-white">Android TV</h2>
+              <p className="text-xs text-zinc-400">Телевизоры и приставки на Android TV / Google TV</p>
+            </div>
+          </div>
+          <a
+            href={APK_TV}
+            className="flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-violet-500 hover:bg-violet-400 text-white font-extrabold text-sm shadow-lg shadow-violet-500/30 active:scale-[0.98]"
+          >
+            <Download className="w-5 h-5" /> Скачать APK для Android TV
+          </a>
+          <ol className="space-y-2 text-xs text-zinc-400 list-decimal pl-5">
+            <li>Установите на телевизор приложение-загрузчик (например, «Downloader») из Google Play.</li>
+            <li>Откройте в нём ссылку на APK из этой кнопки и установите.</li>
+            <li>SlyNet Radio появится в списке приложений, управление — пультом.</li>
+          </ol>
+          <div className="flex flex-wrap items-center gap-2">
+            <Soon store="Google Play для ТВ" />
+          </div>
+        </section>
+      </div>
+
+      {/* iPhone / iPad */}
+      <section className="rounded-3xl p-5 sm:p-6 bg-gradient-to-br from-zinc-900 to-sky-950/60 border border-sky-500/25">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+          <div className="flex items-center gap-3">
+            <span className="w-12 h-12 rounded-2xl bg-gradient-to-br from-sky-400 to-indigo-500 flex items-center justify-center shadow-lg shadow-sky-500/30">
+              <Apple className="w-6 h-6 text-white" />
+            </span>
+            <div>
+              <h2 className="text-lg font-extrabold text-white">iPhone и iPad</h2>
+              <p className="text-xs text-zinc-400">Полноценное приложение на экране «Домой» — без App Store</p>
+            </div>
+          </div>
+          <Soon store="App Store" />
+        </div>
+        <ol className="grid sm:grid-cols-2 gap-4">
+          <Step n={1} icon={<Compass className="w-4 h-4" />}>
+            Откройте <b className="text-white">tenyls.github.io/slynet-radio</b> именно в <b className="text-white">Safari</b>.
+          </Step>
+          <Step n={2} icon={<Share className="w-4 h-4" />}>
+            Нажмите кнопку <b className="text-white">«Поделиться»</b> — квадрат со стрелкой вверх (внизу на iPhone, вверху на iPad).
+          </Step>
+          <Step n={3} icon={<PlusSquare className="w-4 h-4" />}>
+            Прокрутите и выберите <b className="text-white">«На экран „Домой“»</b>, затем «Добавить».
+          </Step>
+          <Step n={4} icon={<Check className="w-4 h-4" />}>
+            Запускайте SlyNet Radio с иконки: на весь экран, без адресной строки, со звуком на экране блокировки.
+          </Step>
+        </ol>
+      </section>
+
+      {isNativeApp && <p className="text-xs text-zinc-500 text-center">Вы уже пользуетесь приложением SlyNet Radio 💚</p>}
+    </div>
+  );
+};

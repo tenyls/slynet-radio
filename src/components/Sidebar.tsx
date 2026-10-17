@@ -23,6 +23,7 @@ import {
   Info,
   Mic2,
   Tv,
+  Smartphone,
 } from 'lucide-react';
 import { useAudio } from '../context/AudioPlayerContext';
 import { SlyNetLogo } from './SlyNetLogo';
@@ -96,6 +97,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       icon: Crown,
       isProBadge: true,
     },
+    { id: 'apps' as MainTab, label: 'Mobile Apps', icon: Smartphone, badgeText: 'APK' },
     {
       id: 'info' as MainTab,
       label: t.navInfo,

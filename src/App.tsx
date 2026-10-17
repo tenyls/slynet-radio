@@ -11,6 +11,7 @@ import { isSectionHidden, hiddenCountrySet } from './utils/visibility';
 import { ContinueListening } from './components/ContinueListening';
 import { ListFilters } from './components/ListFilters';
 import { ExclusiveSection } from './components/ExclusiveSection';
+import { AppsView } from './components/AppsView';
 import { useCustomStations } from './hooks/useCustomStations';
 import { fetchStations, fetchGenreStations, fetchCatalogStats, fetchStationsByUuids } from './services/radioApi';
 import { MobileHome } from './components/MobileHome';
@@ -185,7 +186,8 @@ function RadioApp() {
       currentTab === 'info' ||
       currentTab === 'moods' ||
       currentTab === 'history' ||
-      currentTab === 'webcams'
+      currentTab === 'webcams' ||
+      currentTab === 'apps'
     ) {
       return;
     }
@@ -546,7 +548,7 @@ function RadioApp() {
         {/* Dynamic Page Views */}
         <main className="flex-1 px-4 sm:px-6 py-6 max-w-7xl w-full mx-auto">
           {/* Active Combo Filters Banner: Country + Genre (hidden on webcams, tv, info, artists) */}
-          {!(currentTab === 'webcams' || currentTab === 'tv' || currentTab === 'info' || currentTab === 'artists') &&
+          {!(currentTab === 'webcams' || currentTab === 'tv' || currentTab === 'info' || currentTab === 'artists' || currentTab === 'apps') &&
             (selectedCountry || (currentTab === 'genres' && activeGenreDetail)) && (
             <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-zinc-900/95 via-zinc-900/80 to-emerald-950/40 border border-cyan-500/30 shadow-lg animate-fade-in mb-6">
               <div className="flex flex-wrap items-center gap-2">
@@ -615,10 +617,6 @@ function RadioApp() {
                 onTrending={handleTrending}
                 onMyCountry={handleMyCountry}
               />
-
-              <ContinueListening />
-
-              <ExclusiveSection />
 
               {/* BRAND CYBER HERO BANNER IN SLYNET COLORS */}
               <div className="hidden md:block relative overflow-hidden rounded-3xl p-6 sm:p-8 bg-gradient-to-br from-slate-950 via-[#040e1a] to-[#03150e] border border-cyan-500/25 shadow-[0_10px_35px_-10px_rgba(6,182,212,0.3)]">
@@ -706,6 +704,11 @@ function RadioApp() {
                 </div>
               </div>
 
+              {/* Под баннером: эксклюзив, затем «Продолжить слушать» */}
+              <ExclusiveSection />
+
+              <ContinueListening />
+
               {/* Quick Horizontal Genre Carousel */}
               <div className="flex flex-col gap-3">
                 <div className="flex items-center justify-between">
@@ -742,6 +745,8 @@ function RadioApp() {
                   <ListFilters
                     country={selectedCountry}
                     onCountry={setSelectedCountry}
+                    query={searchQuery}
+                    onQuery={setSearchQuery}
                     onGenre={(g) => g && handleSelectGenre(g)}
                   />
                 </div>
@@ -821,6 +826,8 @@ function RadioApp() {
                   <ListFilters
                     country={selectedCountry}
                     onCountry={setSelectedCountry}
+                    query={searchQuery}
+                    onQuery={setSearchQuery}
                     genreId={activeGenreDetail.id}
                     onGenre={(g) => (g ? handleSelectGenre(g) : (handleBackToGenresList(), setCurrentTab('popular')))}
                   />
@@ -952,6 +959,8 @@ function RadioApp() {
           )}
 
           {/* TAB: INFO & TELEGRAM */}
+          {currentTab === 'apps' && <AppsView />}
+
           {currentTab === 'info' && (
             <InfoTelegramView
               telegramUrl={settings.telegramUrl}
