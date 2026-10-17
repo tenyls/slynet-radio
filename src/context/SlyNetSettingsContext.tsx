@@ -164,6 +164,7 @@ interface SlyNetSettingsContextType {
   /** Есть ли неопубликованные правки владельца */
   hasDraft: boolean;
   discardDraft: () => void;
+  markPublished: () => void;
   togglePro: () => void;
   setTheme: (themeId: ThemeId) => void;
   setLanguage: (lang: import('../types/radio').Language) => void;
@@ -186,7 +187,16 @@ export const SlyNetSettingsProvider: React.FC<{ children: React.ReactNode }> = (
     fetch(`./content.json?v=${Date.now()}`, { cache: 'no-store' })
       .then((r) => (r.ok ? r.json() : {}))
       .then((json) => {
-        if (!cancelled) setPublished(sanitizeSiteContent(json));
+        if (cancelled) return;
+        const pub = sanitizeSiteContent(json);
+        setPublished(pub);
+        // Из черновика убираем то, что уже опубликовано (совпадает с сайтом)
+        setDraft((d) => {
+          const left = Object.fromEntries(
+            Object.entries(d).filter(([k, v]) => JSON.stringify(v) !== JSON.stringify((pub as any)[k]))
+          );
+          return Object.keys(left).length === Object.keys(d).length ? d : left;
+        });
       })
       .catch(() => {});
     return () => {
@@ -246,6 +256,11 @@ export const SlyNetSettingsProvider: React.FC<{ children: React.ReactNode }> = (
   const resetLogo = useCallback(() => updateSettings({ customLogoUrl: DEFAULT_SETTINGS.customLogoUrl }), [updateSettings]);
 
   const discardDraft = useCallback(() => setDraft({}), []);
+  /** После успешной публикации: черновик стал опубликованной версией */
+  const markPublished = useCallback(() => {
+    setPublished((p) => ({ ...p, ...draft }));
+    setDraft({});
+  }, [draft]);
 
   const togglePro = useCallback(() => {
     setUserPrefs((prev) => ({ ...prev, isPro: !prev.isPro }));
@@ -270,6 +285,7 @@ export const SlyNetSettingsProvider: React.FC<{ children: React.ReactNode }> = (
         publishedContent: published,
         hasDraft: Object.keys(draft).length > 0,
         discardDraft,
+        markPublished,
         togglePro,
         setTheme,
         setLanguage,
@@ -292,6 +308,7 @@ export function useSlyNetSettings() {
       publishedContent: {},
       hasDraft: false,
       discardDraft: () => {},
+      markPublished: () => {},
       togglePro: () => {},
       setTheme: () => {},
       setLanguage: () => {},

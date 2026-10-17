@@ -67,7 +67,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({
   onAddCustomStation,
   onDeleteCustomStation,
 }) => {
-  const { hasDraft, discardDraft } = useSlyNetSettings();
+  const { hasDraft, discardDraft, markPublished } = useSlyNetSettings();
   const [activeTab, setActiveTab] = useState<'brand' | 'cms' | 'webcams' | 'backup' | 'scanner' | 'stations' | 'tv' | 'server' | 'messages' | 'partners' | 'visibility'>('brand');
   const [unlocked, setUnlocked] = useState(false);
   const [publishState, setPublishState] = useState<string | null>(null);
@@ -538,6 +538,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({
                   setPublishState('Публикуем…');
                   try {
                     await api('/admin/publish', { body: { content: buildSiteContent(settings) }, token: adminToken.get() });
+                    markPublished();
                     setPublishState('✓ Опубликовано. Через 1–2 минуты сайт обновится у всех.');
                   } catch (e: any) {
                     setPublishState(`Не получилось: ${e?.message || 'ошибка'}. Можно опубликовать вручную через content.json.`);
