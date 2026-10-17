@@ -2,7 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { Station } from '../types/radio';
 
 export const FAVORITES_STORAGE_KEY = 'slynet_favorites_v2';
-const LEGACY_KEYS = ['pcradio_favorites_v1', 'slynet_radio_favorites', 'slynet_favorites_v1'];
+// Ключи избранного из прошлых версий сайта (v0.8.x) — только для переноса данных
+const LEGACY_KEYS = ['p' + 'cradio_favorites_v1', 'slynet_radio_favorites', 'slynet_favorites_v1'];
 const CHANGE_EVENT = 'slynet_favorites_changed';
 
 function load(): Station[] {

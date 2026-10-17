@@ -2,7 +2,8 @@ import React, { useState, useMemo } from 'react';
 import { ARTISTS_DATA, ArtistItem } from '../constants/artists';
 import { Station } from '../types/radio';
 import { useAudio } from '../context/AudioPlayerContext';
-import { findArtistStations } from '../services/artistService';
+import { findArtistStations, fetchArtistSeriesStations, artistLabel } from '../services/artistService';
+import { StationRow } from './StationRow';
 import {
   Mic2,
   Play,
@@ -32,12 +33,25 @@ export const ArtistsView: React.FC<ArtistsViewProps> = ({
   initialCategory = 'all',
   onCategoryChange,
 }) => {
-  const { currentStation, isPlaying, playStation, togglePlayPause } = useAudio();
+  const { currentStation, isPlaying, playStation, togglePlayPause, currentTrackTitle } = useAudio();
+
+
 
   const [activeCategory, setActiveCategory] = useState<'all' | 'cis' | 'world' | 'ost'>(initialCategory);
   const [selectedLetter, setSelectedLetter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [loadingArtistId, setLoadingArtistId] = useState<string | null>(null);
+  // Самообновляемый каталог станций исполнителей из открытой базы
+  const [series, setSeries] = useState<Station[] | null>(null);
+  React.useEffect(() => {
+    fetchArtistSeriesStations().then(setSeries);
+  }, []);
+  const seriesFiltered = useMemo(() => {
+    if (!series) return [];
+    const q = searchQuery.trim().toLowerCase();
+    return q ? series.filter((s) => s.name.toLowerCase().includes(q)) : series;
+  }, [series, searchQuery]);
+  const [seriesShown, setSeriesShown] = useState(60);
 
   // Sync when initialCategory prop changes from external buttons (e.g. Header)
   React.useEffect(() => {
@@ -352,6 +366,36 @@ export const ArtistsView: React.FC<ArtistsViewProps> = ({
             );
           })}
         </div>
+      )}
+      {activeCategory !== 'ost' && (
+        <section className="flex flex-col gap-3 mt-4">
+          <div>
+            <h2 className="text-lg font-bold text-white">Ещё исполнители — каталог обновляется сам</h2>
+            <p className="text-xs text-zinc-400 mt-1">
+              Станции, где звучит один исполнитель: серии «Exclusively», «101.ru», «Radio Maximum», «Best of Rock FM». Новые появляются автоматически.
+              {series ? ` Сейчас: ${series.length}.` : ' Загружаем…'}
+            </p>
+          </div>
+          <div className="flex flex-col gap-1.5">
+            {seriesFiltered.slice(0, seriesShown).map((st) => (
+              <StationRow
+                key={st.stationuuid}
+                station={{ ...st, name: artistLabel(st.name), tags: st.name }}
+                isCurrent={currentStation?.stationuuid === st.stationuuid}
+                isPlaying={isPlaying}
+                isFavorite={isFavorite(st.stationuuid)}
+                trackTitle={currentTrackTitle}
+                onPlay={() => playStation(st, seriesFiltered)}
+                onToggleFavorite={() => onToggleFavorite(st)}
+              />
+            ))}
+          </div>
+          {seriesFiltered.length > seriesShown && (
+            <button onClick={() => setSeriesShown((n) => n + 60)} className="self-center px-5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-xs font-bold text-zinc-200 hover:bg-zinc-800">
+              Показать ещё ({seriesFiltered.length - seriesShown})
+            </button>
+          )}
+        </section>
       )}
     </div>
   );

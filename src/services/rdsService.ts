@@ -2,7 +2,7 @@
  * Честный RDS: «что сейчас играет».
  *
  * Название песни показывается ТОЛЬКО если его реально передаёт станция:
- *  1. официальные API станций (SomaFM, Radio Paradise, laut.fm, Radio Record);
+ *  1. официальные API станций (SomaFM, laut.fm, Radio Record);
  *  2. страница статуса Icecast на сервере потока (status-json.xsl);
  *  3. метаданные внутри самого потока (ICY StreamTitle) — через наш маленький
  *     прокси на Cloudflare Workers (см. папку worker/), если он настроен.
@@ -162,14 +162,6 @@ const somaFm: Fetcher = async (_s, url) => {
   return join(cur?.artist, cur?.title);
 };
 
-/** Radio Paradise: каналы main/mellow/rock/global → chan 0/1/2/3 */
-const radioParadise: Fetcher = async (_s, url) => {
-  if (!/radioparadise\.com/i.test(url)) return null;
-  const chan = /mellow/i.test(url) ? 1 : /rock/i.test(url) ? 2 : /global|eclectic/i.test(url) ? 3 : 0;
-  const json = await getJson(`https://api.radioparadise.com/api/now_playing?chan=${chan}`);
-  return join(json?.artist, json?.title);
-};
-
 /** laut.fm: https://stream.laut.fm/<station> */
 const lautFm: Fetcher = async (_s, url) => {
   const m = url.match(/laut\.fm\/([a-z0-9_-]+)/i);
@@ -223,7 +215,7 @@ const icyProxy: Fetcher = async (station, url) => {
   return cleanTrackTitle(json?.title || '', station.name);
 };
 
-const FETCHERS: Fetcher[] = [somaFm, radioParadise, lautFm, radioRecord, icecastStatus, icyProxy];
+const FETCHERS: Fetcher[] = [somaFm, lautFm, radioRecord, icecastStatus, icyProxy];
 
 /**
  * Реальное название текущего трека или null, если станция его не передаёт.
