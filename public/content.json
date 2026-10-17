@@ -4,11 +4,20 @@
   "customLogoUrl": "./logo.png",
   "telegramUrl": "https://t.me/slynet_radio",
   "customLinks": [
-    { "id": "1", "title": "Telegram Канал", "url": "https://t.me/slynet_radio" },
-    { "id": "2", "title": "Чат / Поддержка", "url": "https://t.me/slynet_support" }
+    {
+      "id": "1",
+      "title": "Telegram Канал",
+      "url": "https://t.me/slynet_radio"
+    },
+    {
+      "id": "2",
+      "title": "Чат / Поддержка",
+      "url": "https://t.me/slynet_support"
+    }
   ],
   "heroTitle": "SlyNet Radio",
   "customStations": [],
   "customWebcams": [],
-  "customTvChannels": []
+  "customTvChannels": [],
+  "apiUrl": "https://slynet-api.tenylse.workers.dev"
 }
