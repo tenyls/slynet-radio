@@ -112,7 +112,7 @@ export const CountryModal: React.FC<CountryModalProps> = ({
                 Выбрать страну вещания
               </h2>
               <p className="text-xs text-zinc-400">
-                Фильтрация 1000+ радиостанций по странам и регионам
+                Радиостанции по странам и регионам
               </p>
             </div>
           </div>

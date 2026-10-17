@@ -45,7 +45,7 @@ export const ProView: React.FC<ProViewProps> = ({
                 </span>
               </div>
               <p className="text-sm text-zinc-400 mt-1 max-w-lg">
-                Максимальное качество звука Ultra HD, кастомные темы оформления и неограниченные возможности управления эфиром.
+                Сейчас все функции SlyNet Radio бесплатны. Здесь можно выбрать тему оформления. Платная версия с дополнительными возможностями появится позже.
               </p>
             </div>
           </div>
@@ -61,12 +61,12 @@ export const ProView: React.FC<ProViewProps> = ({
             {isPro ? (
               <>
                 <Check className="w-5 h-5 text-emerald-400" />
-                <span>PRO-режим Активен (Отключить)</span>
+                <span>Бета-тестер PRO (выключить)</span>
               </>
             ) : (
               <>
                 <Sparkles className="w-5 h-5 fill-zinc-950" />
-                <span>Активировать PRO-режим (Бесплатный тест)</span>
+                <span>Стать бета-тестером PRO</span>
               </>
             )}
           </button>
@@ -78,8 +78,8 @@ export const ProView: React.FC<ProViewProps> = ({
         {[
           {
             icon: Zap,
-            title: 'Потоки 320 kbps Ultra HD',
-            desc: 'Кристально чистый звук без компрессии и сжатия частот для аудиофилов.',
+            title: 'Фильтр по качеству звука',
+            desc: 'Показывайте только станции 128+ или 256–320 kbps — фильтр в верхней панели.',
           },
           {
             icon: ShieldCheck,
@@ -88,8 +88,8 @@ export const ProView: React.FC<ProViewProps> = ({
           },
           {
             icon: Moon,
-            title: 'Таймер сна Pro',
-            desc: 'Умное автовыключение воспроизведения в заданное время с плавным затуханием громкости.',
+            title: 'Таймер сна',
+            desc: 'Автовыключение радио через заданное время.',
           },
           {
             icon: Palette,

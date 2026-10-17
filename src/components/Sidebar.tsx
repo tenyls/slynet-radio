@@ -120,7 +120,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </span>
           </div>
           <span className="text-[11px] font-medium text-emerald-400 font-mono truncate block">
-            {settings.appSubtitle || 'Global 1000+ Radio Hub'}
+            {settings.appSubtitle}
           </span>
         </div>
       </div>

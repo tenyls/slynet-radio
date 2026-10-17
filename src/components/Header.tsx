@@ -147,7 +147,7 @@ export const Header: React.FC<HeaderProps> = ({
                 </span>
               </div>
               <span className="text-[10px] font-medium text-emerald-400 font-mono truncate max-w-[200px]">
-                {settings.appSubtitle || 'Global 1000+ Radio Hub'}
+                {settings.appSubtitle}
               </span>
             </div>
           </div>
