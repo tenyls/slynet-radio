@@ -1,5 +1,7 @@
 import { liveFallbackLabel } from '../services/rdsService';
 import { getMyCountry } from '../services/geoService';
+import { useViewMode } from '../hooks/useViewMode';
+import { isSectionHidden } from '../utils/visibility';
 import React, { useState, useRef } from 'react';
 import {
   Search,
@@ -63,6 +65,7 @@ export const Header: React.FC<HeaderProps> = ({
   onSelectArtistsCategory,
 }) => {
   const { settings } = useSlyNetSettings();
+  const { mode: viewMode, setMode: setViewMode } = useViewMode();
   const { currentStation, currentTrackTitle, isPlaying } = useAudio();
   const t = TRANSLATIONS[language] || TRANSLATIONS.ru;
   const appVersion = settings.appVersion || 'v0.8.6';
@@ -285,8 +288,19 @@ export const Header: React.FC<HeaderProps> = ({
                 📍 <span>Моя страна</span>
               </button>
 
+              {/* Вид станций: плитка / список — для всего сайта */}
+              <button
+                type="button"
+                onClick={() => setViewMode(viewMode === 'list' ? 'grid' : 'list')}
+                title="Как показывать станции"
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border shrink-0 ${viewMode === 'list' ? 'bg-emerald-500/15 text-emerald-200 border-emerald-500/40' : 'bg-zinc-900/90 hover:bg-zinc-800 text-zinc-200 border-zinc-800'}`}
+              >
+                {viewMode === 'list' ? '☰ Список' : '▦ Плитка'}
+              </button>
+
               {/* Artists & Groups Selector Button */}
               {(() => {
+                if (isSectionHidden(settings, 'artists')) return null;
                 const isArtistsActive = currentTab === 'artists' && (!artistsCategory || artistsCategory !== 'ost');
                 return (
                   <button
@@ -314,6 +328,7 @@ export const Header: React.FC<HeaderProps> = ({
 
               {/* Soundtracks OST Selector Button */}
               {(() => {
+                if (isSectionHidden(settings, 'artists')) return null;
                 const isOstActive = currentTab === 'artists' && artistsCategory === 'ost';
                 return (
                   <button

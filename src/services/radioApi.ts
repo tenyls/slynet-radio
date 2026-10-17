@@ -25,6 +25,13 @@ export function isFamilySafe(st: Station): boolean {
   return !ADULT_RE.test(`${st.name} ${st.tags || ''}`);
 }
 
+/** Страны, скрытые владельцем в админке (для радио) */
+let hiddenRadio = new Set<string>();
+export function setHiddenRadioCountries(list: string[]) {
+  hiddenRadio = new Set(list.map((c) => c.toUpperCase()));
+}
+export const isRadioCountryHidden = (cc?: string) => !!cc && hiddenRadio.has(cc.toUpperCase());
+
 export function isPlayableHere(st: Station): boolean {
   const u = st.url_resolved || st.url || '';
   if (!u) return false;
@@ -206,6 +213,7 @@ export function deduplicateStations(stations: Station[]): Station[] {
     if (!st || !st.stationuuid) continue;
     if (!st.isCustom && !isPlayableHere(st)) continue;
     if (!st.isCustom && !isFamilySafe(st)) continue;
+    if (!st.isCustom && isRadioCountryHidden(st.countrycode)) continue;
     if (isStationQuarantined(st.stationuuid)) continue;
 
     // Normalizing stream host and path

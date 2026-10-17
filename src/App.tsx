@@ -7,6 +7,7 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { AudioProvider, useAudio } from './context/AudioPlayerContext';
 import { useFavorites } from './hooks/useFavorites';
 import { useSlyNetSettings, SlyNetSettingsProvider } from './context/SlyNetSettingsContext';
+import { isSectionHidden, hiddenCountrySet } from './utils/visibility';
 import { useCustomStations } from './hooks/useCustomStations';
 import { fetchStations, fetchCatalogStats, fetchStationsByUuids, guessUserCountry } from './services/radioApi';
 import { MobileHome } from './components/MobileHome';
@@ -335,7 +336,7 @@ function RadioApp() {
     }
   };
 
-  const [userCountry, setUserCountry] = useState(() => guessUserCountry());
+  const [userCountry, setUserCountry] = useState('');
   useEffect(() => {
     getMyCountry().then((cc) => cc && setUserCountry(cc));
   }, [settings.apiUrl]);
@@ -350,11 +351,18 @@ function RadioApp() {
   };
   const handleRandom = async () => playList(await fetchStations({ order: 'random', limit: 40 }));
   const handleTrending = async () => playList(await fetchStations({ order: 'clicktrend', limit: 60 }));
-  const handleMyCountry = () => {
-    if (!userCountry) return;
-    setSelectedCountry(userCountry);
-    window.scrollTo({ top: 400, behavior: 'smooth' });
+  const handleMyCountry = async () => {
+    const cc = userCountry || (await getMyCountry());
+    if (!cc) return;
+    setUserCountry(cc);
+    setSelectedCountry(cc);
+    setTimeout(() => document.getElementById('station-list')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
   };
+
+  // Раздел выключен владельцем в админке → возвращаемся на главную
+  useEffect(() => {
+    if (isSectionHidden(settings, currentTab)) setCurrentTab('popular');
+  }, [currentTab, settings.hiddenSections]);
 
   const formatRemaining = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -711,11 +719,19 @@ function RadioApp() {
               </div>
 
               {/* Station Grid */}
-              <div className="mt-2">
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-sm font-semibold text-zinc-300">
-                    Станции в эфире ({displayedStations.length})
+              <div className="mt-2 scroll-mt-24" id="station-list">
+                <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
+                  <span className="text-base font-bold text-white">
+                    {selectedCountry
+                      ? `${getCountryFlag(selectedCountry)} Станции: ${COUNTRIES.find((c) => c.code.toUpperCase() === selectedCountry.toUpperCase())?.name || selectedCountry}`
+                      : '🌍 Популярные станции мира'}{' '}
+                    <span className="text-zinc-400 font-semibold text-sm">({displayedStations.length})</span>
                   </span>
+                  {selectedCountry && (
+                    <button onClick={() => setSelectedCountry('')} className="px-3 py-1.5 rounded-xl bg-zinc-800 text-zinc-200 text-xs font-semibold">
+                      ✕ Показать все страны
+                    </button>
+                  )}
                 </div>
 
                 <StationGrid

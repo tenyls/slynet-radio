@@ -210,7 +210,10 @@ export interface SlyNetSettings {
   customStations?: Station[]; // Stations added via Admin (content.json)
   customTvChannels?: LiveTvChannel[]; // TV channels added via Admin (content.json)
   featuredStation?: Station | null;
-  apiUrl?: string; // адрес мини-сервера slynet-api (Cloudflare Worker)
+  apiUrl?: string;
+  defaultViewMode?: 'grid' | 'list'; // вид станций по умолчанию для всех
+  hiddenSections?: string[]; // скрытые разделы сайта (webcams, tv, moods, artists, history, pro)
+  hiddenCountries?: { radio?: string[]; tv?: string[]; webcams?: string[] }; // скрытые страны по разделам
   partners?: PartnerLink[]; // блок «Рекомендуем / Партнёры»
   adminLock?: string; // отпечаток пароля админки (если сервер не настроен)
   contactEmail?: string; // e-mail для связи (политика конфиденциальности, магазины)

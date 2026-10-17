@@ -27,6 +27,7 @@ import {
 import { useAudio } from '../context/AudioPlayerContext';
 import { SlyNetLogo } from './SlyNetLogo';
 import { TRANSLATIONS } from '../i18n/translations';
+import { isSectionHidden } from '../utils/visibility';
 
 interface SidebarProps {
   currentTab: MainTab;
@@ -148,7 +149,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Main Navigation Items */}
       <nav className="flex flex-col gap-1 mb-3">
-        {navItems.map((item) => {
+        {navItems.filter((item) => !isSectionHidden(settings, item.id)).map((item) => {
           const Icon = item.icon;
           const isActive = currentTab === item.id;
           return (

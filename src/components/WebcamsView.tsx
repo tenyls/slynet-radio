@@ -6,6 +6,7 @@ import { Globe3DCanvas } from './Globe3DCanvas';
 import { fetchCityWeather } from '../services/weatherService';
 import { useAudio } from '../context/AudioPlayerContext';
 import { useSlyNetSettings } from '../context/SlyNetSettingsContext';
+import { hiddenCountrySet } from '../utils/visibility';
 import {
   Video,
   Globe,
@@ -46,9 +47,10 @@ export const WebcamsView: React.FC<WebcamsViewProps> = ({ onOpenAdmin }) => {
     loadCatalog().then((c) => setDead(new Set(c.deadLinks)));
   }, []);
 
+  const hiddenCams = hiddenCountrySet(settings, 'webcams');
   // Combine default and custom webcams from CMS
   const allWebcams: WebcamCity[] = [...(settings.customWebcams || []), ...WEBCAMS_DATA].filter(
-    (c) => !c.directPortalUrl || !dead.has(c.directPortalUrl)
+    (c) => (!c.directPortalUrl || !dead.has(c.directPortalUrl)) && !hiddenCams.has((c.countryCode || '').toUpperCase())
   );
 
   const [selectedCity, setSelectedCity] = useState<WebcamCity>(allWebcams[0]);

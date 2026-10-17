@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { MainTab } from '../types/radio';
+import { useSlyNetSettings } from '../context/SlyNetSettingsContext';
+import { isSectionHidden } from '../utils/visibility';
 import { Flame, LayoutGrid, Sparkles, Search, Heart, Clock, Video, Mic2, Tv, MoreHorizontal, X, Crown, Info } from 'lucide-react';
 
 interface BottomNavProps {
@@ -11,13 +13,15 @@ interface BottomNavProps {
 /** Нижнее меню телефона: 5 крупных кнопок + «Ещё» со всеми остальными разделами */
 export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onSelectTab, favoritesCount }) => {
   const [moreOpen, setMoreOpen] = useState(false);
+  const { settings } = useSlyNetSettings();
+  const visible = (t: { id: string }) => !isSectionHidden(settings, t.id);
 
   const main = [
     { id: 'popular' as MainTab, label: 'Главная', icon: Flame },
     { id: 'genres' as MainTab, label: 'Жанры', icon: LayoutGrid },
     { id: 'artists' as MainTab, label: 'Артисты', icon: Mic2 },
     { id: 'favorites' as MainTab, label: 'Избранное', icon: Heart, badge: favoritesCount || undefined },
-  ];
+  ].filter(visible);
   const more = [
     { id: 'search' as MainTab, label: 'Поиск', icon: Search },
     { id: 'moods' as MainTab, label: 'Настроение', icon: Sparkles },
@@ -26,7 +30,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onSelectTab, f
     { id: 'history' as MainTab, label: 'История', icon: Clock },
     { id: 'pro' as MainTab, label: 'Оформление', icon: Crown },
     { id: 'info' as MainTab, label: 'О проекте', icon: Info },
-  ];
+  ].filter(visible);
   const moreActive = more.some((t) => t.id === currentTab);
 
   const go = (tab: MainTab) => {

@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { X, Search, Globe, Check, Sparkles } from 'lucide-react';
 import { CountryOption } from '../types/radio';
 import { COUNTRIES, fetchDynamicCountries } from '../constants/countries';
+import { useSlyNetSettings } from '../context/SlyNetSettingsContext';
+import { hiddenCountrySet } from '../utils/visibility';
 
 interface CountryModalProps {
   isOpen: boolean;
@@ -18,6 +20,8 @@ export const CountryModal: React.FC<CountryModalProps> = ({
 }) => {
   const [filterText, setFilterText] = useState('');
   const [countriesList, setCountriesList] = useState<CountryOption[]>(COUNTRIES);
+  const { settings } = useSlyNetSettings();
+  const hiddenRadio = hiddenCountrySet(settings, 'radio');
   const searchInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
@@ -72,6 +76,7 @@ export const CountryModal: React.FC<CountryModalProps> = ({
   ]);
 
   const filteredCountries = countriesList.filter((c) => {
+    if (c.code && hiddenRadio.has(c.code.toUpperCase())) return false;
     if (!filterText.trim()) return true;
     const q = filterText.toLowerCase();
     return (

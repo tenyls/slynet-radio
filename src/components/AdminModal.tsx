@@ -1,3 +1,4 @@
+import { AdminVisibilityTab } from './AdminVisibilityTab';
 import React, { useState, useRef } from 'react';
 import {
   X,
@@ -67,7 +68,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({
   onDeleteCustomStation,
 }) => {
   const { hasDraft, discardDraft } = useSlyNetSettings();
-  const [activeTab, setActiveTab] = useState<'brand' | 'cms' | 'webcams' | 'backup' | 'scanner' | 'stations' | 'tv' | 'server' | 'messages' | 'partners'>('brand');
+  const [activeTab, setActiveTab] = useState<'brand' | 'cms' | 'webcams' | 'backup' | 'scanner' | 'stations' | 'tv' | 'server' | 'messages' | 'partners' | 'visibility'>('brand');
   const [unlocked, setUnlocked] = useState(false);
   const [publishState, setPublishState] = useState<string | null>(null);
   const [rbStats, setRbStats] = useState<any>(null);
@@ -699,6 +700,17 @@ export const AdminModal: React.FC<AdminModalProps> = ({
               </button>
 
               <button
+                onClick={() => setActiveTab('visibility')}
+                className={`pb-3 px-3 text-xs sm:text-sm font-semibold transition-colors border-b-2 whitespace-nowrap flex items-center gap-1.5 ${
+                  activeTab === 'visibility'
+                    ? 'border-amber-400 text-amber-400'
+                    : 'border-transparent text-zinc-400 hover:text-zinc-200'
+                }`}
+              >
+                <span>👁 Видимость</span>
+              </button>
+
+              <button
                 onClick={() => setActiveTab('scanner')}
                 className={`pb-3 px-3 text-xs sm:text-sm font-semibold transition-colors border-b-2 whitespace-nowrap flex items-center gap-1.5 ${
                   activeTab === 'scanner'
@@ -1223,6 +1235,8 @@ export const AdminModal: React.FC<AdminModalProps> = ({
             {activeTab === 'server' && <AdminServerTab apiUrl={settings.apiUrl || ''} onSave={(url) => onUpdateSettings({ apiUrl: url })} />}
             {activeTab === 'messages' && <AdminMessagesTab hasServer={hasApi()} />}
             {activeTab === 'partners' && <AdminPartnersTab partners={settings.partners || []} onChange={(p) => onUpdateSettings({ partners: p })} />}
+
+            {activeTab === 'visibility' && <AdminVisibilityTab settings={settings} onChange={onUpdateSettings} />}
 
             {activeTab === 'tv' && (
               <AdminTvTab channels={settings.customTvChannels || []} onChange={(list) => onUpdateSettings({ customTvChannels: list })} />

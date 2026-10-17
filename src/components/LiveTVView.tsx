@@ -4,6 +4,7 @@ import { loadCatalog, CatalogTvChannel } from '../services/catalogService';
 import { useAudio } from '../context/AudioPlayerContext';
 import { useSlyNetSettings } from '../context/SlyNetSettingsContext';
 import { getMyCountry } from '../services/geoService';
+import { hiddenCountrySet } from '../utils/visibility';
 
 /**
  * Телеканалы мира.
@@ -110,7 +111,8 @@ export const LiveTVView: React.FC = () => {
       setChannels(all);
       // Сначала показываем каналы страны пользователя, если они есть
       getMyCountry().then((mine) => {
-        if (mine && all.some((ch) => ch.country === mine)) setCountry(mine);
+        const hidden = hiddenCountrySet(settings, 'tv');
+        if (mine && !hidden.has(mine) && all.some((ch) => ch.country === mine)) setCountry(mine);
       });
       if (!c.tv.length && !custom.length) setTab('links');
     });
@@ -166,7 +168,8 @@ export const LiveTVView: React.FC = () => {
     setVideoState('idle');
   };
 
-  const list = channels || [];
+  const hiddenTv = useMemo(() => hiddenCountrySet(settings, 'tv'), [settings.hiddenCountries]);
+  const list = (channels || []).filter((c) => !hiddenTv.has((c.country || '').toUpperCase()));
   const countries = useMemo(() => {
     const m = new Map<string, number>();
     list.forEach((c) => m.set(c.country, (m.get(c.country) || 0) + 1));
@@ -185,7 +188,8 @@ export const LiveTVView: React.FC = () => {
       (!q.trim() || c.name.toLowerCase().includes(q.trim().toLowerCase()))
   );
   const links = OFFICIAL_LINKS.filter(
-    (l) => (category === 'all' || l.category === category) && (!q.trim() || l.name.toLowerCase().includes(q.trim().toLowerCase()))
+    (l) =>
+      !hiddenTv.has(l.country) && (category === 'all' || l.category === category) && (!q.trim() || l.name.toLowerCase().includes(q.trim().toLowerCase()))
   );
 
   const chip = (active: boolean) =>

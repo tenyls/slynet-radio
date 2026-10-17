@@ -1,6 +1,7 @@
 import { FEATURES } from '../utils/platform';
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAudio } from '../context/AudioPlayerContext';
+import { useSlyNetSettings } from '../context/SlyNetSettingsContext';
 import { StationFallbackIcon } from './StationFallbackIcon';
 import { SlyNetLogo } from './SlyNetLogo';
 import { SleepTimerModal } from './SleepTimerModal';
@@ -84,6 +85,7 @@ export const FullScreenPlayer: React.FC<FullScreenPlayerProps> = ({ isFavorite, 
     stopRecording,
     bookmarkCurrentTrack,
   } = useAudio();
+  const { settings } = useSlyNetSettings();
 
   const [isSleepModalOpen, setIsSleepModalOpen] = useState(false);
   const [imageError, setImageError] = useState(false);
@@ -568,7 +570,7 @@ export const FullScreenPlayer: React.FC<FullScreenPlayerProps> = ({ isFavorite, 
               <div className="overflow-y-auto p-3">
                 {sheet === 'country' && (
                   <div className="grid grid-cols-2 gap-1.5">
-                    {COUNTRIES.map((c) => (
+                    {COUNTRIES.filter((c) => !(settings.hiddenCountries?.radio || []).includes(c.code.toUpperCase())).map((c) => (
                       <button
                         key={c.code || 'all'}
                         onClick={() => {

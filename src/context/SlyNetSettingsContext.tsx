@@ -2,6 +2,8 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import { SlyNetSettings, ThemeId } from '../types/radio';
 import { isOwnerMode } from '../utils/owner';
 import { setApiBase } from '../services/apiService';
+import { setHiddenRadioCountries } from '../services/radioApi';
+import { setDefaultViewMode } from '../hooks/useViewMode';
 
 /** Личные настройки посетителя (тема, язык) — хранятся только на его устройстве. */
 export const SETTINGS_KEY = 'slynet_user_prefs_v3';
@@ -21,6 +23,9 @@ export const SITE_FIELDS = [
   'featuredStation',
   'contactEmail',
   'apiUrl',
+  'hiddenSections',
+  'hiddenCountries',
+  'defaultViewMode',
   'partners',
   'adminLock',
   'legalContact',
@@ -49,6 +54,8 @@ export const DEFAULT_SETTINGS: SlyNetSettings = {
   customWebcams: [],
   customStations: [],
   customTvChannels: [],
+  hiddenSections: [],
+  hiddenCountries: { radio: [], tv: ['RU'], webcams: [] },
   isPro: false,
   activeTheme: 'slynet-original',
   language: 'ru',
@@ -78,7 +85,8 @@ function readJson(key: string): any {
 /** Только проверенные поля из content.json, чтобы битый файл не уронил сайт. */
 export function sanitizeSiteContent(raw: any): SiteContent {
   const c: any = pick(raw, SITE_FIELDS as unknown as string[]);
-  for (const k of ['customLinks', 'customWebcams', 'customStations', 'customTvChannels', 'partners']) {
+  if (c.hiddenCountries && typeof c.hiddenCountries !== 'object') delete c.hiddenCountries;
+  for (const k of ['customLinks', 'customWebcams', 'customStations', 'customTvChannels', 'partners', 'hiddenSections']) {
     if (c[k] !== undefined && !Array.isArray(c[k])) delete c[k];
   }
   for (const k of ['apiUrl', 'adminLock', 'contactEmail', 'legalContact', 'appTitle', 'appSubtitle', 'customLogoUrl', 'telegramUrl', 'heroTitle', 'heroSubtitle', 'appVersion', 'versionChangelog', 'dmcaPolicy']) {
@@ -195,6 +203,8 @@ export const SlyNetSettingsProvider: React.FC<{ children: React.ReactNode }> = (
   } as SlyNetSettings;
   if (!settings.customLogoUrl) settings.customLogoUrl = DEFAULT_SETTINGS.customLogoUrl;
   setApiBase(settings.apiUrl);
+  setHiddenRadioCountries(settings.hiddenCountries?.radio || []);
+  setDefaultViewMode(settings.defaultViewMode);
 
   // Тема
   useEffect(() => {

@@ -19,5 +19,14 @@
   "customStations": [],
   "customWebcams": [],
   "customTvChannels": [],
-  "apiUrl": "https://slynet-api.tenylse.workers.dev"
+  "apiUrl": "https://slynet-api.tenylse.workers.dev",
+  "hiddenSections": [],
+  "hiddenCountries": {
+    "radio": [],
+    "tv": [
+      "RU"
+    ],
+    "webcams": []
+  },
+  "defaultViewMode": "grid"
 }

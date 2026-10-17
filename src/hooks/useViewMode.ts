@@ -4,11 +4,21 @@ export type ViewMode = 'grid' | 'list';
 const KEY = 'slynet_view_mode';
 const EVENT = 'slynet_view_mode_changed';
 
+let siteDefault: ViewMode = 'grid';
+/** Вид по умолчанию для всех посетителей (задаётся в админке) */
+export function setDefaultViewMode(m?: string) {
+  const next: ViewMode = m === 'list' ? 'list' : 'grid';
+  if (next === siteDefault) return;
+  siteDefault = next;
+  window.dispatchEvent(new CustomEvent(EVENT));
+}
+
 function read(): ViewMode {
   try {
-    return localStorage.getItem(KEY) === 'list' ? 'list' : 'grid';
+    const v = localStorage.getItem(KEY);
+    return v === 'list' || v === 'grid' ? v : siteDefault;
   } catch {
-    return 'grid';
+    return siteDefault;
   }
 }
 
