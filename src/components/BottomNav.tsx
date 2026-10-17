@@ -49,6 +49,26 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onSelectTab, f
                 <X className="w-6 h-6" />
               </button>
             </div>
+            <div className="grid grid-cols-2 gap-2 mb-2">
+              <button
+                onClick={() => {
+                  setMoreOpen(false);
+                  window.dispatchEvent(new CustomEvent('slynet_open_sync'));
+                }}
+                className="py-3 rounded-2xl bg-emerald-500/15 border border-emerald-500/40 text-emerald-200 text-sm font-bold"
+              >
+                👤 Вход и синхронизация
+              </button>
+              <button
+                onClick={() => {
+                  setMoreOpen(false);
+                  window.dispatchEvent(new CustomEvent('slynet_open_support'));
+                }}
+                className="py-3 rounded-2xl bg-zinc-900 border border-zinc-800 text-zinc-200 text-sm font-bold"
+              >
+                ✉️ Поддержка
+              </button>
+            </div>
             <div className="grid grid-cols-3 gap-2 mb-3">
               {more.map((t) => {
                 const Icon = t.icon;

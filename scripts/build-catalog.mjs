@@ -24,6 +24,7 @@ const UA = 'SlyNetRadio-CatalogBot/1.0 (+https://github.com/tenyls/slynet-radio)
 const RB = ['https://de1.api.radio-browser.info', 'https://de2.api.radio-browser.info', 'https://fi1.api.radio-browser.info', 'https://nl1.api.radio-browser.info'];
 const log = (...a) => console.log(new Date().toISOString().slice(11, 19), ...a);
 
+const stats = {};
 const data = JSON.parse(await fs.readFile(path.join(ROOT, 'src/data/artist-search.json'), 'utf8'));
 
 // ---------- утилиты ----------
@@ -230,6 +231,7 @@ async function buildSeries() {
     if (!prev || s.clickcount > prev.clickcount) byArtist.set(k, s);
   }
   const list = [...byArtist.values()];
+  stats.seriesChecked = list.length;
   const alive = await pool(list, 25, (s) => audioAlive(s.url_resolved));
   const ok = list.filter((_, i) => alive[i]).sort((a, b) => artistLabel(a.name).localeCompare(artistLabel(b.name)));
   log(`серии: ${ok.length}/${list.length} рабочих`);
@@ -297,6 +299,7 @@ async function buildTv() {
       quality: st.quality,
     };
   });
+  stats.tvCandidates = cand.length;
   log(`ТВ: кандидатов ${cand.length}, проверяем…`);
   const ok = await pool(cand, 30, (c) => hlsPlayableInBrowser(c.stream));
   const tv = cand.filter((_, i) => ok[i]).sort((a, b) => a.country.localeCompare(b.country) || a.name.localeCompare(b.name));
@@ -340,6 +343,7 @@ const catalog = {
   tv: await safe('ТВ', buildTv, prev.tv || []),
   deadLinks: await safe('ссылки', buildDeadLinks, prev.deadLinks || []),
 };
+catalog.stats = stats;
 
 await fs.writeFile(OUT, JSON.stringify(catalog));
 log(`готово: ${OUT} (${(JSON.stringify(catalog).length / 1024).toFixed(0)} КБ)`);

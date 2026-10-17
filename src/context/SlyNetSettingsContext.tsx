@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { SlyNetSettings, ThemeId } from '../types/radio';
 import { isOwnerMode } from '../utils/owner';
+import { setApiBase } from '../services/apiService';
 
 /** Личные настройки посетителя (тема, язык) — хранятся только на его устройстве. */
 export const SETTINGS_KEY = 'slynet_user_prefs_v3';
@@ -19,6 +20,9 @@ export const SITE_FIELDS = [
   'customTvChannels',
   'featuredStation',
   'contactEmail',
+  'apiUrl',
+  'partners',
+  'adminLock',
   'legalContact',
   'heroTitle',
   'heroSubtitle',
@@ -74,10 +78,10 @@ function readJson(key: string): any {
 /** Только проверенные поля из content.json, чтобы битый файл не уронил сайт. */
 export function sanitizeSiteContent(raw: any): SiteContent {
   const c: any = pick(raw, SITE_FIELDS as unknown as string[]);
-  for (const k of ['customLinks', 'customWebcams', 'customStations', 'customTvChannels']) {
+  for (const k of ['customLinks', 'customWebcams', 'customStations', 'customTvChannels', 'partners']) {
     if (c[k] !== undefined && !Array.isArray(c[k])) delete c[k];
   }
-  for (const k of ['contactEmail', 'legalContact', 'appTitle', 'appSubtitle', 'customLogoUrl', 'telegramUrl', 'heroTitle', 'heroSubtitle', 'appVersion', 'versionChangelog', 'dmcaPolicy']) {
+  for (const k of ['apiUrl', 'adminLock', 'contactEmail', 'legalContact', 'appTitle', 'appSubtitle', 'customLogoUrl', 'telegramUrl', 'heroTitle', 'heroSubtitle', 'appVersion', 'versionChangelog', 'dmcaPolicy']) {
     if (c[k] !== undefined && typeof c[k] !== 'string') delete c[k];
   }
   const fs = c.featuredStation;
@@ -190,6 +194,7 @@ export const SlyNetSettingsProvider: React.FC<{ children: React.ReactNode }> = (
     appVersion: APP_VERSION,
   } as SlyNetSettings;
   if (!settings.customLogoUrl) settings.customLogoUrl = DEFAULT_SETTINGS.customLogoUrl;
+  setApiBase(settings.apiUrl);
 
   // Тема
   useEffect(() => {

@@ -30,6 +30,9 @@ import { SlyNetSettings, Station, CustomSocialLink, WebcamCity } from '../types/
 import { SlyNetLogo } from './SlyNetLogo';
 import { FeaturedStationPicker } from './FeaturedStationPicker';
 import { AdminTvTab } from './AdminTvTab';
+import { AdminLogin, AdminServerTab, AdminMessagesTab, AdminPartnersTab } from './AdminExtras';
+import { api, adminToken, hasApi } from '../services/apiService';
+import { fetchCatalogStats } from '../services/radioApi';
 import { loadCatalog, Catalog } from '../services/catalogService';
 import { optimizeImageFile, buildSiteContent, sanitizeSiteContent, useSlyNetSettings } from '../context/SlyNetSettingsContext';
 
@@ -64,10 +67,16 @@ export const AdminModal: React.FC<AdminModalProps> = ({
   onDeleteCustomStation,
 }) => {
   const { hasDraft, discardDraft } = useSlyNetSettings();
-  const [activeTab, setActiveTab] = useState<'brand' | 'cms' | 'webcams' | 'backup' | 'scanner' | 'stations' | 'tv'>('brand');
+  const [activeTab, setActiveTab] = useState<'brand' | 'cms' | 'webcams' | 'backup' | 'scanner' | 'stations' | 'tv' | 'server' | 'messages' | 'partners'>('brand');
+  const [unlocked, setUnlocked] = useState(false);
+  const [publishState, setPublishState] = useState<string | null>(null);
+  const [rbStats, setRbStats] = useState<any>(null);
   const [catalog, setCatalog] = useState<Catalog | null>(null);
   React.useEffect(() => {
-    if (isOpen) loadCatalog().then(setCatalog);
+    if (isOpen) {
+      loadCatalog().then(setCatalog);
+      fetchCatalogStats().then(setRbStats);
+    }
   }, [isOpen]);
 
   // Brand edit state
@@ -453,11 +462,8 @@ export const AdminModal: React.FC<AdminModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-fade-in overflow-y-auto">
-      <div
-        className="relative w-full max-w-3xl bg-zinc-900 border border-zinc-800 rounded-3xl shadow-2xl text-zinc-100 overflow-hidden my-6"
-        onClick={(e) => e.stopPropagation()}
-      >
+    <div className="fixed inset-0 z-[70] bg-zinc-950 animate-fade-in flex flex-col" style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
+      <div className="relative w-full max-w-5xl mx-auto flex-1 min-h-0 flex flex-col bg-zinc-900 text-zinc-100 sm:border-x border-zinc-800" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-zinc-800 bg-zinc-950/40">
           <div className="flex items-center gap-3">
@@ -470,13 +476,31 @@ export const AdminModal: React.FC<AdminModalProps> = ({
             </div>
           </div>
 
-          <button
-            onClick={onClose}
-            className="p-2 text-zinc-400 hover:text-white rounded-full hover:bg-zinc-800 transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={() => {
+                adminToken.set(null);
+                try {
+                  localStorage.removeItem('slynet_owner_mode');
+                  sessionStorage.removeItem('slynet_admin_unlocked');
+                } catch {}
+                window.location.href = window.location.pathname;
+              }}
+              className="px-3 py-2 rounded-xl text-xs font-semibold text-zinc-300 bg-zinc-800 hover:bg-zinc-700"
+              title="Выйти из админки и скрыть кнопку на этом устройстве"
+            >
+              Выйти из админки
+            </button>
+            <button onClick={onClose} className="px-3 py-2 rounded-xl text-xs font-bold text-zinc-950 bg-emerald-500 hover:bg-emerald-400 flex items-center gap-1.5">
+              <X className="w-4 h-4" /> Закрыть
+            </button>
+          </div>
         </div>
+
+        {!unlocked ? (
+          <AdminLogin settings={settings} onUnlocked={() => setUnlocked(true)} onSetLock={(lock) => onUpdateSettings({ adminLock: lock })} />
+        ) : (
+        <div className="flex-1 min-h-0 overflow-y-auto">
 
         {/* Публикация изменений */}
         <div className="m-4 sm:m-5 mb-0 p-4 rounded-2xl bg-emerald-950/40 border border-emerald-500/30 text-xs text-zinc-300 space-y-3">
@@ -501,6 +525,23 @@ export const AdminModal: React.FC<AdminModalProps> = ({
               <Download className="w-4 h-4" />
               Скачать content.json
             </button>
+            {hasApi() && (
+              <button
+                type="button"
+                onClick={async () => {
+                  setPublishState('Публикуем…');
+                  try {
+                    await api('/admin/publish', { body: { content: buildSiteContent(settings) }, token: adminToken.get() });
+                    setPublishState('✓ Опубликовано. Через 1–2 минуты сайт обновится у всех.');
+                  } catch (e: any) {
+                    setPublishState(`Не получилось: ${e?.message || 'ошибка'}. Можно опубликовать вручную через content.json.`);
+                  }
+                }}
+                className="px-4 py-2.5 bg-cyan-500 hover:bg-cyan-400 text-zinc-950 font-bold rounded-xl flex items-center gap-2"
+              >
+                🚀 Опубликовать на сайте
+              </button>
+            )}
             {hasDraft && (
               <button
                 type="button"
@@ -514,14 +555,30 @@ export const AdminModal: React.FC<AdminModalProps> = ({
               </button>
             )}
             {backupDownloadNotice && <span className="self-center text-emerald-400 font-medium">✓ Файл скачан</span>}
+            {publishState && <span className="self-center text-cyan-300 font-medium">{publishState}</span>}
           </div>
           <div className="pt-3 border-t border-emerald-500/20 space-y-2">
             <p>
               <b className="text-white">Автопроверка каталога</b> (каждый день, 05:17 по Берлину): станции артистов, телеканалы, ссылки камер. Нерабочее убирается с сайта само.
               {catalog?.generatedAt
-                ? ` Последняя проверка: ${new Date(catalog.generatedAt).toLocaleString('ru-RU')}. Телеканалов: ${catalog.tv.length}, станций артистов: ${catalog.series.length}.`
+                ? ` Последняя проверка: ${new Date(catalog.generatedAt).toLocaleString('ru-RU')}.`
                 : ' Ещё не запускалась.'}
             </p>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {[
+                ['Радиостанций в мировом каталоге', rbStats?.stations],
+                ['Из них нерабочих (скрыты)', rbStats?.stations_broken],
+                ['Телеканалов работает', catalog ? `${catalog.tv.length}${(catalog as any).stats?.tvCandidates ? ` из ${(catalog as any).stats.tvCandidates}` : ''}` : '…'],
+                ['Станций артистов работает', catalog ? `${catalog.series.length}${(catalog as any).stats?.seriesChecked ? ` из ${(catalog as any).stats.seriesChecked}` : ''}` : '…'],
+                ['Артистов показано', catalog ? `${Object.values(catalog.artists).filter((l) => l.length).length} из ${Object.keys(catalog.artists).length}` : '…'],
+                ['Скрыто нерабочих ссылок', catalog?.deadLinks.length ?? '…'],
+              ].map(([label, value]) => (
+                <div key={String(label)} className="p-2.5 rounded-xl bg-zinc-950/60 border border-zinc-800">
+                  <div className="text-base font-bold text-white">{typeof value === 'number' ? value.toLocaleString('ru-RU') : value ?? '…'}</div>
+                  <div className="text-[10px] text-zinc-400 leading-tight">{label}</div>
+                </div>
+              ))}
+            </div>
             <a
               href="https://github.com/tenyls/slynet-radio/actions/workflows/catalog.yml"
               target="_blank"
@@ -548,7 +605,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({
           /* Authenticated Admin Views */
           <div>
             {/* Tabs Bar */}
-            <div className="flex border-b border-zinc-800 px-5 pt-2 gap-2 overflow-x-auto scrollbar-none">
+            <div className="sticky top-0 z-10 bg-zinc-900 flex flex-wrap border-b border-zinc-800 px-3 sm:px-5 pt-2 gap-x-1 gap-y-0">
               <button
                 onClick={() => setActiveTab('brand')}
                 className={`pb-3 px-3 text-xs sm:text-sm font-semibold transition-colors border-b-2 whitespace-nowrap flex items-center gap-1.5 ${
@@ -572,6 +629,24 @@ export const AdminModal: React.FC<AdminModalProps> = ({
                 <Edit3 className="w-4 h-4" />
                 <span>CMS / Контент</span>
               </button>
+
+              {(
+                [
+                  ['server', '🛰 Сервер'],
+                  ['messages', '✉️ Сообщения'],
+                  ['partners', '🤝 Партнёры'],
+                ] as const
+              ).map(([id, label]) => (
+                <button
+                  key={id}
+                  onClick={() => setActiveTab(id)}
+                  className={`pb-3 px-3 text-xs sm:text-sm font-semibold transition-colors border-b-2 whitespace-nowrap ${
+                    activeTab === id ? 'border-emerald-400 text-emerald-400' : 'border-transparent text-zinc-400 hover:text-zinc-200'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
 
               <button
                 onClick={() => setActiveTab('tv')}
@@ -615,7 +690,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({
                 }`}
               >
                 <Radio className="w-4 h-4" />
-                <span>Свои станции ({customStations.length})</span>
+                <span>📻 Свои радиостанции ({customStations.length})</span>
               </button>
 
               <button
@@ -633,7 +708,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({
 
             {/* TAB 1: Brand & Logo */}
             {activeTab === 'brand' && (
-              <div className="p-5 sm:p-6 space-y-6 max-h-[70vh] overflow-y-auto">
+              <div className="p-5 sm:p-6 space-y-6">
                 {/* Logo Uploader Card */}
                 <div className="p-4 rounded-2xl bg-zinc-950/60 border border-zinc-800">
                   <label className="text-xs font-bold text-zinc-200 uppercase tracking-wider block mb-3">
@@ -770,7 +845,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({
 
             {/* TAB 2: CMS / Content Management */}
             {activeTab === 'cms' && (
-              <div className="p-5 sm:p-6 space-y-5 max-h-[70vh] overflow-y-auto">
+              <div className="p-5 sm:p-6 space-y-5">
                 <div className="p-3.5 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 text-xs text-cyan-300 flex items-center gap-2">
                   <Sparkles className="w-4 h-4 shrink-0 text-cyan-400" />
                   <span>
@@ -981,7 +1056,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({
 
             {/* TAB: Webcams Manager */}
             {activeTab === 'webcams' && (
-              <div className="p-5 sm:p-6 space-y-6 max-h-[70vh] overflow-y-auto">
+              <div className="p-5 sm:p-6 space-y-6">
                 <div className="p-4 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 text-xs text-cyan-300 flex items-center gap-2.5">
                   <Video className="w-5 h-5 text-cyan-400 shrink-0" />
                   <span>
@@ -1140,12 +1215,16 @@ export const AdminModal: React.FC<AdminModalProps> = ({
             )}
 
             {/* TAB: Full Server/Site Backup */}
+            {activeTab === 'server' && <AdminServerTab apiUrl={settings.apiUrl || ''} onSave={(url) => onUpdateSettings({ apiUrl: url })} />}
+            {activeTab === 'messages' && <AdminMessagesTab hasServer={hasApi()} />}
+            {activeTab === 'partners' && <AdminPartnersTab partners={settings.partners || []} onChange={(p) => onUpdateSettings({ partners: p })} />}
+
             {activeTab === 'tv' && (
               <AdminTvTab channels={settings.customTvChannels || []} onChange={(list) => onUpdateSettings({ customTvChannels: list })} />
             )}
 
             {activeTab === 'backup' && (
-              <div className="p-5 sm:p-6 space-y-6 max-h-[70vh] overflow-y-auto">
+              <div className="p-5 sm:p-6 space-y-6">
                 {/* Intro banner */}
                 <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-950/60 to-zinc-900 border border-emerald-500/30 text-xs text-emerald-300 flex items-start gap-3">
                   <HardDrive className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
@@ -1258,7 +1337,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({
 
             {/* TAB 3: Broken Stream Scanner */}
             {activeTab === 'scanner' && (
-              <div className="p-5 sm:p-6 space-y-5 max-h-[70vh] overflow-y-auto">
+              <div className="p-5 sm:p-6 space-y-5">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-zinc-950/70 border border-zinc-800 rounded-2xl">
                   <div>
                     <h3 className="text-sm font-bold text-white flex items-center gap-2">
@@ -1351,7 +1430,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({
 
             {/* TAB 4: Custom Stations */}
             {activeTab === 'stations' && (
-              <div className="p-5 sm:p-6 space-y-6 max-h-[70vh] overflow-y-auto">
+              <div className="p-5 sm:p-6 space-y-6">
                 {/* Form to add station */}
                 <form
                   onSubmit={handleAddStationSubmit}
@@ -1522,6 +1601,8 @@ export const AdminModal: React.FC<AdminModalProps> = ({
               </div>
             )}
           </div>
+        )}
+        </div>
         )}
       </div>
     </div>

@@ -628,7 +628,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
 
     poll();
-    const interval = setInterval(poll, 15000);
+    const interval = setInterval(poll, 20000);
 
     return () => {
       cancelled = true;

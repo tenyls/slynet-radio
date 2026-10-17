@@ -3,7 +3,7 @@ import { Tv, Play, ExternalLink, Search, Youtube, Globe, AlertTriangle, Loader2,
 import { loadCatalog, CatalogTvChannel } from '../services/catalogService';
 import { useAudio } from '../context/AudioPlayerContext';
 import { useSlyNetSettings } from '../context/SlyNetSettingsContext';
-import { guessUserCountry } from '../services/radioApi';
+import { getMyCountry } from '../services/geoService';
 
 /**
  * Телеканалы мира.
@@ -109,8 +109,9 @@ export const LiveTVView: React.FC = () => {
       const all = [...custom, ...c.tv];
       setChannels(all);
       // Сначала показываем каналы страны пользователя, если они есть
-      const mine = guessUserCountry();
-      if (mine && all.some((ch) => ch.country === mine)) setCountry(mine);
+      getMyCountry().then((mine) => {
+        if (mine && all.some((ch) => ch.country === mine)) setCountry(mine);
+      });
       if (!c.tv.length && !custom.length) setTab('links');
     });
   }, [settings.customTvChannels]);

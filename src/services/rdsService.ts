@@ -12,6 +12,7 @@
 
 import { Station } from '../types/radio';
 import { METADATA_PROXY_URL } from '../config';
+import { getApiBase } from './apiService';
 
 /**
  * Clean up raw stream metadata / icy title:
@@ -209,10 +210,17 @@ const icecastStatus: Fetcher = async (station, url) => {
 };
 
 /** ICY-метаданные потока через прокси на Cloudflare Workers (если настроен) */
+// Станции без названий в потоке запоминаем, чтобы не тратить лимит сервера (100 000 запросов/сутки)
+const icyMisses = new Map<string, number>();
 const icyProxy: Fetcher = async (station, url) => {
-  if (!METADATA_PROXY_URL) return null;
-  const json = await getJson(`${METADATA_PROXY_URL}?url=${encodeURIComponent(url)}`, 6000);
-  return cleanTrackTitle(json?.title || '', station.name);
+  if ((icyMisses.get(url) || 0) >= 2) return null;
+  if (typeof document !== 'undefined' && document.hidden) return null;
+  const base = getApiBase() ? `${getApiBase()}/meta` : METADATA_PROXY_URL;
+  if (!base) return null;
+  const json = await getJson(`${base}?url=${encodeURIComponent(url)}`, 6000);
+  const title = cleanTrackTitle(json?.title || '', station.name);
+  icyMisses.set(url, title ? 0 : (icyMisses.get(url) || 0) + 1);
+  return title;
 };
 
 const FETCHERS: Fetcher[] = [somaFm, lautFm, radioRecord, icecastStatus, icyProxy];

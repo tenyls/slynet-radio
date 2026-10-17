@@ -29,8 +29,10 @@ function load(): Station[] {
 export function saveFavorites(list: Station[]) {
   try {
     localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(list));
+    localStorage.setItem('slynet_sync_local_updated', String(Date.now()));
   } catch {}
   window.dispatchEvent(new CustomEvent(CHANGE_EVENT));
+  window.dispatchEvent(new CustomEvent('slynet_local_change'));
 }
 
 export function useFavorites() {

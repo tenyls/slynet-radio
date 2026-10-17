@@ -5,6 +5,9 @@ import { useFavorites, saveFavorites } from '../hooks/useFavorites';
 import { useAudio } from '../context/AudioPlayerContext';
 import { useSlyNetSettings } from '../context/SlyNetSettingsContext';
 import { fetchStationsByUuids } from '../services/radioApi';
+import { api, hasApi, userSession } from '../services/apiService';
+import { syncNow, lastSyncAt } from '../services/syncService';
+import { LogIn, LogOut, UserPlus, RefreshCw, Loader2, Trash2 } from 'lucide-react';
 
 const RECOGNIZED_TRACKS_KEY = 'slynet_recognized_tracks_v1';
 const IMPORT_HASH = 'fav=';
@@ -53,7 +56,7 @@ export const SyncModal: React.FC<SyncModalProps> = ({ onClose }) => {
   const { favorites } = useFavorites();
   const { recognizedTracks } = useAudio();
   const { settings } = useSlyNetSettings();
-  const [tab, setTab] = useState<'link' | 'file'>('link');
+  const [tab, setTab] = useState<'account' | 'link' | 'file'>(hasApi() ? 'account' : 'link');
   const [status, setStatus] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -150,7 +153,7 @@ export const SyncModal: React.FC<SyncModalProps> = ({ onClose }) => {
     e.target.value = '';
   };
 
-  const tabBtn = (id: 'link' | 'file', icon: React.ReactNode, label: string) => (
+  const tabBtn = (id: 'account' | 'link' | 'file', icon: React.ReactNode, label: string) => (
     <button
       onClick={() => setTab(id)}
       className={`flex-1 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-colors ${
@@ -174,8 +177,8 @@ export const SyncModal: React.FC<SyncModalProps> = ({ onClose }) => {
               <Share2 className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-white">Перенос на другое устройство</h2>
-              <p className="text-xs text-zinc-400">Без регистрации — данные хранятся только у вас</p>
+              <h2 className="text-base font-bold text-white">Синхронизация устройств</h2>
+              <p className="text-xs text-zinc-400">Избранное на телефоне и компьютере одновременно</p>
             </div>
           </div>
           <button onClick={onClose} aria-label="Закрыть" className="p-1.5 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-800">
@@ -184,7 +187,8 @@ export const SyncModal: React.FC<SyncModalProps> = ({ onClose }) => {
         </div>
 
         <div className="mx-5 mt-4 p-1 rounded-2xl bg-zinc-900 border border-zinc-800 flex gap-1">
-          {tabBtn('link', <QrCode className="w-4 h-4" />, 'QR-код / ссылка')}
+          {hasApi() && tabBtn('account', <LogIn className="w-4 h-4" />, 'Аккаунт')}
+          {tabBtn('link', <QrCode className="w-4 h-4" />, 'QR / ссылка')}
           {tabBtn('file', <FileText className="w-4 h-4" />, 'Файл копии')}
         </div>
 
@@ -212,6 +216,8 @@ export const SyncModal: React.FC<SyncModalProps> = ({ onClose }) => {
               </div>
             </div>
           </div>
+
+          {tab === 'account' && <AccountPanel onStatus={flash} />}
 
           {tab === 'link' && (
             <div className="space-y-4">
@@ -270,5 +276,112 @@ export const SyncModal: React.FC<SyncModalProps> = ({ onClose }) => {
         </div>
       </div>
     </div>
+  );
+};
+
+/** Вход по логину и паролю: избранное одинаково на всех устройствах */
+const AccountPanel: React.FC<{ onStatus: (m: string) => void }> = ({ onStatus }) => {
+  const [session, setSession] = useState(userSession.get());
+  const [mode, setMode] = useState<'login' | 'register'>('login');
+  const [login, setLogin] = useState('');
+  const [password, setPassword] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const input = 'w-full text-sm py-2.5 px-3.5 rounded-xl bg-zinc-950 border border-zinc-800 focus:border-emerald-400 focus:outline-none text-white';
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setBusy(true);
+    setError(null);
+    try {
+      const r = await api<{ token: string; login: string }>(mode === 'login' ? '/sync/login' : '/sync/register', { body: { login, password } });
+      userSession.set(r.token, r.login);
+      setSession({ token: r.token, login: r.login });
+      await syncNow({ mergeFirst: true });
+      onStatus(mode === 'login' ? 'Вход выполнен, избранное синхронизировано' : 'Аккаунт создан, избранное сохранено');
+      setPassword('');
+    } catch (err: any) {
+      setError(err?.message || 'Ошибка');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  if (session.token) {
+    const last = lastSyncAt();
+    return (
+      <div className="space-y-3">
+        <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30">
+          <div className="text-xs text-emerald-300">Вы вошли как</div>
+          <div className="text-lg font-bold text-white">{session.login}</div>
+          <div className="text-[11px] text-zinc-400 mt-1">
+            Избранное синхронизируется автоматически. {last ? `Последняя синхронизация: ${new Date(last).toLocaleString('ru-RU')}` : ''}
+          </div>
+        </div>
+        <button
+          onClick={async () => {
+            setBusy(true);
+            try {
+              const r = await syncNow();
+              onStatus(r === 'pulled' ? 'Загружено с сервера' : 'Сохранено на сервере');
+            } catch (e: any) {
+              onStatus(e?.message || 'Ошибка синхронизации');
+            } finally {
+              setBusy(false);
+            }
+          }}
+          className="w-full py-3 rounded-xl bg-emerald-500 text-zinc-950 text-xs font-bold flex items-center justify-center gap-2"
+        >
+          {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />} Синхронизировать сейчас
+        </button>
+        <button
+          onClick={() => {
+            userSession.set(null, null);
+            setSession({ token: null, login: null });
+          }}
+          className="w-full py-3 rounded-xl bg-zinc-800 text-white text-xs font-bold flex items-center justify-center gap-2"
+        >
+          <LogOut className="w-4 h-4" /> Выйти (избранное останется на устройстве)
+        </button>
+        <button
+          onClick={async () => {
+            if (!confirm('Удалить аккаунт и все данные на сервере? Избранное на этом устройстве останется.')) return;
+            try {
+              await api('/sync/account', { method: 'DELETE', token: session.token });
+              userSession.set(null, null);
+              setSession({ token: null, login: null });
+              onStatus('Аккаунт удалён');
+            } catch (e: any) {
+              onStatus(e?.message || 'Ошибка');
+            }
+          }}
+          className="w-full py-2.5 rounded-xl text-rose-300 text-xs font-semibold flex items-center justify-center gap-2 hover:bg-rose-500/10"
+        >
+          <Trash2 className="w-4 h-4" /> Удалить аккаунт
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={submit} className="space-y-3">
+      <p className="text-xs text-zinc-400 leading-relaxed">Без почты и телефона: придумайте логин и пароль. Войдите с тем же логином на другом устройстве — избранное появится там.</p>
+      <div className="grid grid-cols-2 gap-1 p-1 rounded-xl bg-zinc-950 border border-zinc-800">
+        <button type="button" onClick={() => setMode('login')} className={`py-2 rounded-lg text-xs font-bold ${mode === 'login' ? 'bg-zinc-700 text-white' : 'text-zinc-400'}`}>
+          Вход
+        </button>
+        <button type="button" onClick={() => setMode('register')} className={`py-2 rounded-lg text-xs font-bold ${mode === 'register' ? 'bg-zinc-700 text-white' : 'text-zinc-400'}`}>
+          Регистрация
+        </button>
+      </div>
+      <input className={input} value={login} onChange={(e) => setLogin(e.target.value)} placeholder="Логин" autoComplete="username" autoCapitalize="none" />
+      <input className={input} type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder={mode === 'register' ? 'Пароль (от 6 символов)' : 'Пароль'} autoComplete={mode === 'register' ? 'new-password' : 'current-password'} />
+      {error && <p className="text-xs text-rose-400">{error}</p>}
+      <button type="submit" disabled={busy} className="w-full py-3 rounded-xl bg-emerald-500 text-zinc-950 text-sm font-bold flex items-center justify-center gap-2">
+        {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : mode === 'login' ? <LogIn className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
+        {mode === 'login' ? 'Войти' : 'Создать аккаунт'}
+      </button>
+      <p className="text-[11px] text-zinc-500">Пароль хранится на сервере в зашифрованном виде (PBKDF2). Аккаунт можно удалить в любой момент.</p>
+    </form>
   );
 };

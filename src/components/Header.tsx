@@ -1,4 +1,5 @@
 import { liveFallbackLabel } from '../services/rdsService';
+import { getMyCountry } from '../services/geoService';
 import React, { useState, useRef } from 'react';
 import {
   Search,
@@ -212,7 +213,7 @@ export const Header: React.FC<HeaderProps> = ({
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 text-xs font-semibold text-zinc-300 hover:text-white transition-colors shrink-0"
             >
               <Share2 className="w-3.5 h-3.5 text-cyan-400" />
-              <span>Sync</span>
+              <span>Вход</span>
             </button>
 
             {/* Admin button — owner mode only */}
@@ -267,6 +268,22 @@ export const Header: React.FC<HeaderProps> = ({
                 }}
                 placeholder={t.searchCountry}
               />
+
+              {/* Быстрый фильтр «моя страна» */}
+              <button
+                type="button"
+                onClick={async () => {
+                  const cc = await getMyCountry();
+                  if (cc) {
+                    if (currentTab === 'artists') onSelectTab && onSelectTab('popular');
+                    onSelectCountry(selectedCountry === cc ? '' : cc);
+                  }
+                }}
+                title="Показать станции моей страны"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border shrink-0 bg-zinc-900/90 hover:bg-zinc-800 text-zinc-200 border-zinc-800 hover:border-cyan-400/40"
+              >
+                📍 <span>Моя страна</span>
+              </button>
 
               {/* Artists & Groups Selector Button */}
               {(() => {

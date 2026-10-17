@@ -185,6 +185,15 @@ export interface WebcamCity {
   isCustom?: boolean;
 }
 
+export interface PartnerLink {
+  id: string;
+  title: string;
+  url: string;
+  description?: string;
+  image?: string;
+  isAd?: boolean; // платная реклама → помечается «Реклама» (требование закона ЕС)
+}
+
 export interface CustomSocialLink {
   id: string;
   title: string;
@@ -201,6 +210,9 @@ export interface SlyNetSettings {
   customStations?: Station[]; // Stations added via Admin (content.json)
   customTvChannels?: LiveTvChannel[]; // TV channels added via Admin (content.json)
   featuredStation?: Station | null;
+  apiUrl?: string; // адрес мини-сервера slynet-api (Cloudflare Worker)
+  partners?: PartnerLink[]; // блок «Рекомендуем / Партнёры»
+  adminLock?: string; // отпечаток пароля админки (если сервер не настроен)
   contactEmail?: string; // e-mail для связи (политика конфиденциальности, магазины)
   legalContact?: string; // Impressum / контактные данные владельца // «Станция SlyNet Radio» — назначается в админке
   isPro: boolean;

@@ -10,6 +10,10 @@ import { useSlyNetSettings, SlyNetSettingsProvider } from './context/SlyNetSetti
 import { useCustomStations } from './hooks/useCustomStations';
 import { fetchStations, fetchCatalogStats, fetchStationsByUuids, guessUserCountry } from './services/radioApi';
 import { MobileHome } from './components/MobileHome';
+import { syncNow } from './services/syncService';
+import { getMyCountry } from './services/geoService';
+import { SupportModal } from './components/SupportModal';
+import { PartnersBlock } from './components/PartnersBlock';
 import { Station, MainTab, BitrateFilter, GenreCategory } from './types/radio';
 import { GENRES } from './constants/genres';
 import { Sidebar } from './components/Sidebar';
@@ -103,6 +107,37 @@ function RadioApp() {
   const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
   const [catalogCount, setCatalogCount] = useState<number | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+
+  // Автосинхронизация избранного (если пользователь вошёл в аккаунт)
+  useEffect(() => {
+    let timer: any;
+    const t0 = setTimeout(() => syncNow().catch(() => {}), 1500);
+    const onChange = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => syncNow().catch(() => {}), 2000);
+    };
+    const onFocus = () => syncNow().catch(() => {});
+    window.addEventListener('slynet_local_change', onChange);
+    window.addEventListener('focus', onFocus);
+    return () => {
+      clearTimeout(t0);
+      clearTimeout(timer);
+      window.removeEventListener('slynet_local_change', onChange);
+      window.removeEventListener('focus', onFocus);
+    };
+  }, [settings.apiUrl]);
+
+  const [isSupportOpen, setIsSupportOpen] = useState(false);
+  useEffect(() => {
+    const open = () => setIsSupportOpen(true);
+    const openSync = () => setIsSyncModalOpen(true);
+    window.addEventListener('slynet_open_support', open);
+    window.addEventListener('slynet_open_sync', openSync);
+    return () => {
+      window.removeEventListener('slynet_open_support', open);
+      window.removeEventListener('slynet_open_sync', openSync);
+    };
+  }, []);
 
   // Ссылка «поделиться станцией»: #station=<uuid>
   const [sharedStation, setSharedStation] = useState<Station | null>(null);
@@ -286,7 +321,10 @@ function RadioApp() {
     }
   };
 
-  const userCountry = useMemo(() => guessUserCountry(), []);
+  const [userCountry, setUserCountry] = useState(() => guessUserCountry());
+  useEffect(() => {
+    getMyCountry().then((cc) => cc && setUserCountry(cc));
+  }, [settings.apiUrl]);
 
   const playList = (list: Station[]) => {
     if (!list.length) {
@@ -868,12 +906,15 @@ function RadioApp() {
             <InfoTelegramView
               telegramUrl={settings.telegramUrl}
               onOpenAdmin={isOwnerMode ? () => setIsAdminModalOpen(true) : undefined}
-              onSuggestStation={() => setIsSuggestModalOpen(true)}
+              onSuggestStation={() => setIsSupportOpen(true)}
             />
           )}
+          {(currentTab === 'popular' || currentTab === 'info') && <PartnersBlock partners={settings.partners} />}
+
           <footer className="mt-12 pt-5 border-t border-zinc-900 text-[11px] text-zinc-500 flex flex-wrap gap-x-4 gap-y-1">
             <span>© {new Date().getFullYear()} {settings.appTitle}</span>
             <a href="./privacy.html" className="hover:text-zinc-300 underline-offset-2 hover:underline">Политика конфиденциальности</a>
+            <button onClick={() => setIsSupportOpen(true)} className="hover:text-zinc-300 underline-offset-2 hover:underline">Написать в поддержку</button>
             <span>Каталог станций: Radio Browser · laut.fm</span>
             <span>Эфиры принадлежат их правообладателям</span>
           </footer>
@@ -959,6 +1000,10 @@ function RadioApp() {
       {/* Sync Profile Modal */}
       {isSyncModalOpen && (
         <SyncModal onClose={() => setIsSyncModalOpen(false)} />
+      )}
+
+      {isSupportOpen && (
+        <SupportModal onClose={() => setIsSupportOpen(false)} telegramUrl={settings.telegramUrl} contactEmail={settings.contactEmail} />
       )}
 
       {/* About & Changelog Modal */}
