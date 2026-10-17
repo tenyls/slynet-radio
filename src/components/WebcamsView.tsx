@@ -137,7 +137,7 @@ export const WebcamsView: React.FC<WebcamsViewProps> = ({ onOpenAdmin }) => {
               <Video className="w-5 h-5 stroke-[2.5]" />
             </span>
             <span className="text-xs font-mono font-bold uppercase tracking-wider text-cyan-400">
-              SLYNET GLOBAL LIVE VISION 24/7
+              ОТКРЫТЫЕ ВЕБ-КАМЕРЫ МИРА
             </span>
             <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30 flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-ping" />
@@ -224,8 +224,8 @@ export const WebcamsView: React.FC<WebcamsViewProps> = ({ onOpenAdmin }) => {
         </div>
       )}
 
-      {/* ACTIVE WEBCAM PLAYER STAGE (100% reliable Live Frame without black screens) */}
-      <div ref={playerRef} className="mb-8 rounded-3xl bg-zinc-950 border border-zinc-800 shadow-2xl overflow-hidden">
+      {/* Карточка выбранной камеры */}
+      <div ref={playerRef} className="mb-8 max-w-3xl mx-auto rounded-3xl bg-zinc-950 border border-zinc-800 shadow-2xl overflow-hidden">
         {/* Top Info Bar on Player */}
         <div className="flex flex-wrap items-center justify-between gap-3 p-4 bg-zinc-900/90 border-b border-zinc-800/80">
           <div className="flex items-center gap-3">
@@ -298,39 +298,32 @@ export const WebcamsView: React.FC<WebcamsViewProps> = ({ onOpenAdmin }) => {
             className="w-full h-full object-cover animate-fade-in"
           />
 
-          {/* Top Live Overlay watermark badges */}
-          <div className="absolute top-4 left-4 z-10 pointer-events-none flex items-center gap-2">
-            <span className="px-2.5 py-1 rounded-md bg-black/80 backdrop-blur-md text-[10px] font-mono font-bold text-rose-400 border border-rose-500/40 flex items-center gap-1.5 shadow-lg">
-              <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
-              LIVE 24/7
-            </span>
-            <span className="px-2.5 py-1 rounded-md bg-black/80 backdrop-blur-md text-[10px] font-mono font-medium text-zinc-300 border border-zinc-700/50 shadow-lg">
-              <Eye className="w-3 h-3 inline mr-1 text-cyan-400" />
-              {selectedCity.liveViews || '18.5k онлайн'}
+          {/* Это фото города, а не кадр камеры — честно говорим об этом */}
+          <div className="absolute top-3 left-3 z-10 pointer-events-none">
+            <span className="px-2.5 py-1 rounded-md bg-black/75 backdrop-blur-md text-[10px] font-medium text-zinc-300 border border-white/10">
+              Фото города · эфир на официальном сайте камеры
             </span>
           </div>
 
-          {/* Top Right Quick Actions: Manual Refresh */}
-          <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
-            <button
-              onClick={() => {
-                setMediaError(false);
-                setRefreshKey(Date.now());
-              }}
-              className="p-2 rounded-xl bg-black/70 hover:bg-black/90 text-white border border-white/10 backdrop-blur-md text-xs font-mono flex items-center gap-1.5 transition-transform active:scale-95 shadow-lg"
-              title="Обновить кадр камеры"
+          {selectedCity.directPortalUrl && (
+            <a
+              href={selectedCity.directPortalUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="absolute inset-0 z-[5] flex items-center justify-center bg-black/25 hover:bg-black/35 transition-colors"
+              aria-label="Смотреть прямой эфир на официальном сайте"
             >
-              <RefreshCw className="w-3.5 h-3.5 text-cyan-400" />
-              <span className="hidden sm:inline">Обновить кадр</span>
-            </button>
-          </div>
+              <span className="w-20 h-20 rounded-full bg-gradient-to-r from-cyan-500 to-emerald-400 text-zinc-950 flex items-center justify-center shadow-2xl">
+                <Play className="w-9 h-9 fill-current ml-1" />
+              </span>
+            </a>
+          )}
 
           {/* Bottom Bar on Video Stage: Direct Stream Link & Camera Portal */}
           <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/90 via-black/50 to-transparent flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center gap-2 text-xs text-white">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="font-semibold">{selectedCity.name} — Прямая трансляция</span>
-              <span className="text-zinc-400 hidden sm:inline">• Обновление кадра каждые 15 сек</span>
+              <span className="font-semibold">{selectedCity.name}</span>
+              <span className="text-zinc-400 hidden sm:inline">• трансляция откроется на сайте камеры</span>
             </div>
 
             {selectedCity.directPortalUrl && (
@@ -340,7 +333,7 @@ export const WebcamsView: React.FC<WebcamsViewProps> = ({ onOpenAdmin }) => {
                 rel="noopener noreferrer"
                 className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-400 hover:brightness-110 text-zinc-950 font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-lg active:scale-95 shrink-0"
               >
-                <span>Открыть прямой эфир</span>
+                <span>Смотреть прямой эфир</span>
                 <ExternalLink className="w-3.5 h-3.5" />
               </a>
             )}
@@ -442,8 +435,7 @@ export const WebcamsView: React.FC<WebcamsViewProps> = ({ onOpenAdmin }) => {
                 <tr className="border-b border-zinc-800 bg-zinc-900/90 text-[11px] font-mono text-zinc-400 uppercase tracking-wider">
                   <th className="py-3 px-4">Город & Локация</th>
                   <th className="py-3 px-4">Страна</th>
-                  <th className="py-3 px-4">Категория</th>
-                  <th className="py-3 px-4">Статус</th>
+                  <th className="py-3 px-4 hidden md:table-cell">Категория</th>
                   <th className="py-3 px-4 text-right">Действия</th>
                 </tr>
               </thead>
@@ -483,17 +475,10 @@ export const WebcamsView: React.FC<WebcamsViewProps> = ({ onOpenAdmin }) => {
                           {city.country}
                         </span>
                       </td>
-                      <td className="py-3 px-4 whitespace-nowrap">
+                      <td className="py-3 px-4 whitespace-nowrap hidden md:table-cell">
                         <span className="text-[11px] font-mono text-cyan-300 uppercase">
                           {city.category}
                         </span>
-                      </td>
-                      <td className="py-3 px-4 whitespace-nowrap">
-                        <div className="flex items-center gap-1.5">
-                          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                          <span className="font-mono text-emerald-400 font-semibold">LIVE</span>
-                          <span className="text-zinc-500 font-mono text-[11px]">({city.liveViews || '15k'})</span>
-                        </div>
                       </td>
                       <td className="py-3 px-4 text-right whitespace-nowrap">
                         <div className="flex items-center justify-end gap-2" onClick={(e) => e.stopPropagation()}>
@@ -502,7 +487,7 @@ export const WebcamsView: React.FC<WebcamsViewProps> = ({ onOpenAdmin }) => {
                             className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-400 text-zinc-950 font-bold text-xs flex items-center gap-1 shadow hover:brightness-110 active:scale-95 transition-all"
                           >
                             <Play className="w-3 h-3 fill-current" />
-                            <span>Смотреть</span>
+                            <span className="hidden sm:inline">Открыть</span>
                           </button>
                           {city.directPortalUrl && (
                             <a
@@ -557,9 +542,8 @@ export const WebcamsView: React.FC<WebcamsViewProps> = ({ onOpenAdmin }) => {
 
                   {/* Badges on Thumbnail */}
                   <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5">
-                    <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-rose-500/90 text-white flex items-center gap-1 shadow">
-                      <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
-                      LIVE
+                    <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-black/70 text-zinc-200 shadow">
+                      ВЕБ-КАМЕРА
                     </span>
                   </div>
 
@@ -595,7 +579,7 @@ export const WebcamsView: React.FC<WebcamsViewProps> = ({ onOpenAdmin }) => {
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                       {city.category.toUpperCase()}
                     </span>
-                    <span>{city.liveViews || '24/7 stream'}</span>
+                    <span>официальный сайт ↗</span>
                   </div>
                 </div>
               </div>

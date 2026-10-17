@@ -4,6 +4,8 @@ import { Station } from '../types/radio';
 import { useAudio } from '../context/AudioPlayerContext';
 import { findArtistStations, fetchArtistSeriesStations, artistLabel } from '../services/artistService';
 import { StationRow } from './StationRow';
+import { useViewMode } from '../hooks/useViewMode';
+import { LayoutGrid, List, ChevronDown } from 'lucide-react';
 import { loadCatalog, isCatalogReady } from '../services/catalogService';
 import {
   Mic2,
@@ -84,7 +86,10 @@ export const ArtistsView: React.FC<ArtistsViewProps> = ({
   const [available, setAvailable] = useState<Set<string> | null>(null);
   React.useEffect(() => {
     loadCatalog().then((c) => {
-      if (isCatalogReady(c)) setAvailable(new Set(Object.entries(c.artists).filter(([, l]) => l.length > 0).map(([id]) => id)));
+      if (isCatalogReady(c)) {
+        setAvailable(new Set(Object.entries(c.artists).filter(([, l]) => l.length > 0).map(([id]) => id)));
+        setFound((prev) => ({ ...c.artists, ...prev }));
+      }
     });
   }, []);
 
@@ -120,6 +125,28 @@ export const ArtistsView: React.FC<ArtistsViewProps> = ({
   // Найденные станции по каждому исполнителю (только с его именем в названии)
   const [found, setFound] = useState<Record<string, Station[]>>({});
   const [notice, setNotice] = useState<string | null>(null);
+  const [openId, setOpenId] = useState<string | null>(null);
+  const { mode, setMode } = useViewMode();
+
+  const stationList = (artist: ArtistItem) => {
+    const list = found[artist.id] || [];
+    return (
+      <div className="flex flex-col gap-1.5 p-3 pt-0">
+        {list.map((st) => (
+          <StationRow
+            key={st.stationuuid}
+            station={st}
+            isCurrent={currentStation?.stationuuid === st.stationuuid}
+            isPlaying={isPlaying}
+            isFavorite={isFavorite(st.stationuuid)}
+            trackTitle={currentTrackTitle}
+            onPlay={() => playStation(st, list)}
+            onToggleFavorite={() => onToggleFavorite(st)}
+          />
+        ))}
+      </div>
+    );
+  };
 
   const isArtistPlaying = (artistId: string) =>
     !!currentStation && (found[artistId] || []).some((s) => s.stationuuid === currentStation.stationuuid);
@@ -222,6 +249,17 @@ export const ArtistsView: React.FC<ArtistsViewProps> = ({
         })}
       </div>
 
+      <div className="flex justify-end -mb-2">
+        <div className="inline-flex p-1 rounded-xl bg-zinc-900/90 border border-zinc-800">
+          <button onClick={() => setMode('grid')} className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 ${mode === 'grid' ? 'bg-zinc-700 text-white' : 'text-zinc-400'}`}>
+            <LayoutGrid className="w-3.5 h-3.5" /> Плитка
+          </button>
+          <button onClick={() => setMode('list')} className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 ${mode === 'list' ? 'bg-zinc-700 text-white' : 'text-zinc-400'}`}>
+            <List className="w-3.5 h-3.5" /> Список
+          </button>
+        </div>
+      </div>
+
       {notice && (
         <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200 font-medium">{notice}</div>
       )}
@@ -281,6 +319,42 @@ export const ArtistsView: React.FC<ArtistsViewProps> = ({
             Попробуйте изменить поисковый запрос или выбрать другую букву алфавита
           </p>
         </div>
+      ) : mode === 'list' ? (
+        <div className="flex flex-col gap-1.5">
+          {filteredArtists.map((artist) => {
+            const list = found[artist.id];
+            const playingThis = isArtistPlaying(artist.id) && isPlaying;
+            return (
+              <div key={artist.id} className={`rounded-2xl border ${playingThis ? 'border-emerald-500/50 bg-emerald-950/20' : 'border-zinc-800 bg-zinc-900/50'}`}>
+                <div className="flex items-center gap-3 p-2.5">
+                  <button
+                    onClick={() => handlePlayArtist(artist)}
+                    className="w-10 h-10 rounded-full bg-gradient-to-r from-cyan-500 to-emerald-400 text-zinc-950 flex items-center justify-center shrink-0"
+                    aria-label="Слушать"
+                  >
+                    {loadingArtistId === artist.id ? (
+                      <div className="w-4 h-4 border-2 border-zinc-950 border-t-transparent rounded-full animate-spin" />
+                    ) : playingThis ? (
+                      <Pause className="w-4 h-4 fill-current" />
+                    ) : (
+                      <Play className="w-4 h-4 fill-current ml-0.5" />
+                    )}
+                  </button>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-sm font-bold text-white truncate">{artist.name}</div>
+                    <div className="text-[11px] text-zinc-400 truncate">{artist.genre}</div>
+                  </div>
+                  {list && list.length > 0 && (
+                    <button onClick={() => setOpenId(openId === artist.id ? null : artist.id)} className="px-2.5 py-1.5 rounded-lg bg-zinc-800 text-[11px] font-semibold text-zinc-200 flex items-center gap-1 shrink-0">
+                      {list.length} <ChevronDown className={`w-3.5 h-3.5 transition-transform ${openId === artist.id ? 'rotate-180' : ''}`} />
+                    </button>
+                  )}
+                </div>
+                {openId === artist.id && stationList(artist)}
+              </div>
+            );
+          })}
+        </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {filteredArtists.map((artist) => {
@@ -291,6 +365,8 @@ export const ArtistsView: React.FC<ArtistsViewProps> = ({
               <div
                 key={artist.id}
                 className={`group relative overflow-hidden rounded-3xl border transition-all duration-300 flex flex-col justify-between ${
+                  openId === artist.id ? 'sm:col-span-2 lg:col-span-3 xl:col-span-4 ' : ''
+                }${
                   isPlayingThis
                     ? 'bg-gradient-to-b from-zinc-900 to-emerald-950/40 border-emerald-500 shadow-xl shadow-emerald-500/10'
                     : 'bg-zinc-950/70 border-zinc-800/80 hover:border-cyan-500/40 hover:bg-zinc-900/60 shadow-lg'
@@ -359,9 +435,17 @@ export const ArtistsView: React.FC<ArtistsViewProps> = ({
 
                   {/* Footer Action */}
                   <div className="pt-2 border-t border-zinc-800/80 flex items-center justify-between">
-                    <span className="text-[10px] font-mono text-zinc-500">
-                      {foundList ? (foundList.length ? `Найдено станций: ${foundList.length}` : 'Станции нет') : artist.category === 'ost' ? 'Подборка' : 'Исполнитель'}
-                    </span>
+                    {foundList && foundList.length > 0 ? (
+                      <button
+                        onClick={() => setOpenId(openId === artist.id ? null : artist.id)}
+                        className="text-[11px] font-semibold text-zinc-300 hover:text-white flex items-center gap-1"
+                      >
+                        Станции: {foundList.length}
+                        <ChevronDown className={`w-3.5 h-3.5 transition-transform ${openId === artist.id ? 'rotate-180' : ''}`} />
+                      </button>
+                    ) : (
+                      <span className="text-[10px] font-mono text-zinc-500">{artist.category === 'ost' ? 'Подборка' : 'Исполнитель'}</span>
+                    )}
 
                     <button
                       onClick={() => handlePlayArtist(artist)}
@@ -372,6 +456,7 @@ export const ArtistsView: React.FC<ArtistsViewProps> = ({
                     </button>
                   </div>
                 </div>
+                {openId === artist.id && stationList(artist)}
               </div>
             );
           })}

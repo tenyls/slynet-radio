@@ -11,51 +11,12 @@ import { ArtistItem } from '../constants/artists';
 import { fetchStations, fetchStationsByMultipleTags, deduplicateStations } from './radioApi';
 import { loadCatalog, isCatalogReady } from './catalogService';
 
-/** Варианты написания имени для поиска в названиях станций */
-const NAME_VARIANTS: Record<string, string[]> = {
-  // «Кино» без уточнения ловит станции киномузыки, поэтому ищем по Цою
-  kino: ['Виктор Цой', 'Цой', 'Группа Кино', 'Kino Tsoi'],
-  'sektor-gaza': ['Сектор Газа', 'Sektor Gaza'],
-  'korol-i-shut': ['Король и Шут', 'Korol i Shut'],
-  aria: ['Ария'],
-  nautilus: ['Наутилус', 'Nautilus Pompilius'],
-  ddt: ['ДДТ'],
-  'bi-2': ['Би-2', 'Би 2'],
-  splin: ['Сплин'],
-  'ruki-vverh': ['Руки Вверх', 'Ruki Vverh'],
-  'laskoviy-may': ['Ласковый Май', 'Laskovyi Mai'],
-  'mikhail-krug': ['Михаил Круг'],
-  vysotsky: ['Высоцкий', 'Vysotsky'],
-  zemfira: ['Земфира', 'Zemfira'],
-  basta: ['Баста'],
-  miyagi: ['Miyagi', 'Мияги'],
-  queen: ['Queen'],
-  metallica: ['Metallica'],
-  'linkin-park': ['Linkin Park'],
-  rammstein: ['Rammstein'],
-  'depeche-mode': ['Depeche Mode'],
-  'the-prodigy': ['Prodigy'],
-  scooter: ['Scooter'],
-  'modern-talking': ['Modern Talking'],
-  abba: ['ABBA'],
-  'michael-jackson': ['Michael Jackson'],
-  eminem: ['Eminem'],
-  'daft-punk': ['Daft Punk'],
-  'pink-floyd': ['Pink Floyd'],
-  acdc: ['AC/DC', 'ACDC'],
-  nirvana: ['Nirvana'],
-  'the-beatles': ['Beatles'],
-  'hans-zimmer': ['Hans Zimmer', 'Zimmer'],
-};
+import searchData from '../data/artist-search.json';
 
-/** Теги для подборок саундтреков (здесь поиск по жанру — это и есть суть подборки) */
-const OST_TAGS: Record<string, string[]> = {
-  soundtrack: ['soundtrack', 'soundtracks', 'film music'],
-  game: ['video game music', 'game music', 'vgm'],
-  anime: ['anime', 'j-pop', 'jpop'],
-  series: ['soundtrack', 'tv series', 'movie'],
-  synthwave: ['synthwave', 'epic', 'cinematic'],
-};
+/** Варианты имён и теги подборок — общий файл с роботом автопроверки (src/data/artist-search.json) */
+const NAME_VARIANTS: Record<string, string[]> = searchData.nameVariants;
+const OST_TAGS: Record<string, string[]> = searchData.ostTags;
+const SERIES: string[] = searchData.series;
 
 function variantsFor(artist: ArtistItem): string[] {
   const explicit = NAME_VARIANTS[artist.id];
@@ -159,7 +120,6 @@ export async function searchLautFm(query: string): Promise<Station[]> {
  * серии таких станций («Exclusively …», «101.ru …», «Radio Maximum – …», «Best of Rock FM – …»).
  * Новые станции появляются здесь автоматически, без правок кода.
  */
-const SERIES = ['Exclusively', '101.ru', 'Radio Maximum', 'Best of Rock FM', 'Best Of Rock.FM'];
 let seriesCache: Promise<Station[]> | null = null;
 
 export function fetchArtistSeriesStations(): Promise<Station[]> {

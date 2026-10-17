@@ -136,6 +136,30 @@
       "synthwave",
       "epic",
       "cinematic"
+    ],
+    "filmscore": [
+      "film score",
+      "score",
+      "soundtracks"
+    ],
+    "musical": [
+      "musical",
+      "broadway",
+      "musicals"
+    ],
+    "cartoons": [
+      "disney",
+      "cartoon",
+      "kids music"
+    ],
+    "chiptune": [
+      "chiptune",
+      "8bit",
+      "8-bit"
+    ],
+    "bollywood": [
+      "bollywood",
+      "filmi"
     ]
   },
   "series": [
@@ -367,6 +391,36 @@
       "name": "Киберпанк & Эпическая Музыка",
       "category": "ost",
       "tag": "synthwave"
+    },
+    {
+      "id": "ost-classic-film",
+      "name": "Классика киномузыки",
+      "category": "ost",
+      "tag": "filmscore"
+    },
+    {
+      "id": "ost-musicals",
+      "name": "Мюзиклы & Бродвей",
+      "category": "ost",
+      "tag": "musical"
+    },
+    {
+      "id": "ost-cartoons",
+      "name": "Мультфильмы & Дисней",
+      "category": "ost",
+      "tag": "cartoons"
+    },
+    {
+      "id": "ost-chiptune",
+      "name": "8-бит & Chiptune",
+      "category": "ost",
+      "tag": "chiptune"
+    },
+    {
+      "id": "ost-bollywood",
+      "name": "Болливуд",
+      "category": "ost",
+      "tag": "bollywood"
     }
   ]
 }
