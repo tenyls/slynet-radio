@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import { SlyNetSettings, Station, CustomSocialLink, WebcamCity } from '../types/radio';
 import { SlyNetLogo } from './SlyNetLogo';
+import { FeaturedStationPicker } from './FeaturedStationPicker';
 import { optimizeImageFile, buildSiteContent, sanitizeSiteContent, useSlyNetSettings } from '../context/SlyNetSettingsContext';
 
 interface AdminModalProps {
@@ -695,6 +696,12 @@ export const AdminModal: React.FC<AdminModalProps> = ({
                     Совет: лучше загрузить файл логотипа прямо в GitHub (public/logo.png) — так сайт грузится быстрее. Загрузка здесь встраивает картинку внутрь content.json.
                   </div>
                 </div>
+
+                <FeaturedStationPicker
+                  value={settings.featuredStation}
+                  customStations={customStations}
+                  onChange={(st) => onUpdateSettings({ featuredStation: st })}
+                />
 
                 <div className="flex items-center gap-3 pt-2">
                   <button

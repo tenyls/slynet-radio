@@ -160,7 +160,14 @@ export function fetchArtistSeriesStations(): Promise<Station[]> {
       .then((lists) => {
         const all = lists.flatMap((r) => (r.status === 'fulfilled' ? r.value : []));
         const onlySeries = all.filter((st) => SERIES.some((n) => norm(st.name).startsWith(norm(n))));
-        return deduplicateStations(onlySeries).sort((a, b) => artistLabel(a.name).localeCompare(artistLabel(b.name)));
+        // Одна станция на исполнителя (копии-ретрансляции отбрасываем, оставляем популярную)
+        const byArtist = new Map<string, Station>();
+        for (const st of deduplicateStations(onlySeries)) {
+          const key = norm(artistLabel(st.name));
+          const prev = byArtist.get(key);
+          if (!prev || (st.clickcount || 0) > (prev.clickcount || 0)) byArtist.set(key, st);
+        }
+        return [...byArtist.values()].sort((a, b) => artistLabel(a.name).localeCompare(artistLabel(b.name)));
       })
       .catch(() => {
         seriesCache = null;
@@ -173,7 +180,7 @@ export function fetchArtistSeriesStations(): Promise<Station[]> {
 /** «Exclusively - Metallica» → «Metallica» */
 export function artistLabel(stationName: string): string {
   return stationName
-    .replace(/^\s*(exclusively|exclusive radio|101\.ru|radio maximum|best of rock\.?\s?fm)\s*[-–—:]?\s*/i, '')
+    .replace(/^[^\p{L}\p{N}]*(exclusively|exclusive radio|101\.ru|radio maximum|best of rock\.?\s?fm)\s*[-–—:]?\s*/iu, '')
     .replace(/\((mp3|aac)[^)]*\)/gi, '')
     .trim() || stationName;
 }

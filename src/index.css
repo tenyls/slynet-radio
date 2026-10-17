@@ -191,3 +191,8 @@ input[type="range"] {
 .animate-matrix-ticker:hover {
   animation-play-state: paused;
 }
+
+/* Отступы под «чёлку» и полоску «Домой» на iPhone */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}

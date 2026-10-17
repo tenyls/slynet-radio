@@ -99,7 +99,7 @@ export const BottomPlayer: React.FC<BottomPlayerProps> = ({
 
   return (
     <>
-      <div className="fixed bottom-0 left-0 right-0 z-30 bg-zinc-950/95 backdrop-blur-xl border-t border-zinc-800/80 px-3 sm:px-6 py-2.5 shadow-2xl transition-all">
+      <div className="fixed left-0 right-0 z-40 bottom-[calc(4rem+env(safe-area-inset-bottom))] md:bottom-0 bg-zinc-900/95 backdrop-blur-xl border-t border-emerald-500/30 md:border-zinc-800/80 px-3 sm:px-6 py-2 md:py-2.5 shadow-[0_-8px_30px_rgba(0,0,0,0.5)] transition-all">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
           {/* Left: Station info + Cover + Weather badge */}
           <div
@@ -107,7 +107,7 @@ export const BottomPlayer: React.FC<BottomPlayerProps> = ({
             onClick={() => setIsFullScreenOpen(true)}
           >
             {/* Station Icon / Cover - Spins ONLY when isPlaying is true */}
-            <div className={`relative w-12 h-12 rounded-xl overflow-hidden bg-zinc-900 border border-zinc-800 shrink-0 shadow-md ${isPlaying ? 'animate-[spin_12s_linear_infinite] shadow-[0_0_15px_rgba(16,185,129,0.4)] border-emerald-500/50' : ''}`}>
+            <div className={`relative w-12 h-12 rounded-xl overflow-hidden bg-zinc-900 border border-zinc-800 shrink-0 shadow-md ${isPlaying ? 'shadow-[0_0_15px_rgba(16,185,129,0.4)] border-emerald-500/50' : ''}`}>
               {typeof currentStation?.favicon === 'string' && currentStation.favicon.startsWith('http') ? (
                 <img
                   src={currentStation.favicon}
@@ -215,14 +215,14 @@ export const BottomPlayer: React.FC<BottomPlayerProps> = ({
               onClick={togglePlayPause}
               disabled={isLoading}
               aria-label={isPlaying ? 'Пауза' : 'Слушать'}
-              className="w-11 h-11 rounded-full bg-gradient-to-r from-cyan-500 via-emerald-500 to-lime-400 hover:brightness-110 text-zinc-950 flex items-center justify-center shadow-lg shadow-emerald-500/25 transition-transform active:scale-95"
+              className="w-14 h-14 md:w-11 md:h-11 shrink-0 rounded-full bg-gradient-to-r from-cyan-500 via-emerald-500 to-lime-400 hover:brightness-110 text-zinc-950 flex items-center justify-center shadow-lg shadow-emerald-500/25 transition-transform active:scale-95"
             >
               {isLoading ? (
                 <div className="w-5 h-5 border-2 border-zinc-950 border-t-transparent rounded-full animate-spin" />
               ) : isPlaying ? (
-                <Pause className="w-5 h-5 fill-zinc-950" />
+                <Pause className="w-6 h-6 md:w-5 md:h-5 fill-zinc-950" />
               ) : (
-                <Play className="w-5 h-5 fill-zinc-950 ml-0.5" />
+                <Play className="w-6 h-6 md:w-5 md:h-5 fill-zinc-950 ml-0.5" />
               )}
             </button>
 

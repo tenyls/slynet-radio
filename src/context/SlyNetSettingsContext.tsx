@@ -17,6 +17,7 @@ export const SITE_FIELDS = [
   'customWebcams',
   'customStations',
   'customTvChannels',
+  'featuredStation',
   'heroTitle',
   'heroSubtitle',
   'appVersion',
@@ -77,6 +78,8 @@ export function sanitizeSiteContent(raw: any): SiteContent {
   for (const k of ['appTitle', 'appSubtitle', 'customLogoUrl', 'telegramUrl', 'heroTitle', 'heroSubtitle', 'appVersion', 'versionChangelog', 'dmcaPolicy']) {
     if (c[k] !== undefined && typeof c[k] !== 'string') delete c[k];
   }
+  const fs = c.featuredStation;
+  if (fs !== undefined && fs !== null && !(typeof fs === 'object' && fs.name && (fs.url_resolved || fs.url))) delete c.featuredStation;
   // Версию задаёт код, а не файл контента
   delete c.appVersion;
   return c;

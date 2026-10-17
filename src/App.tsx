@@ -74,6 +74,7 @@ function RadioApp() {
     setIsRecorderOpen,
     isAlarmOpen,
     setIsAlarmOpen,
+    setIsFullScreenOpen,
   } = useAudio();
 
   const { favorites, isFavorite, toggleFavorite, favoritesCount } = useFavorites();
@@ -262,8 +263,13 @@ function RadioApp() {
     }
   };
 
+  const featured = settings.featuredStation || null;
+
   const handlePlayFirstStation = () => {
-    if (displayedStations.length > 0) {
+    if (featured) {
+      playStation(featured, [featured, ...displayedStations.filter((s) => s.stationuuid !== featured.stationuuid)]);
+      setIsFullScreenOpen(true);
+    } else if (displayedStations.length > 0) {
       playStation(displayedStations[0], displayedStations);
     }
   };
@@ -303,7 +309,7 @@ function RadioApp() {
       />
 
       {/* Main Content Area */}
-      <div className="relative z-10 flex-1 flex flex-col min-w-0 pb-36 md:pb-28">
+      <div className="relative z-10 flex-1 flex flex-col min-w-0 pb-48 md:pb-28">
         {/* Mobile Top Header */}
         <div className="md:hidden flex items-center justify-between px-4 py-3 bg-zinc-950/90 backdrop-blur-md border-b border-zinc-900 sticky top-0 z-30">
           <div className="flex items-center gap-2.5 min-w-0">
@@ -535,7 +541,7 @@ function RadioApp() {
                       className="flex-1 sm:flex-none px-6 py-3.5 rounded-2xl bg-theme-accent text-zinc-950 font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-theme-glow hover:brightness-110 active:scale-95 transition-all"
                     >
                       <Play className="w-4 h-4 fill-zinc-950" />
-                      <span>Включить топ-эфир</span>
+                      <span>{featured ? `Слушать ${settings.appTitle}` : 'Включить топ-эфир'}</span>
                     </button>
 
                     <button

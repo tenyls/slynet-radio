@@ -126,52 +126,6 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <header className="sticky top-0 z-30 bg-zinc-950/95 backdrop-blur-xl border-b border-zinc-900/80 px-3 sm:px-6 py-2.5">
       <div className="flex flex-col gap-2 max-w-7xl mx-auto">
-        {/* Mobile-only brand identity row (Static Logo) */}
-        <div className="flex md:hidden items-center justify-between gap-3 pb-1 border-b border-zinc-900/60">
-          <div className="flex items-center gap-2.5 select-none">
-            <div>
-              <SlyNetLogo
-                size="sm"
-                className="w-9 h-9"
-                allowUpload={false}
-                isSpinning={false}
-              />
-            </div>
-            <div className="flex flex-col">
-              <div className="flex items-center gap-1.5">
-                <span className="text-sm font-extrabold tracking-tight text-white">
-                  {settings.appTitle || 'SlyNet Radio'}
-                </span>
-                <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
-                  {appVersion}
-                </span>
-              </div>
-              <span className="text-[10px] font-medium text-emerald-400 font-mono truncate max-w-[200px]">
-                {settings.appSubtitle}
-              </span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-1.5">
-            <button
-              onClick={onOpenAbout}
-              title={t.navAbout}
-              className="p-1.5 rounded-xl bg-zinc-900 border border-zinc-800 text-[10px] font-mono font-bold text-emerald-400"
-            >
-              {appVersion}
-            </button>
-            {onOpenAdmin && (
-            <button
-              onClick={onOpenAdmin}
-              title="Панель администратора"
-              className="p-1.5 rounded-xl bg-zinc-900 border border-emerald-500/30 text-emerald-300"
-            >
-              <Settings className="w-4 h-4" />
-            </button>
-            )}
-          </div>
-        </div>
-
         {/* Top Header Row: WIDE Search Bar & Quick Actions on Desktop */}
         <div className="flex items-center justify-between gap-3">
           {/* WIDE Search Bar with Voice Input & Clear Button */}
@@ -276,7 +230,7 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Matrix LED Running Marquee Ticker */}
-        <div className="relative overflow-hidden bg-black/90 border border-emerald-500/30 rounded-xl px-2.5 py-1 flex items-center gap-2 shadow-[inset_0_0_12px_rgba(16,185,129,0.15)]">
+        <div className={`relative overflow-hidden bg-black/90 border border-emerald-500/30 rounded-xl px-2.5 py-1 ${currentStation ? 'flex' : 'hidden md:flex'} items-center gap-2 shadow-[inset_0_0_12px_rgba(16,185,129,0.15)]`}>
           <div className="flex items-center gap-1.5 shrink-0 px-1.5 py-0.5 rounded bg-emerald-950/80 border border-emerald-500/40 text-emerald-400 font-mono text-[10px] font-bold uppercase tracking-wider">
             <span className={`w-1.5 h-1.5 rounded-full ${isPlaying ? 'bg-emerald-400 animate-ping' : 'bg-zinc-500'}`} />
             <span>LIVE:</span>

@@ -200,6 +200,7 @@ export interface SlyNetSettings {
   customWebcams?: WebcamCity[]; // Webcams added via Admin (content.json)
   customStations?: Station[]; // Stations added via Admin (content.json)
   customTvChannels?: LiveTvChannel[]; // TV channels added via Admin (content.json)
+  featuredStation?: Station | null; // «Станция SlyNet Radio» — назначается в админке
   isPro: boolean;
   activeTheme: ThemeId;
   language: Language;
