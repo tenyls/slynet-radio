@@ -1,3 +1,4 @@
+import { liveFallbackLabel } from '../services/rdsService';
 import React, { useState, useEffect } from 'react';
 import { useAudio } from '../context/AudioPlayerContext';
 import { StationFallbackIcon } from './StationFallbackIcon';
@@ -144,12 +145,10 @@ export const BottomPlayer: React.FC<BottomPlayerProps> = ({
               <div className="flex items-center gap-1.5 mt-0.5 text-xs text-emerald-400 font-semibold truncate">
                 <span className="px-1.5 py-0.5 rounded-md bg-emerald-500/20 text-[9px] font-mono font-bold text-emerald-300 border border-emerald-500/40 shrink-0 flex items-center gap-1 shadow-sm">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-                  <span>🎵 ЭФИР:</span>
+                  <span>{currentTrackTitle ? '🎵 ПЕСНЯ:' : '📡 ЭФИР:'}</span>
                 </span>
-                <span className="truncate text-white font-medium hover:text-emerald-300 transition-colors" title={currentTrackTitle || `${currentStation?.name} — Прямой эфир`}>
-                  {currentTrackTitle && currentTrackTitle !== currentStation?.name
-                    ? currentTrackTitle
-                    : `${currentStation?.name || 'SlyNet'} — Прямой эфир`}
+                <span className="truncate text-white font-medium hover:text-emerald-300 transition-colors" title={currentTrackTitle || liveFallbackLabel(currentStation)}>
+                  {currentTrackTitle || liveFallbackLabel(currentStation)}
                 </span>
                 {stationWeather && (
                   <span

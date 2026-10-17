@@ -1,3 +1,4 @@
+import { liveFallbackLabel } from '../services/rdsService';
 import React, { useState, useEffect } from 'react';
 import { useAudio } from '../context/AudioPlayerContext';
 import { StationFallbackIcon } from './StationFallbackIcon';
@@ -308,9 +309,7 @@ export const FullScreenPlayer: React.FC<FullScreenPlayerProps> = ({
             </div>
             <div className="flex-1 overflow-hidden whitespace-nowrap">
               <div className="animate-marquee inline-block font-mono text-xs sm:text-sm font-bold text-white drop-shadow">
-                {currentTrackTitle && currentTrackTitle !== currentStation?.name
-                  ? currentTrackTitle
-                  : `${currentStation?.name || 'SlyNet'} — Прямой эфир 24/7`}
+                {currentTrackTitle || liveFallbackLabel(currentStation)}
               </div>
             </div>
           </div>

@@ -3,7 +3,7 @@ import { Station, EqualizerBand, RecordedTrack, PlayedTrackHistory, RadioAlarm, 
 import { registerStationClick } from '../services/radioApi';
 import { DEFAULT_EQ_BANDS, EQUALIZER_PRESETS } from '../constants/equalizer';
 import { quarantineStation } from '../services/quarantineService';
-import { fetchLiveTrackTitle, parseAndValidateTrack } from '../services/rdsService';
+import { fetchLiveTrackTitle, parseAndValidateTrack, liveFallbackLabel } from '../services/rdsService';
 import { fetchAlbumArtFromItunes } from '../services/itunesService';
 
 const HISTORY_KEY = 'slynet_play_history_v1';
@@ -232,7 +232,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 audioRef.current.src = next.url_resolved || next.url;
                 audioRef.current.play().catch(() => {});
                 setCurrentStation(next);
-                setCurrentTrackTitle(next.name);
+                setCurrentTrackTitle('');
               }
             }, 1000);
           }
@@ -430,7 +430,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
       setCurrentStation(station);
       currentStationRef.current = station;
-      setCurrentTrackTitle(station.name || 'Радио');
+      setCurrentTrackTitle('');
 
       // Clear existing connection timeout
       if (connectTimeoutRef.current) {
@@ -590,48 +590,56 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     []
   );
 
-  // Live RDS track polling every 12 seconds for the active station
+  // Честный RDS: опрос реального названия трека каждые 15 секунд
+  const missesRef = useRef(0);
   useEffect(() => {
     if (!currentStation || !isPlaying) return;
 
     let cancelled = false;
+    missesRef.current = 0;
 
     const poll = async () => {
       try {
         const liveTitle = await fetchLiveTrackTitle(currentStation);
-        if (!cancelled && liveTitle && liveTitle !== currentTrackTitle) {
-          setCurrentTrackTitle(liveTitle);
+        if (cancelled) return;
+        if (!liveTitle) {
+          // Станция перестала передавать название — после 2 пустых ответов честно убираем его
+          missesRef.current += 1;
+          if (missesRef.current >= 2) setCurrentTrackTitle('');
+          return;
+        }
+        missesRef.current = 0;
+        setCurrentTrackTitle((prevTitle) => {
+          if (prevTitle === liveTitle) return prevTitle;
           setHistory((prev) => {
             const updated = prev.map((item) =>
-              item.stationUuid === currentStation.stationuuid
-                ? { ...item, title: liveTitle }
-                : item
+              item.stationUuid === currentStation.stationuuid ? { ...item, title: liveTitle } : item
             );
             try {
               localStorage.setItem(HISTORY_KEY, JSON.stringify(updated));
             } catch {}
             return updated;
           });
-
-          // Strict Shazam detection: only register if genuine Artist - Song
+          // В «Распознанные треки» попадают только настоящие песни (Исполнитель — Название)
           registerRecognizedSong(liveTitle, currentStation);
-        }
+          return liveTitle;
+        });
       } catch {}
     };
 
     poll();
-    const interval = setInterval(poll, 12000);
+    const interval = setInterval(poll, 15000);
 
     return () => {
       cancelled = true;
       clearInterval(interval);
     };
-  }, [currentStation?.stationuuid, isPlaying, currentTrackTitle, registerRecognizedSong]);
+  }, [currentStation?.stationuuid, isPlaying, registerRecognizedSong]);
 
   // Bookmark current track into saved list & history
   const bookmarkCurrentTrack = useCallback((): boolean => {
     if (!currentStation) return false;
-    const titleToSave = currentTrackTitle || currentStation.name || 'Радиостанция';
+    const titleToSave = currentTrackTitle || liveFallbackLabel(currentStation);
     const item: PlayedTrackHistory = {
       id: `saved_${Date.now()}_${currentStation.stationuuid}`,
       stationUuid: currentStation.stationuuid,

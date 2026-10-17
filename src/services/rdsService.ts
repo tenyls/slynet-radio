@@ -1,13 +1,17 @@
 /**
- * RDS Live Track Detection Service.
- * Safely polls current track title ("Artist - Song") for playing radio streams
- * from Icecast/Shoutcast status endpoints, public station APIs, and stream info.
+ * Честный RDS: «что сейчас играет».
+ *
+ * Название песни показывается ТОЛЬКО если его реально передаёт станция:
+ *  1. официальные API станций (SomaFM, Radio Paradise, laut.fm, Radio Record);
+ *  2. страница статуса Icecast на сервере потока (status-json.xsl);
+ *  3. метаданные внутри самого потока (ICY StreamTitle) — через наш маленький
+ *     прокси на Cloudflare Workers (см. папку worker/), если он настроен.
+ * Если ничего не найдено — возвращаем null, и интерфейс пишет «Прямой эфир».
+ * Никаких выдуманных/случайных песен.
  */
 
 import { Station } from '../types/radio';
-
-// In-memory cache for recent track titles per station uuid
-const stationTrackCache = new Map<string, string>();
+import { METADATA_PROXY_URL } from '../config';
 
 /**
  * Clean up raw stream metadata / icy title:
@@ -137,241 +141,118 @@ export function parseAndValidateTrack(
   };
 }
 
+type Fetcher = (station: Station, streamUrl: string) => Promise<string | null>;
+
+async function getJson(url: string, timeout = 3500): Promise<any> {
+  const res = await fetch(url, { signal: AbortSignal.timeout(timeout) });
+  if (!res.ok) throw new Error(String(res.status));
+  return res.json();
+}
+
+const join = (artist?: string, title?: string) =>
+  artist && title ? `${String(artist).trim()} — ${String(title).trim()}` : null;
+
+/** SomaFM: https://ice1.somafm.com/groovesalad-128-mp3 → канал groovesalad */
+const somaFm: Fetcher = async (_s, url) => {
+  if (!/somafm\.com/i.test(url)) return null;
+  const m = url.match(/somafm\.com\/([a-z0-9]+?)(?:-\d+)?(?:-(?:mp3|aac|aacp))?(?:[/?.]|$)/i);
+  if (!m) return null;
+  const json = await getJson(`https://somafm.com/songs/${m[1]}.json`);
+  const cur = json?.songs?.[0];
+  return join(cur?.artist, cur?.title);
+};
+
+/** Radio Paradise: каналы main/mellow/rock/global → chan 0/1/2/3 */
+const radioParadise: Fetcher = async (_s, url) => {
+  if (!/radioparadise\.com/i.test(url)) return null;
+  const chan = /mellow/i.test(url) ? 1 : /rock/i.test(url) ? 2 : /global|eclectic/i.test(url) ? 3 : 0;
+  const json = await getJson(`https://api.radioparadise.com/api/now_playing?chan=${chan}`);
+  return join(json?.artist, json?.title);
+};
+
+/** laut.fm: https://stream.laut.fm/<station> */
+const lautFm: Fetcher = async (_s, url) => {
+  const m = url.match(/laut\.fm\/([a-z0-9_-]+)/i);
+  if (!m) return null;
+  const json = await getJson(`https://api.laut.fm/station/${m[1].toLowerCase()}/current_song`);
+  const artist = json?.artist?.name;
+  return join(artist, json?.title);
+};
+
+/** Radio Record: сопоставляем поток со станцией по её «prefix» */
+let recordStations: Promise<Array<{ id: number; prefix: string }>> | null = null;
+const radioRecord: Fetcher = async (_s, url) => {
+  if (!/radiorecord|hostingradio\.ru/i.test(url)) return null;
+  if (!recordStations) {
+    recordStations = getJson('https://www.radiorecord.ru/api/stations/')
+      .then((j) => (j?.result?.stations || []).map((x: any) => ({ id: x.id, prefix: String(x.prefix || '') })))
+      .catch(() => []);
+  }
+  const list = await recordStations;
+  const st = list.find((x) => x.prefix && new RegExp(`/${x.prefix}\\d*\\.`, 'i').test(url));
+  if (!st) return null;
+  const now = await getJson('https://www.radiorecord.ru/api/stations/now/');
+  const item = (now?.result || []).find((x: any) => x.id === st.id);
+  return join(item?.track?.artist, item?.track?.song);
+};
+
+/** Icecast: /status-json.xsl на сервере потока (у многих серверов открыт для браузера) */
+const failedIcecastHosts = new Set<string>();
+const icecastStatus: Fetcher = async (station, url) => {
+  const u = new URL(url);
+  if (failedIcecastHosts.has(u.host)) return null;
+  try {
+    const json = await getJson(`${u.protocol}//${u.host}/status-json.xsl`, 3000);
+    const src = json?.icestats?.source;
+    const list: any[] = Array.isArray(src) ? src : src ? [src] : [];
+    // Берём именно наш mountpoint, если на сервере несколько потоков
+    const mine = list.find((x) => x?.listenurl && new URL(x.listenurl).pathname === u.pathname) || (list.length === 1 ? list[0] : null);
+    if (!mine) return null;
+    const raw = mine.artist && mine.title ? `${mine.artist} - ${mine.title}` : mine.title || mine.yp_currently_playing || '';
+    return cleanTrackTitle(raw, station.name);
+  } catch (e) {
+    failedIcecastHosts.add(u.host);
+    throw e;
+  }
+};
+
+/** ICY-метаданные потока через прокси на Cloudflare Workers (если настроен) */
+const icyProxy: Fetcher = async (station, url) => {
+  if (!METADATA_PROXY_URL) return null;
+  const json = await getJson(`${METADATA_PROXY_URL}?url=${encodeURIComponent(url)}`, 6000);
+  return cleanTrackTitle(json?.title || '', station.name);
+};
+
+const FETCHERS: Fetcher[] = [somaFm, radioParadise, lautFm, radioRecord, icecastStatus, icyProxy];
+
 /**
- * Attempts to fetch live now-playing title for a station
+ * Реальное название текущего трека или null, если станция его не передаёт.
  */
 export async function fetchLiveTrackTitle(station: Station): Promise<string | null> {
   if (!station) return null;
   const streamUrl = station.url_resolved || station.url;
-  if (!streamUrl) return null;
+  if (!streamUrl || !/^https?:/i.test(streamUrl)) return null;
 
-  // 1. Specialized providers: SomaFM
-  if (streamUrl.includes('somafm.com')) {
+  for (const f of FETCHERS) {
     try {
-      const match = streamUrl.match(/somafm\.com\/([a-z0-9]+)/i);
-      const channel = match ? match[1] : '';
-      if (channel) {
-        const res = await fetch(`https://somafm.com/songs/${channel}.json`, {
-          signal: AbortSignal.timeout(3500),
-        });
-        if (res.ok) {
-          const json = await res.json();
-          const current = json?.songs?.[0];
-          if (current?.artist && current?.title) {
-            const result = `${current.artist} — ${current.title}`;
-            stationTrackCache.set(station.stationuuid, result);
-            return result;
-          }
-        }
-      }
-    } catch {}
-  }
-
-  // 2. Specialized providers: Radio Paradise
-  if (streamUrl.includes('radioparadise.com')) {
-    try {
-      const res = await fetch('https://api.radioparadise.com/api/now_playing', {
-        signal: AbortSignal.timeout(3500),
-      });
-      if (res.ok) {
-        const json = await res.json();
-        if (json?.artist && json?.title) {
-          const result = `${json.artist} — ${json.title}`;
-          stationTrackCache.set(station.stationuuid, result);
-          return result;
-        }
-      }
-    } catch {}
-  }
-
-  // 3. Icecast /status-json.json endpoint check
-  try {
-    const parsed = new URL(streamUrl);
-    const icecastStatusUrl = `${parsed.protocol}//${parsed.host}/status-json.json`;
-    const res = await fetch(icecastStatusUrl, { signal: AbortSignal.timeout(3000) });
-    if (res.ok) {
-      const json = await res.json();
-      const sources = json?.icestats?.source;
-      const sourceList = Array.isArray(sources) ? sources : sources ? [sources] : [];
-      for (const s of sourceList) {
-        const title = s?.title || s?.yp_currently_playing || (s?.artist ? `${s.artist} — ${s.title}` : '');
-        const cleaned = cleanTrackTitle(title, station.name);
-        if (cleaned) {
-          stationTrackCache.set(station.stationuuid, cleaned);
-          return cleaned;
-        }
-      }
+      const title = await f(station, streamUrl);
+      if (title && parseAndValidateTrack(title, station.name)) return title;
+    } catch {
+      // источник недоступен — пробуем следующий
     }
-  } catch {}
-
-  // Return cached title if exists
-  const cached = stationTrackCache.get(station.stationuuid);
-  if (cached) return cached;
-
-  // 4. Dynamic realistic on-air track rotation by genre & tags
-  // Rotates naturally every ~3.5 minutes (210s) based on station UUID + time bucket
-  const dynamicTrack = getDynamicGenreTrack(station);
-  if (dynamicTrack) {
-    stationTrackCache.set(station.stationuuid, dynamicTrack);
-    return dynamicTrack;
   }
-
   return null;
 }
 
-/**
- * High-fidelity genre song catalog for realistic live RDS on-air rotation
- */
-const GENRE_PLAYLISTS: Record<string, string[]> = {
-  rock: [
-    'Queen — Bohemian Rhapsody',
-    'AC/DC — Back In Black',
-    'Metallica — Enter Sandman',
-    'Linkin Park — Numb',
-    'Nirvana — Smells Like Teen Spirit',
-    'Guns N\' Roses — Sweet Child O\' Mine',
-    'Rammstein — Du Hast',
-    'Pink Floyd — Comfortably Numb',
-    'Scorpions — Wind Of Change',
-    'Red Hot Chili Peppers — Californication',
-    'The Rolling Stones — Paint It Black',
-    'Led Zeppelin — Stairway To Heaven',
-  ],
-  russian_rock: [
-    'Кино — Группа крови',
-    'Сектор Газа — Туман',
-    'Король и Шут — Лесник',
-    'Ария — Беспечный ангел',
-    'Наутилус Помпилиус — Скованные одной цепью',
-    'ДДТ — Что такое осень',
-    'Би-2 — Полковнику никто не пишет',
-    'Сплин — Мое сердце',
-    'Земфира — Искала',
-    'Кино — Звезда по имени Солнце',
-    'Король и Шут — Прыгну со скалы',
-  ],
-  pop: [
-    'The Weeknd — Blinding Lights',
-    'Dua Lipa — Levitating',
-    'Ed Sheeran — Shape of You',
-    'Michael Jackson — Billie Jean',
-    'Madonna — Like a Prayer',
-    'Lady Gaga — Bad Romance',
-    'Bruno Mars — 24K Magic',
-    'Adele — Rolling in the Deep',
-    'Harry Styles — As It Was',
-    'Katy Perry — Roar',
-    'Taylor Swift — Anti-Hero',
-  ],
-  electronic: [
-    'Daft Punk — Get Lucky',
-    'The Prodigy — Breathe',
-    'Scooter — How Much Is The Fish',
-    'Avicii — Wake Me Up',
-    'David Guetta — Titanium',
-    'Calvin Harris — Summer',
-    'Tiesto — The Business',
-    'Martin Garrix — Animals',
-    'Fatboy Slim — Right Here, Right Now',
-    'Chemical Brothers — Hey Boy Hey Girl',
-    'Armin van Buuren — Blah Blah Blah',
-  ],
-  disco: [
-    'ABBA — Dancing Queen',
-    'Modern Talking — Cheri, Cheri Lady',
-    'Boney M. — Rasputin',
-    'Bee Gees — Stayin\' Alive',
-    'Donna Summer — Hot Stuff',
-    'Earth, Wind & Fire — September',
-    'Gloria Gaynor — I Will Survive',
-    'C.C. Catch — Cause You Are Young',
-    'Bad Boys Blue — You\'re a Woman',
-  ],
-  jazz: [
-    'Miles Davis — So What',
-    'John Coltrane — Giant Steps',
-    'Louis Armstrong — What a Wonderful World',
-    'Ella Fitzgerald — Summertime',
-    'Dave Brubeck — Take Five',
-    'Chet Baker — My Funny Valentine',
-    'Bill Evans — Peace Piece',
-    'Norah Jones — Don\'t Know Why',
-  ],
-  classical: [
-    'Ludwig van Beethoven — Symphony No. 5',
-    'Wolfgang Amadeus Mozart — Eine kleine Nachtmusik',
-    'Antonio Vivaldi — The Four Seasons: Spring',
-    'Johann Sebastian Bach — Air on the G String',
-    'Pyotr Tchaikovsky — Swan Lake Scene',
-    'Frederic Chopin — Nocturne in E-flat major',
-    'Claude Debussy — Clair de Lune',
-  ],
-  soundtrack: [
-    'Hans Zimmer — Time (Inception OST)',
-    'John Williams — Star Wars Main Theme',
-    'Ennio Morricone — The Good, The Bad and The Ugly',
-    'Howard Shore — The Lord of the Rings: The Shire',
-    'Klaus Badelt — He\'s a Pirate (Pirates of the Caribbean)',
-    'Ludovico Einaudi — Una Mattina (The Intouchables)',
-    'Ramin Djawadi — Game of Thrones Main Theme',
-    'Alan Silvestri — The Avengers Theme',
-  ],
-  hiphop: [
-    'Eminem — Lose Yourself',
-    '2Pac — Changes',
-    'The Notorious B.I.G. — Juicy',
-    'Dr. Dre feat. Snoop Dogg — Still D.R.E.',
-    'Kendrick Lamar — HUMBLE.',
-    'Jay-Z — Empire State of Mind',
-    '50 Cent — In Da Club',
-    'Баста — Сансара',
-    'Miyagi & Andy Panda — Minor',
-  ],
-  ambient: [
-    'Brian Eno — An Ending (Ascent)',
-    'Tycho — Awake',
-    'Carbon Based Lifeforms — World of Sleepers',
-    'Solar Fields — Sol',
-    'Moby — Porcelain',
-    'Hammock — Departure Songs',
-  ],
-};
-
-function getDynamicGenreTrack(station: Station): string {
-  const combined = `${station.name} ${station.tags || ''} ${station.country || ''}`.toLowerCase();
-  
-  let key = 'pop';
-  if (combined.includes('ost') || combined.includes('soundtrack') || combined.includes('cinema') || combined.includes('movie')) {
-    key = 'soundtrack';
-  } else if (
-    (combined.includes('русск') || combined.includes('рок') || combined.includes('ru') || combined.includes('russia')) &&
-    (combined.includes('рок') || combined.includes('rock'))
-  ) {
-    key = 'russian_rock';
-  } else if (combined.includes('metal') || combined.includes('rock') || combined.includes('punk') || combined.includes('grunge')) {
-    key = 'rock';
-  } else if (combined.includes('dance') || combined.includes('edm') || combined.includes('club') || combined.includes('house') || combined.includes('techno') || combined.includes('trance')) {
-    key = 'electronic';
-  } else if (combined.includes('disco') || combined.includes('80s') || combined.includes('70s') || combined.includes('retro') || combined.includes('oldies')) {
-    key = 'disco';
-  } else if (combined.includes('jazz') || combined.includes('blues') || combined.includes('smooth')) {
-    key = 'jazz';
-  } else if (combined.includes('classic') || combined.includes('orchestra') || combined.includes('symphon')) {
-    key = 'classical';
-  } else if (combined.includes('hip') || combined.includes('rap') || combined.includes('urban') || combined.includes('trap')) {
-    key = 'hiphop';
-  } else if (combined.includes('chill') || combined.includes('relax') || combined.includes('ambient') || combined.includes('lofi') || combined.includes('lounge')) {
-    key = 'ambient';
-  }
-
-  const list = GENRE_PLAYLISTS[key] || GENRE_PLAYLISTS.pop;
-  
-  // Calculate bucket index based on 210 seconds (~3.5 minutes) time rotation + station uuid hash
-  const timeBucket = Math.floor(Date.now() / 210000);
-  let hash = 0;
-  for (let i = 0; i < station.stationuuid.length; i++) {
-    hash = (hash * 31 + station.stationuuid.charCodeAt(i)) | 0;
-  }
-  const index = Math.abs((hash + timeBucket) % list.length);
-  return list[index];
+/** Подпись, когда станция не передаёт название песни: «Прямой эфир • Рок • Германия • 128 kbps» */
+export function liveFallbackLabel(station: Station | null | undefined): string {
+  if (!station) return 'Прямой эфир';
+  const genre = (station.tags || '').split(',').map((t) => t.trim()).filter(Boolean)[0];
+  const parts = [
+    'Прямой эфир',
+    genre ? genre.charAt(0).toUpperCase() + genre.slice(1) : '',
+    station.country || '',
+    station.bitrate ? `${station.bitrate} kbps` : '',
+  ].filter(Boolean);
+  return parts.join(' • ');
 }

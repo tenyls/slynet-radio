@@ -1,3 +1,4 @@
+import { liveFallbackLabel } from '../services/rdsService';
 import React, { useState, useRef } from 'react';
 import {
   Search,
@@ -284,12 +285,8 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="flex-1 overflow-hidden whitespace-nowrap">
             <div className="animate-matrix-ticker font-mono text-[11px] text-lime-400 font-medium tracking-wide">
               {currentStation
-                ? `♫ ${currentStation.name.toUpperCase()} ${
-                    currentTrackTitle ? `» ${currentTrackTitle.toUpperCase()}` : ''
-                  } • [${currentStation.bitrate || 320} KBPS ULTRA HD] • ${
-                    currentStation.country?.toUpperCase() || 'GLOBAL'
-                  } • SLYNET GLOBAL RADIO NETWORK • 1000+ СТАНЦИЙ И ВЕБ-КАМЕРЫ 24/7 •`
-                : `♫ SLYNET RADIO ${appVersion} • 30+ ЖАНРОВ И КОМБО-ФИЛЬТР СТРАНА + ЖАНР • ГОЛОСОВОЙ ПОИСК 🎙️ • ПОЛНЫЙ БЭКАП .JSON В АДМИНКЕ •`}
+                ? `♫ ${currentStation.name.toUpperCase()} » ${(currentTrackTitle || liveFallbackLabel(currentStation)).toUpperCase()} •`
+                : `♫ SLYNET RADIO ${appVersion} • РАДИО СО ВСЕГО МИРА • ЖАНРЫ, СТРАНЫ И НАСТРОЕНИЯ • БЕЗ РЕКЛАМЫ •`}
             </div>
           </div>
 
