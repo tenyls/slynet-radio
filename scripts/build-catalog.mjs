@@ -111,14 +111,16 @@ async function hlsPlayableInBrowser(url) {
 }
 
 async function linkAlive(url) {
+  // «Мёртвой» считаем только страницу, которой точно нет (404/410).
+  // Таймаут или блокировка по стране (многие сайты закрыты для зарубежных серверов) — не повод скрывать.
   try {
-    const r = await fetchWithTimeout(url, { redirect: 'follow' }, 10000);
+    const r = await fetchWithTimeout(url, { redirect: 'follow' }, 12000);
     try {
       await r.body?.cancel();
     } catch {}
-    return r.status < 400 || r.status === 403 || r.status === 429; // 403/429 — сайт жив, но не любит роботов
+    return !(r.status === 404 || r.status === 410);
   } catch {
-    return false;
+    return true;
   }
 }
 
