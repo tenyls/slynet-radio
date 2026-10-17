@@ -9,6 +9,7 @@ import { fetchAlbumArtFromItunes } from '../services/itunesService';
 import { liveFallbackLabel } from '../services/rdsService';
 import { fetchStations } from '../services/radioApi';
 import { findArtistStations } from '../services/artistService';
+import { loadCatalog, isCatalogReady } from '../services/catalogService';
 import { GENRES } from '../constants/genres';
 import { COUNTRIES } from '../constants/countries';
 import { ARTISTS_DATA, ArtistItem } from '../constants/artists';
@@ -95,6 +96,12 @@ export const FullScreenPlayer: React.FC<FullScreenPlayerProps> = ({ isFavorite, 
   const [resultsTitle, setResultsTitle] = useState('');
   const [sheetLoading, setSheetLoading] = useState(false);
   const [sheetMessage, setSheetMessage] = useState<string | null>(null);
+  const [availableArtists, setAvailableArtists] = useState<Set<string> | null>(null);
+  useEffect(() => {
+    loadCatalog().then((c) => {
+      if (isCatalogReady(c)) setAvailableArtists(new Set(Object.entries(c.artists).filter(([, l]) => l.length).map(([id]) => id)));
+    });
+  }, []);
 
   // Обложка из iTunes — только для настоящей песни (а не по названию станции)
   useEffect(() => {
@@ -580,7 +587,7 @@ export const FullScreenPlayer: React.FC<FullScreenPlayerProps> = ({ isFavorite, 
                       <div key={cat}>
                         <p className="text-[11px] font-bold text-zinc-400 px-1 pb-1">{label}</p>
                         <div className="grid grid-cols-2 gap-1.5">
-                          {ARTISTS_DATA.filter((a) => a.category === cat).map((a) => (
+                          {ARTISTS_DATA.filter((a) => a.category === cat && (!availableArtists || availableArtists.has(a.id))).map((a) => (
                             <button key={a.id} onClick={() => openArtist(a)} className="px-3 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-left text-xs font-semibold text-zinc-200 truncate">
                               {a.name}
                             </button>

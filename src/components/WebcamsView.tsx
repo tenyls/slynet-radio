@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { WebcamCity, CityWeather } from '../types/radio';
 import { WEBCAMS_DATA } from '../constants/webcams';
+import { loadCatalog } from '../services/catalogService';
 import { Globe3DCanvas } from './Globe3DCanvas';
 import { fetchCityWeather } from '../services/weatherService';
 import { useAudio } from '../context/AudioPlayerContext';
@@ -39,11 +40,16 @@ export const WebcamsView: React.FC<WebcamsViewProps> = ({ onOpenAdmin }) => {
   const { currentStation, isPlaying, togglePlayPause } = useAudio();
   const { settings } = useSlyNetSettings();
 
+  // Нерабочие ссылки (по ежедневной проверке) скрываем
+  const [dead, setDead] = useState<Set<string>>(new Set());
+  React.useEffect(() => {
+    loadCatalog().then((c) => setDead(new Set(c.deadLinks)));
+  }, []);
+
   // Combine default and custom webcams from CMS
-  const allWebcams: WebcamCity[] = [
-    ...(settings.customWebcams || []),
-    ...WEBCAMS_DATA,
-  ];
+  const allWebcams: WebcamCity[] = [...(settings.customWebcams || []), ...WEBCAMS_DATA].filter(
+    (c) => !c.directPortalUrl || !dead.has(c.directPortalUrl)
+  );
 
   const [selectedCity, setSelectedCity] = useState<WebcamCity>(allWebcams[0]);
   // View mode: table (compact row list), cards (grid), or globe (3D Canvas)

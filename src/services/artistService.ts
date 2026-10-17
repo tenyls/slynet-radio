@@ -9,6 +9,7 @@
 import { Station } from '../types/radio';
 import { ArtistItem } from '../constants/artists';
 import { fetchStations, fetchStationsByMultipleTags, deduplicateStations } from './radioApi';
+import { loadCatalog, isCatalogReady } from './catalogService';
 
 /** Варианты написания имени для поиска в названиях станций */
 const NAME_VARIANTS: Record<string, string[]> = {
@@ -83,6 +84,13 @@ export async function findArtistStations(artist: ArtistItem): Promise<Station[]>
   const cached = cache.get(artist.id);
   if (cached) return cached;
 
+  // Проверенные роботом станции (обновляются каждый день)
+  const catalog = await loadCatalog();
+  if (isCatalogReady(catalog) && catalog.artists[artist.id]) {
+    cache.set(artist.id, catalog.artists[artist.id]);
+    return catalog.artists[artist.id];
+  }
+
   let result: Station[] = [];
 
   if (artist.category === 'ost') {
@@ -156,7 +164,14 @@ let seriesCache: Promise<Station[]> | null = null;
 
 export function fetchArtistSeriesStations(): Promise<Station[]> {
   if (!seriesCache) {
-    seriesCache = Promise.allSettled(SERIES.map((n) => fetchStations({ name: n, limit: 400 })))
+    seriesCache = loadCatalog().then((c) => (isCatalogReady(c) && c.series.length ? c.series : liveSeries()));
+  }
+  return seriesCache;
+}
+
+function liveSeries(): Promise<Station[]> {
+  {
+    return Promise.allSettled(SERIES.map((n) => fetchStations({ name: n, limit: 400 })))
       .then((lists) => {
         const all = lists.flatMap((r) => (r.status === 'fulfilled' ? r.value : []));
         const onlySeries = all.filter((st) => SERIES.some((n) => norm(st.name).startsWith(norm(n))));
@@ -174,7 +189,6 @@ export function fetchArtistSeriesStations(): Promise<Station[]> {
         return [];
       });
   }
-  return seriesCache;
 }
 
 /** «Exclusively - Metallica» → «Metallica» */

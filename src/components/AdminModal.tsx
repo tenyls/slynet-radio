@@ -29,6 +29,8 @@ import {
 import { SlyNetSettings, Station, CustomSocialLink, WebcamCity } from '../types/radio';
 import { SlyNetLogo } from './SlyNetLogo';
 import { FeaturedStationPicker } from './FeaturedStationPicker';
+import { AdminTvTab } from './AdminTvTab';
+import { loadCatalog, Catalog } from '../services/catalogService';
 import { optimizeImageFile, buildSiteContent, sanitizeSiteContent, useSlyNetSettings } from '../context/SlyNetSettingsContext';
 
 interface AdminModalProps {
@@ -62,7 +64,11 @@ export const AdminModal: React.FC<AdminModalProps> = ({
   onDeleteCustomStation,
 }) => {
   const { hasDraft, discardDraft } = useSlyNetSettings();
-  const [activeTab, setActiveTab] = useState<'brand' | 'cms' | 'webcams' | 'backup' | 'scanner' | 'stations'>('brand');
+  const [activeTab, setActiveTab] = useState<'brand' | 'cms' | 'webcams' | 'backup' | 'scanner' | 'stations' | 'tv'>('brand');
+  const [catalog, setCatalog] = useState<Catalog | null>(null);
+  React.useEffect(() => {
+    if (isOpen) loadCatalog().then(setCatalog);
+  }, [isOpen]);
 
   // Brand edit state
   const [appSubtitle, setAppSubtitle] = useState(settings.appSubtitle);
@@ -505,6 +511,33 @@ export const AdminModal: React.FC<AdminModalProps> = ({
             )}
             {backupDownloadNotice && <span className="self-center text-emerald-400 font-medium">✓ Файл скачан</span>}
           </div>
+          <div className="pt-3 border-t border-emerald-500/20 space-y-2">
+            <p>
+              <b className="text-white">Автопроверка каталога</b> (каждый день, 05:17 по Берлину): станции артистов, телеканалы, ссылки камер. Нерабочее убирается с сайта само.
+              {catalog?.generatedAt
+                ? ` Последняя проверка: ${new Date(catalog.generatedAt).toLocaleString('ru-RU')}. Телеканалов: ${catalog.tv.length}, станций артистов: ${catalog.series.length}.`
+                : ' Ещё не запускалась.'}
+            </p>
+            <a
+              href="https://github.com/tenyls/slynet-radio/actions/workflows/catalog.yml"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex px-4 py-2.5 bg-cyan-500 hover:bg-cyan-400 text-zinc-950 font-bold rounded-xl items-center gap-2"
+            >
+              <RefreshCw className="w-4 h-4" /> Обновить и проверить всё сейчас
+            </a>
+            <p className="text-[11px] text-zinc-400">Откроется GitHub: нажмите «Run workflow» → зелёную «Run workflow». Через 10–20 минут сайт обновится.</p>
+            {catalog && catalog.deadLinks.length > 0 && (
+              <details className="text-[11px]">
+                <summary className="cursor-pointer text-amber-300">Нерабочие ссылки: {catalog.deadLinks.length}</summary>
+                <ul className="mt-1 space-y-0.5 text-zinc-400 break-all">
+                  {catalog.deadLinks.map((u) => (
+                    <li key={u}>{u}</li>
+                  ))}
+                </ul>
+              </details>
+            )}
+          </div>
         </div>
 
         {(
@@ -534,6 +567,15 @@ export const AdminModal: React.FC<AdminModalProps> = ({
               >
                 <Edit3 className="w-4 h-4" />
                 <span>CMS / Контент</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('tv')}
+                className={`pb-3 px-3 text-xs sm:text-sm font-semibold transition-colors border-b-2 whitespace-nowrap flex items-center gap-1.5 ${
+                  activeTab === 'tv' ? 'border-cyan-400 text-cyan-400' : 'border-transparent text-zinc-400 hover:text-zinc-200'
+                }`}
+              >
+                <span>📺 Телеканалы ({(settings.customTvChannels || []).length})</span>
               </button>
 
               <button
@@ -1074,6 +1116,10 @@ export const AdminModal: React.FC<AdminModalProps> = ({
             )}
 
             {/* TAB: Full Server/Site Backup */}
+            {activeTab === 'tv' && (
+              <AdminTvTab channels={settings.customTvChannels || []} onChange={(list) => onUpdateSettings({ customTvChannels: list })} />
+            )}
+
             {activeTab === 'backup' && (
               <div className="p-5 sm:p-6 space-y-6 max-h-[70vh] overflow-y-auto">
                 {/* Intro banner */}

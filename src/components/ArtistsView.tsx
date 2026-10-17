@@ -4,6 +4,7 @@ import { Station } from '../types/radio';
 import { useAudio } from '../context/AudioPlayerContext';
 import { findArtistStations, fetchArtistSeriesStations, artistLabel } from '../services/artistService';
 import { StationRow } from './StationRow';
+import { loadCatalog, isCatalogReady } from '../services/catalogService';
 import {
   Mic2,
   Play,
@@ -79,9 +80,18 @@ export const ArtistsView: React.FC<ArtistsViewProps> = ({
     return Array.from(letters).sort((a, b) => a.localeCompare(b, 'ru'));
   }, []);
 
+  // Артисты без рабочих станций скрываются (по данным ежедневной проверки)
+  const [available, setAvailable] = useState<Set<string> | null>(null);
+  React.useEffect(() => {
+    loadCatalog().then((c) => {
+      if (isCatalogReady(c)) setAvailable(new Set(Object.entries(c.artists).filter(([, l]) => l.length > 0).map(([id]) => id)));
+    });
+  }, []);
+
   // Filter artists
   const filteredArtists = useMemo(() => {
     return ARTISTS_DATA.filter((artist) => {
+      if (available && !available.has(artist.id)) return false;
       // Category filter
       if (activeCategory !== 'all' && artist.category !== activeCategory) {
         return false;
@@ -105,7 +115,7 @@ export const ArtistsView: React.FC<ArtistsViewProps> = ({
 
       return true;
     });
-  }, [activeCategory, selectedLetter, searchQuery]);
+  }, [activeCategory, selectedLetter, searchQuery, available]);
 
   // Найденные станции по каждому исполнителю (только с его именем в названии)
   const [found, setFound] = useState<Record<string, Station[]>>({});
