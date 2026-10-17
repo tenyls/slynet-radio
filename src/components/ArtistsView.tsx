@@ -131,7 +131,7 @@ export const ArtistsView: React.FC<ArtistsViewProps> = ({
   const stationList = (artist: ArtistItem) => {
     const list = found[artist.id] || [];
     return (
-      <div className="flex flex-col gap-1.5 p-3 pt-0">
+      <div className="flex flex-col gap-1 p-2 pt-0 max-h-64 overflow-y-auto">
         {list.map((st) => (
           <StationRow
             key={st.stationuuid}
@@ -365,7 +365,7 @@ export const ArtistsView: React.FC<ArtistsViewProps> = ({
               <div
                 key={artist.id}
                 className={`group relative overflow-hidden rounded-3xl border transition-all duration-300 flex flex-col justify-between ${
-                  openId === artist.id ? 'sm:col-span-2 lg:col-span-3 xl:col-span-4 ' : ''
+                  ''
                 }${
                   isPlayingThis
                     ? 'bg-gradient-to-b from-zinc-900 to-emerald-950/40 border-emerald-500 shadow-xl shadow-emerald-500/10'

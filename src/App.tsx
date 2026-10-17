@@ -139,6 +139,20 @@ function RadioApp() {
     };
   }, []);
 
+  // Набрали #admin в адресе без перезагрузки страницы — включаем режим владельца
+  useEffect(() => {
+    const onHash = () => {
+      if (window.location.hash.toLowerCase().includes('admin') && !isOwnerMode) {
+        try {
+          localStorage.setItem('slynet_owner_mode', '1');
+        } catch {}
+        window.location.reload();
+      }
+    };
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, []);
+
   // Ссылка «поделиться станцией»: #station=<uuid>
   const [sharedStation, setSharedStation] = useState<Station | null>(null);
   useEffect(() => {

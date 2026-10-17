@@ -507,9 +507,14 @@ export const AdminModal: React.FC<AdminModalProps> = ({
           <div className="flex items-start gap-3">
             <Globe className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
             <div className="space-y-1">
-              <p className="font-bold text-sm text-white">
-                {hasDraft ? 'Есть неопубликованные изменения' : 'Изменений нет — сайт совпадает с опубликованным'}
-              </p>
+              {hasDraft ? (
+                <p className="font-bold text-sm text-amber-300">
+                  ⚠️ Изменения НЕ опубликованы. Их видите только вы в этом браузере — в другом браузере, в режиме инкогнито и у
+                  посетителей их нет (в том числе пароль админки и главная станция).
+                </p>
+              ) : (
+                <p className="font-bold text-sm text-white">Всё опубликовано — сайт совпадает с вашими настройками</p>
+              )}
               <p className="leading-relaxed">
                 Правки здесь видите только вы. Чтобы их увидели все: нажмите «Сохранить» во вкладке → «Скачать content.json» →
                 на GitHub откройте папку <span className="font-mono text-emerald-300">public</span> → Add file → Upload files → загрузите файл с заменой → Commit changes. Через 1–2 минуты сайт обновится у всех.

@@ -121,10 +121,11 @@ export const WebcamsView: React.FC<WebcamsViewProps> = ({ onOpenAdmin }) => {
     return matchesCat && matchesCountry && matchesSearch;
   });
 
+  // Камеры показываются на официальных сайтах — открываем их в новой вкладке
   const handleSelectCity = (city: WebcamCity) => {
     setSelectedCity(city);
-    setMediaError(false);
-    playerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    const url = city.directPortalUrl || city.streamUrl;
+    if (url && /^https?:\/\//.test(url) && !/unsplash\.com/.test(url)) window.open(url, '_blank', 'noopener,noreferrer');
   };
 
   return (
@@ -223,115 +224,6 @@ export const WebcamsView: React.FC<WebcamsViewProps> = ({ onOpenAdmin }) => {
           />
         </div>
       )}
-
-      {/* Карточка выбранной камеры */}
-      <div ref={playerRef} className="mb-8 max-w-3xl mx-auto rounded-3xl bg-zinc-950 border border-zinc-800 shadow-2xl overflow-hidden">
-        {/* Top Info Bar on Player */}
-        <div className="flex flex-wrap items-center justify-between gap-3 p-4 bg-zinc-900/90 border-b border-zinc-800/80">
-          <div className="flex items-center gap-3">
-            <span className="text-3xl">{selectedCity.flag}</span>
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-base sm:text-lg font-bold text-white">
-                  {selectedCity.name}
-                </h2>
-                <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
-                  {selectedCity.country}
-                </span>
-                {selectedCity.isCustom && (
-                  <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                    СВОЯ КАМЕРА
-                  </span>
-                )}
-              </div>
-              <p className="text-xs text-zinc-400 font-medium">{selectedCity.tagline}</p>
-            </div>
-          </div>
-
-          {/* Live Weather & Local Time Widget */}
-          <div className="flex items-center gap-3 bg-zinc-950/80 border border-zinc-800 px-3.5 py-1.5 rounded-2xl">
-            {weather ? (
-              <div className="flex items-center gap-3 text-xs">
-                <div className="flex items-center gap-1.5 text-zinc-300">
-                  <Clock className="w-3.5 h-3.5 text-cyan-400" />
-                  <span className="font-mono font-bold">{weather.localTime}</span>
-                </div>
-                <div className="w-px h-3.5 bg-zinc-800" />
-                <div className="flex items-center gap-1.5 text-white">
-                  <span>{weather.icon}</span>
-                  <span className="font-bold font-mono">
-                    {weather.temp > 0 ? `+${weather.temp}` : weather.temp}°C
-                  </span>
-                  <span className="text-zinc-400 text-[11px] hidden sm:inline">
-                    ({weather.condition})
-                  </span>
-                </div>
-              </div>
-            ) : isLoadingWeather ? (
-              <div className="flex items-center gap-2 text-xs text-zinc-500 font-mono">
-                <RefreshCw className="w-3 h-3 animate-spin text-cyan-400" />
-                <span>Обновление погоды...</span>
-              </div>
-            ) : (
-              <div className="text-xs text-zinc-400 flex items-center gap-1.5">
-                <CloudSun className="w-3.5 h-3.5 text-zinc-500" />
-                <span>{selectedCity.country}</span>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Live Camera Frame (High-Definition Direct Frame without black screen) */}
-        <div className="relative aspect-video w-full bg-zinc-950 flex items-center justify-center overflow-hidden group">
-          <div className="absolute inset-0 bg-gradient-to-br from-cyan-950 via-zinc-950 to-emerald-950" />
-          <div className="relative z-[1] text-center px-6">
-            <div className="text-6xl mb-3">{selectedCity.flag}</div>
-            <div className="text-xl sm:text-2xl font-extrabold text-white">{selectedCity.name}</div>
-            <div className="text-xs text-zinc-400 mt-1">{selectedCity.country}</div>
-          </div>
-
-          {/* Это фото города, а не кадр камеры — честно говорим об этом */}
-          <div className="absolute top-3 left-3 z-10 pointer-events-none">
-            <span className="px-2.5 py-1 rounded-md bg-black/75 backdrop-blur-md text-[10px] font-medium text-zinc-300 border border-white/10">
-              Нажмите ▶ — эфир откроется на официальном сайте камеры
-            </span>
-          </div>
-
-          {selectedCity.directPortalUrl && (
-            <a
-              href={selectedCity.directPortalUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="absolute inset-0 z-[5] flex items-end justify-center pb-16 sm:pb-20 hover:bg-white/5 transition-colors"
-              aria-label="Смотреть прямой эфир на официальном сайте"
-            >
-              <span className="w-20 h-20 rounded-full bg-gradient-to-r from-cyan-500 to-emerald-400 text-zinc-950 flex items-center justify-center shadow-2xl">
-                <Play className="w-9 h-9 fill-current ml-1" />
-              </span>
-            </a>
-          )}
-
-          {/* Bottom Bar on Video Stage: Direct Stream Link & Camera Portal */}
-          <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/90 via-black/50 to-transparent flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div className="flex items-center gap-2 text-xs text-white">
-              <span className="font-semibold">{selectedCity.name}</span>
-              <span className="text-zinc-400 hidden sm:inline">• трансляция откроется на сайте камеры</span>
-            </div>
-
-            {selectedCity.directPortalUrl && (
-              <a
-                href={selectedCity.directPortalUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-400 hover:brightness-110 text-zinc-950 font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-lg active:scale-95 shrink-0"
-              >
-                <span>Смотреть прямой эфир</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </a>
-            )}
-          </div>
-        </div>
-      </div>
 
       {/* FILTER CONTROLS & SEARCH BAR */}
       <div className="space-y-3 mb-6">

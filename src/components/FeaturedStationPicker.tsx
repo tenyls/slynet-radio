@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Search, Radio, X, Loader2, Play } from 'lucide-react';
 import { Station } from '../types/radio';
 import { fetchStations } from '../services/radioApi';
+import { GENRES } from '../constants/genres';
+import { COUNTRIES } from '../constants/countries';
 import { useAudio } from '../context/AudioPlayerContext';
 
 interface Props {
@@ -16,6 +18,19 @@ export const FeaturedStationPicker: React.FC<Props> = ({ value, customStations, 
   const [q, setQ] = useState('');
   const [results, setResults] = useState<Station[]>([]);
   const [loading, setLoading] = useState(false);
+  const [country, setCountry] = useState('');
+  const [genre, setGenre] = useState('');
+
+  const browse = async () => {
+    setLoading(true);
+    try {
+      setResults(await fetchStations({ countrycode: country || undefined, tag: genre || undefined, limit: 60 }));
+    } catch {
+      setResults([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const search = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -83,6 +98,26 @@ export const FeaturedStationPicker: React.FC<Props> = ({ value, customStations, 
           {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />} Найти
         </button>
       </form>
+
+      <div className="flex flex-wrap gap-2">
+        <select value={country} onChange={(e) => setCountry(e.target.value)} className="flex-1 min-w-[140px] text-xs py-2.5 px-3 rounded-xl bg-zinc-950 border border-zinc-800 text-white">
+          {COUNTRIES.map((c) => (
+            <option key={c.code || 'all'} value={c.code}>
+              {c.flag} {c.name}
+            </option>
+          ))}
+        </select>
+        <select value={genre} onChange={(e) => setGenre(e.target.value)} className="flex-1 min-w-[140px] text-xs py-2.5 px-3 rounded-xl bg-zinc-950 border border-zinc-800 text-white">
+          {GENRES.map((g) => (
+            <option key={g.id} value={g.tag}>
+              {g.tag ? g.name : 'Все жанры'}
+            </option>
+          ))}
+        </select>
+        <button type="button" onClick={browse} className="px-4 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-bold">
+          Показать список
+        </button>
+      </div>
 
       {results.length > 0 && (
         <div className="max-h-64 overflow-y-auto space-y-1">
