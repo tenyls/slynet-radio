@@ -9,7 +9,7 @@ import './index.css';
 createRoot(document.getElementById('root')!).render(<App />);
 
 // Service worker — только в собранной версии на https (не мешает разработке на localhost)
-if ('serviceWorker' in navigator && import.meta.env.PROD && location.protocol === 'https:') {
+if ('serviceWorker' in navigator && import.meta.env.PROD && location.protocol === 'https:' && !(window as any).Capacitor) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js').catch(() => {});
   });

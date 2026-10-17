@@ -7,3 +7,6 @@ coverage/
 .env*
 !.env.example
 logo1.png
+
+# Android (Capacitor) — папка генерируется при сборке
+/android

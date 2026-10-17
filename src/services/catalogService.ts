@@ -1,3 +1,4 @@
+import { DATA_BASE } from '../utils/platform';
 /**
  * Проверенный каталог (public/catalog.json), который каждый день собирает робот GitHub
  * (scripts/build-catalog.mjs). Если файла ещё нет — сайт работает «вживую» без него.
@@ -28,7 +29,7 @@ let promise: Promise<Catalog> | null = null;
 
 export function loadCatalog(): Promise<Catalog> {
   if (!promise) {
-    promise = fetch(`./catalog.json?d=${new Date().toISOString().slice(0, 13)}`)
+    promise = fetch(`${DATA_BASE}catalog.json?d=${new Date().toISOString().slice(0, 13)}`)
       .then((r) => (r.ok ? r.json() : EMPTY))
       .then((j) => ({ ...EMPTY, ...j }))
       .catch(() => EMPTY);

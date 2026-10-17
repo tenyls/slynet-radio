@@ -1,3 +1,4 @@
+import { DATA_BASE } from '../utils/platform';
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { SlyNetSettings, ThemeId } from '../types/radio';
 import { isOwnerMode } from '../utils/owner';
@@ -184,7 +185,7 @@ export const SlyNetSettingsProvider: React.FC<{ children: React.ReactNode }> = (
   // Опубликованный контент сайта
   useEffect(() => {
     let cancelled = false;
-    fetch(`./content.json?v=${Date.now()}`, { cache: 'no-store' })
+    fetch(`${DATA_BASE}content.json?v=${Date.now()}`, { cache: 'no-store' })
       .then((r) => (r.ok ? r.json() : {}))
       .then((json) => {
         if (cancelled) return;

@@ -1,0 +1,7 @@
+{
+  "appId": "com.slynet.radio",
+  "appName": "SlyNet Radio",
+  "webDir": "dist",
+  "android": { "allowMixedContent": false },
+  "server": { "androidScheme": "https" }
+}
