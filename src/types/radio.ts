@@ -21,6 +21,7 @@ export interface GenreCategory {
   id: string;
   name: string;
   tag: string;
+  tags?: string[]; // синонимы тега (в т.ч. по-русски) — станции подписаны по-разному
   subTitle: string;
   gradient: string;
   iconName: string;

@@ -1,3 +1,4 @@
+import { StationLogo } from './StationLogo';
 import { FEATURES } from '../utils/platform';
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAudio } from '../context/AudioPlayerContext';
@@ -239,11 +240,7 @@ export const FullScreenPlayer: React.FC<FullScreenPlayerProps> = ({ isFavorite, 
         }`}
       >
         <span className="w-10 h-10 rounded-lg overflow-hidden bg-zinc-800 shrink-0 flex items-center justify-center">
-          {st.favicon ? (
-            <img src={st.favicon} alt="" loading="lazy" referrerPolicy="no-referrer" className="w-full h-full object-cover" onError={(e) => ((e.target as HTMLImageElement).style.display = 'none')} />
-          ) : (
-            <Music2 className="w-4 h-4 text-zinc-500" />
-          )}
+          <StationLogo favicon={st.favicon} name={st.name} textClass="text-xs" />
         </span>
         <span className="min-w-0 flex-1">
           <span className="block text-sm font-semibold text-white truncate">{st.name}</span>

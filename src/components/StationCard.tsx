@@ -1,3 +1,4 @@
+import { StationLogo } from './StationLogo';
 import React, { useState } from 'react';
 import { Station } from '../types/radio';
 import { Play, Pause, Heart, Sparkles } from 'lucide-react';
@@ -48,20 +49,12 @@ export const StationCard: React.FC<StationCardProps> = ({
     >
       {/* Artwork container */}
       <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-zinc-950/80 mb-2.5 flex items-center justify-center">
-        {typeof station?.favicon === 'string' && station.favicon && !imageError ? (
-          <img
-            src={station.favicon}
-            alt={station?.name || 'Радио'}
-            referrerPolicy="no-referrer"
-            onError={() => setImageError(true)}
-            className={`w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 ${
-              isActivelyPlaying ? 'scale-105' : ''
-            }`}
-            loading="lazy"
-          />
-        ) : (
-          <StationFallbackIcon name={station?.name || 'Радио'} size="lg" className="w-full h-full rounded-xl" />
-        )}
+        <StationLogo
+          favicon={station?.favicon}
+          name={station?.name || 'Радио'}
+          textClass="text-3xl"
+          className={`w-full h-full transition-transform duration-300 group-hover:scale-105 ${isActivelyPlaying ? 'scale-105' : ''}`}
+        />
 
         {/* Custom Station "SlyNet Choice" badge */}
         {station.isCustom && (

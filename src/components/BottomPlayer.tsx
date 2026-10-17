@@ -1,3 +1,4 @@
+import { StationLogo } from './StationLogo';
 import { FEATURES } from '../utils/platform';
 import { liveFallbackLabel } from '../services/rdsService';
 import React, { useState, useEffect } from 'react';
@@ -109,17 +110,10 @@ export const BottomPlayer: React.FC<BottomPlayerProps> = ({
           >
             {/* Station Icon / Cover - Spins ONLY when isPlaying is true */}
             <div className={`relative w-12 h-12 rounded-xl overflow-hidden bg-zinc-900 border border-zinc-800 shrink-0 shadow-md ${isPlaying ? 'shadow-[0_0_15px_rgba(16,185,129,0.4)] border-emerald-500/50' : ''}`}>
-              {typeof currentStation?.favicon === 'string' && currentStation.favicon.startsWith('http') ? (
-                <img
-                  src={currentStation.favicon}
-                  alt={currentStation.name || 'Радио'}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    (e.currentTarget as HTMLElement).style.display = 'none';
-                  }}
-                />
+              {currentStation ? (
+                <StationLogo key={currentStation.stationuuid} favicon={currentStation.favicon} name={currentStation.name || 'Радио'} />
               ) : (
-                <StationFallbackIcon name={currentStation?.name || 'Радио'} className="w-full h-full p-2" />
+                <StationFallbackIcon name="SlyNet Radio" className="w-full h-full p-2" />
               )}
 
               {isPlaying && (

@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
+import { isNativeApp } from '../utils/platform';
 
 export type ViewMode = 'grid' | 'list';
 const KEY = 'slynet_view_mode';
@@ -13,12 +14,21 @@ export function setDefaultViewMode(m?: string) {
   window.dispatchEvent(new CustomEvent(EVENT));
 }
 
+/** В приложении и на телефоне по умолчанию удобнее список, на компьютере — как задано в админке */
+function deviceDefault(): ViewMode {
+  if (isNativeApp) return 'list';
+  try {
+    if (window.matchMedia('(max-width: 640px)').matches) return 'list';
+  } catch {}
+  return siteDefault;
+}
+
 function read(): ViewMode {
   try {
     const v = localStorage.getItem(KEY);
-    return v === 'list' || v === 'grid' ? v : siteDefault;
+    return v === 'list' || v === 'grid' ? v : deviceDefault();
   } catch {
-    return siteDefault;
+    return deviceDefault();
   }
 }
 

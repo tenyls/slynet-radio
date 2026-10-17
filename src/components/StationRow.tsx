@@ -1,3 +1,4 @@
+import { StationLogo } from './StationLogo';
 import React, { useState } from 'react';
 import { Play, Pause, Heart, Music2 } from 'lucide-react';
 import { Station } from '../types/radio';
@@ -39,12 +40,8 @@ export const StationRow: React.FC<StationRowProps> = ({ station, isCurrent, isPl
         {active ? <Pause className="w-4 h-4 fill-current" /> : <Play className="w-4 h-4 fill-current ml-0.5" />}
       </button>
 
-      <span className="hidden sm:flex w-9 h-9 rounded-lg overflow-hidden bg-zinc-950 items-center justify-center shrink-0">
-        {station.favicon && !imgError ? (
-          <img src={station.favicon} alt="" loading="lazy" referrerPolicy="no-referrer" onError={() => setImgError(true)} className="w-full h-full object-cover" />
-        ) : (
-          <Music2 className="w-4 h-4 text-zinc-600" />
-        )}
+      <span className="flex w-10 h-10 sm:w-9 sm:h-9 rounded-lg overflow-hidden bg-zinc-950 items-center justify-center shrink-0">
+        <StationLogo favicon={station.favicon} name={station.name} textClass="text-xs" />
       </span>
 
       <div className="min-w-0 flex-1">

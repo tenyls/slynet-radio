@@ -9,8 +9,9 @@ import { useFavorites } from './hooks/useFavorites';
 import { useSlyNetSettings, SlyNetSettingsProvider } from './context/SlyNetSettingsContext';
 import { isSectionHidden, hiddenCountrySet } from './utils/visibility';
 import { ContinueListening } from './components/ContinueListening';
+import { ListFilters } from './components/ListFilters';
 import { useCustomStations } from './hooks/useCustomStations';
-import { fetchStations, fetchCatalogStats, fetchStationsByUuids, guessUserCountry } from './services/radioApi';
+import { fetchStations, fetchGenreStations, fetchCatalogStats, fetchStationsByUuids } from './services/radioApi';
 import { MobileHome } from './components/MobileHome';
 import { syncNow } from './services/syncService';
 import { getMyCountry } from './services/geoService';
@@ -205,12 +206,16 @@ function RadioApp() {
         nameToUse = searchQuery.trim();
       }
 
-      const results = await fetchStations({
-        tag: tagToUse,
-        name: nameToUse,
-        countrycode: selectedCountry || undefined,
-        limit: 80,
-      });
+      const genreObj = currentTab === 'genres' ? activeGenreDetail || selectedGenre : null;
+      const results =
+        genreObj && genreObj.tag
+          ? await fetchGenreStations(genreObj, { name: nameToUse, countrycode: selectedCountry || undefined, limit: 80 })
+          : await fetchStations({
+              tag: tagToUse,
+              name: nameToUse,
+              countrycode: selectedCountry || undefined,
+              limit: selectedCountry ? 150 : 80,
+            });
 
       setStations(results);
     } catch (err) {
@@ -314,6 +319,7 @@ function RadioApp() {
 
   const handleBackToGenresList = () => {
     setActiveGenreDetail(null);
+    setSelectedGenre(GENRES[0]);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -540,7 +546,7 @@ function RadioApp() {
         <main className="flex-1 px-4 sm:px-6 py-6 max-w-7xl w-full mx-auto">
           {/* Active Combo Filters Banner: Country + Genre (hidden on webcams, tv, info, artists) */}
           {!(currentTab === 'webcams' || currentTab === 'tv' || currentTab === 'info' || currentTab === 'artists') &&
-            (selectedCountry || (currentTab === 'genres' && (activeGenreDetail || selectedGenre.tag))) && (
+            (selectedCountry || (currentTab === 'genres' && activeGenreDetail)) && (
             <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-zinc-900/95 via-zinc-900/80 to-emerald-950/40 border border-cyan-500/30 shadow-lg animate-fade-in mb-6">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-xs font-mono font-bold text-cyan-400 flex items-center gap-1.5 uppercase">
@@ -564,9 +570,9 @@ function RadioApp() {
                   </span>
                 )}
 
-                {currentTab === 'genres' && (activeGenreDetail || selectedGenre.tag) && (
+                {currentTab === 'genres' && activeGenreDetail && (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-emerald-500/15 text-emerald-200 border border-emerald-400/40 shadow-sm">
-                    <span>🎵 Жанр: {(activeGenreDetail || selectedGenre).name}</span>
+                    <span>🎵 Жанр: {activeGenreDetail?.name}</span>
                     <button
                       onClick={handleBackToGenresList}
                       className="hover:text-white p-0.5 rounded ml-1 transition-colors"
@@ -730,11 +736,11 @@ function RadioApp() {
                       : '🌍 Популярные станции мира'}{' '}
                     <span className="text-zinc-400 font-semibold text-sm">({displayedStations.length})</span>
                   </span>
-                  {selectedCountry && (
-                    <button onClick={() => setSelectedCountry('')} className="px-3 py-1.5 rounded-xl bg-zinc-800 text-zinc-200 text-xs font-semibold">
-                      ✕ Показать все страны
-                    </button>
-                  )}
+                  <ListFilters
+                    country={selectedCountry}
+                    onCountry={setSelectedCountry}
+                    onGenre={(g) => g && handleSelectGenre(g)}
+                  />
                 </div>
 
                 <StationGrid
@@ -807,6 +813,14 @@ function RadioApp() {
                       </div>
                     </div>
                   </div>
+
+                  {/* Фильтры над списком: страна + другой жанр */}
+                  <ListFilters
+                    country={selectedCountry}
+                    onCountry={setSelectedCountry}
+                    genreId={activeGenreDetail.id}
+                    onGenre={(g) => (g ? handleSelectGenre(g) : (handleBackToGenresList(), setCurrentTab('popular')))}
+                  />
 
                   {/* Stations in this genre */}
                   <StationGrid

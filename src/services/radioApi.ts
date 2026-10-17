@@ -364,3 +364,20 @@ export function guessUserCountry(): string {
     return '';
   }
 }
+
+/** Станции жанра: основной тег + синонимы (в т.ч. русские подписи), объединяем и сортируем по популярности */
+export async function fetchGenreStations(
+  genre: { tag: string; tags?: string[] },
+  opts: { countrycode?: string; name?: string; limit?: number } = {}
+): Promise<Station[]> {
+  const limit = opts.limit || 80;
+  const tags = [genre.tag, ...(genre.tags || [])].filter(Boolean).slice(0, 7);
+  if (tags.length <= 1) return fetchStations({ tag: tags[0], countrycode: opts.countrycode, name: opts.name, limit });
+  const lists = await Promise.allSettled(
+    tags.map((t, i) => fetchStations({ tag: t, countrycode: opts.countrycode, name: opts.name, limit: i === 0 ? limit : Math.ceil(limit / 2) }))
+  );
+  const all = lists.flatMap((r) => (r.status === 'fulfilled' ? r.value : []));
+  return deduplicateStations(all)
+    .sort((a, b) => (b.clickcount || 0) - (a.clickcount || 0))
+    .slice(0, opts.countrycode ? limit * 2 : limit);
+}

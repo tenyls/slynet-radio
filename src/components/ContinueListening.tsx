@@ -1,3 +1,4 @@
+import { StationLogo } from './StationLogo';
 import React from 'react';
 import { History, Play, Pause } from 'lucide-react';
 import { useAudio } from '../context/AudioPlayerContext';
@@ -23,13 +24,7 @@ export const ContinueListening: React.FC = () => {
               className={`snap-start shrink-0 w-28 sm:w-32 text-left rounded-2xl p-2 border transition-colors active:scale-95 ${active ? 'bg-emerald-500/15 border-emerald-500/50' : 'bg-zinc-900 border-zinc-800 hover:border-zinc-700'}`}
             >
               <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-zinc-800 mb-2">
-                {st.favicon ? (
-                  <img src={st.favicon} alt="" loading="lazy" className="w-full h-full object-cover" onError={(e) => ((e.target as HTMLImageElement).style.display = 'none')} />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <StationFallbackIcon name={st.name} />
-                  </div>
-                )}
+                <StationLogo favicon={st.favicon} name={st.name} textClass="text-2xl" />
                 <span className="absolute bottom-1.5 right-1.5 w-8 h-8 rounded-full bg-emerald-500 text-zinc-950 flex items-center justify-center shadow-lg">
                   {active && isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
                 </span>

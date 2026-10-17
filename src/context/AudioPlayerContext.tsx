@@ -89,7 +89,23 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [volume, setVolumeState] = useState<number>(0.85);
+  const [volume, setVolumeState] = useState<number>(() => {
+    try {
+      const v = parseFloat(localStorage.getItem('slynet_volume') || '');
+      return Number.isFinite(v) && v >= 0 && v <= 1 ? v : 0.6;
+    } catch {
+      return 0.6;
+    }
+  });
+  // Запоминаем громкость на устройстве
+  useEffect(() => {
+    const t = setTimeout(() => {
+      try {
+        localStorage.setItem('slynet_volume', String(volume));
+      } catch {}
+    }, 300);
+    return () => clearTimeout(t);
+  }, [volume]);
   const [isMuted, setIsMuted] = useState<boolean>(false);
   const [playlist, setPlaylist] = useState<Station[]>([]);
 
