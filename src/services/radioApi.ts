@@ -2,11 +2,28 @@ import { Station } from '../types/radio';
 
 const SERVERS = [
   'https://de1.api.radio-browser.info',
+  'https://de2.api.radio-browser.info',
+  'https://fi1.api.radio-browser.info',
   'https://nl1.api.radio-browser.info',
   'https://at1.api.radio-browser.info',
 ];
 
-let currentServerIndex = 0;
+let currentServerIndex = Math.floor(Math.random() * SERVERS.length);
+
+/**
+ * На https-сайте (GitHub Pages) браузер блокирует http-потоки («смешанный контент»),
+ * поэтому показываем только https-станции. В мобильном приложении (Capacitor) это ограничение снимается.
+ */
+export const HTTPS_ONLY =
+  typeof window !== 'undefined' &&
+  window.location.protocol === 'https:' &&
+  !(window as any).Capacitor?.isNativePlatform?.();
+
+export function isPlayableHere(st: Station): boolean {
+  const u = st.url_resolved || st.url || '';
+  if (!u) return false;
+  return HTTPS_ONLY ? u.startsWith('https://') : /^https?:\/\//.test(u);
+}
 
 // Curated high-reliability fallback stations in case network/CORS issues occur
 export const FALLBACK_STATIONS: Station[] = [
@@ -115,21 +132,6 @@ export const FALLBACK_STATIONS: Station[] = [
     clickcount: 42100,
     votes: 1450,
   },
-  {
-    stationuuid: 'fallback-deep-house-lounge',
-    name: 'Deep House Lounge',
-    url: 'https://198.58.98.83:8258/stream',
-    url_resolved: 'https://198.58.98.83:8258/stream',
-    homepage: 'https://deephouselounge.com',
-    favicon: '',
-    tags: 'dance,house,deephouse,electronic',
-    country: 'United States',
-    countrycode: 'US',
-    codec: 'MP3',
-    bitrate: 128,
-    clickcount: 36500,
-    votes: 1120,
-  },
 ];
 
 async function requestWithFailover(path: string): Promise<Response> {
@@ -144,12 +146,7 @@ async function requestWithFailover(path: string): Promise<Response> {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 7000);
 
-      const response = await fetch(fullUrl, {
-        headers: {
-          'User-Agent': 'SlyNetRadio/2.0 (AudioApp; AI-Studio)',
-        },
-        signal: controller.signal,
-      });
+      const response = await fetch(fullUrl, { signal: controller.signal });
 
       clearTimeout(timeoutId);
 
@@ -199,6 +196,7 @@ export function deduplicateStations(stations: Station[]): Station[] {
 
   for (const st of stations) {
     if (!st || !st.stationuuid) continue;
+    if (!st.isCustom && !isPlayableHere(st)) continue;
     if (isStationQuarantined(st.stationuuid)) continue;
 
     // Normalizing stream host and path
@@ -234,66 +232,24 @@ export function deduplicateStations(stations: Station[]): Station[] {
 
 export async function fetchStations(options: FetchOptions = {}): Promise<Station[]> {
   const { tag, name, countrycode, limit = 120 } = options;
-  let path = '';
-
-  if (countrycode && tag) {
-    // Combined Country + Genre Tag Search
-    const query = new URLSearchParams({
-      hidebroken: 'true',
-      lastcheckok: '1',
-      order: 'clickcount',
-      reverse: 'true',
-      limit: String(limit),
-      countrycode: countrycode.trim().toUpperCase(),
-      tag: tag.trim().toLowerCase(),
-    });
-    if (name && name.trim()) query.set('name', name.trim());
-    path = `/json/stations/search?${query.toString()}`;
-  } else if (name && name.trim()) {
-    // Search by name
-    const query = new URLSearchParams({
-      hidebroken: 'true',
-      lastcheckok: '1',
-      order: 'clickcount',
-      reverse: 'true',
-      limit: String(limit),
-    });
-    if (countrycode) query.set('countrycode', countrycode.trim().toUpperCase());
-    if (tag) query.set('tag', tag.trim().toLowerCase());
-    path = `/json/stations/byname/${encodeURIComponent(name.trim())}?${query.toString()}`;
-  } else if (tag && tag.trim()) {
-    // Search by genre tag
-    const query = new URLSearchParams({
-      hidebroken: 'true',
-      lastcheckok: '1',
-      order: 'clickcount',
-      reverse: 'true',
-      limit: String(limit),
-    });
-    path = `/json/stations/bytag/${encodeURIComponent(tag.trim())}?${query.toString()}`;
-  } else if (countrycode && countrycode.trim()) {
-    // Search by country code (supports US, FR, DE, RU, UA, GB, IT, ES, TR, KZ, BY and all ISO codes)
-    const normalizedCode = countrycode.trim().toUpperCase();
-    const effectiveLimit = Math.max(limit, 200);
-    const query = new URLSearchParams({
-      countrycode: normalizedCode,
-      hidebroken: 'true',
-      lastcheckok: '1',
-      order: 'clickcount',
-      reverse: 'true',
-      limit: String(effectiveLimit),
-    });
-    path = `/json/stations/search?${query.toString()}`;
-  } else {
-    // Top world stations
-    path = `/json/stations/topclick/${limit}?hidebroken=true&lastcheckok=1`;
-  }
+  const query = new URLSearchParams({
+    hidebroken: 'true',
+    order: 'clickcount',
+    reverse: 'true',
+    // Берём с запасом: часть отсеется как дубли/http
+    limit: String(Math.min(Math.round(limit * 1.6), 400)),
+  });
+  if (HTTPS_ONLY) query.set('is_https', 'true');
+  if (countrycode && countrycode.trim()) query.set('countrycode', countrycode.trim().toUpperCase());
+  if (tag && tag.trim()) query.set('tag', tag.trim().toLowerCase());
+  if (name && name.trim()) query.set('name', name.trim());
+  const path = `/json/stations/search?${query.toString()}`;
 
   try {
     const res = await requestWithFailover(path);
     const data: Station[] = await res.json();
     if (Array.isArray(data) && data.length > 0) {
-      return deduplicateStations(data);
+      return deduplicateStations(data).slice(0, limit);
     }
     return [];
   } catch (error) {
@@ -357,3 +313,22 @@ export async function registerStationClick(stationuuid: string): Promise<void> {
   }
 }
 
+
+/** Станции по списку идентификаторов (для переноса избранного по ссылке / QR-коду). */
+export async function fetchStationsByUuids(uuids: string[]): Promise<Station[]> {
+  const clean = uuids.filter((u) => /^[0-9a-f-]{36}$/i.test(u)).slice(0, 200);
+  if (!clean.length) return [];
+  const res = await requestWithFailover(`/json/stations/byuuid?uuids=${clean.join(',')}`);
+  const data = await res.json();
+  return Array.isArray(data) ? data : [];
+}
+
+/** Общая статистика каталога (кол-во станций и т.д.) */
+export async function fetchCatalogStats(): Promise<{ stations?: number } | null> {
+  try {
+    const res = await requestWithFailover('/json/stats');
+    return await res.json();
+  } catch {
+    return null;
+  }
+}

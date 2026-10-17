@@ -31,7 +31,8 @@ interface HeaderProps {
   isLoading: boolean;
   language: Language;
   onSelectLanguage: (lang: Language) => void;
-  onOpenAdmin: () => void;
+  /** Только в режиме владельца (#admin) */
+  onOpenAdmin?: () => void;
   onOpenSync: () => void;
   onOpenAbout: () => void;
   currentTab?: MainTab;
@@ -158,6 +159,7 @@ export const Header: React.FC<HeaderProps> = ({
             >
               {appVersion}
             </button>
+            {onOpenAdmin && (
             <button
               onClick={onOpenAdmin}
               title="Панель администратора"
@@ -165,6 +167,7 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <Settings className="w-4 h-4" />
             </button>
+            )}
           </div>
         </div>
 
@@ -257,15 +260,17 @@ export const Header: React.FC<HeaderProps> = ({
               <span>Sync</span>
             </button>
 
-            {/* Admin Modal Button (PIN 1234) */}
+            {/* Admin button — owner mode only */}
+            {onOpenAdmin && (
             <button
               onClick={onOpenAdmin}
-              title="Панель администратора (PIN: 1234)"
+              title="Панель администратора"
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-zinc-900 to-zinc-800 hover:from-zinc-800 hover:to-zinc-700 border border-emerald-500/30 text-xs font-semibold text-emerald-300 hover:text-white transition-all shrink-0 shadow-sm"
             >
               <Settings className="w-3.5 h-3.5 text-emerald-400 animate-spin-slow" />
               <span>{t.navAdmin}</span>
             </button>
+            )}
           </div>
         </div>
 

@@ -36,7 +36,8 @@ interface SidebarProps {
   onOpenSleepTimer: () => void;
   settings: SlyNetSettings;
   onUploadLogo?: (base64: string) => void;
-  onOpenAdmin: () => void;
+  /** Только в режиме владельца (#admin) */
+  onOpenAdmin?: () => void;
   onOpenSync: () => void;
   onOpenAbout: () => void;
   onSelectLanguage: (lang: Language) => void;
@@ -307,7 +308,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <span className="text-[10px] font-mono text-zinc-400">SLY-SYNC</span>
         </button>
 
-        {/* Admin Panel (Password 1234) */}
+        {/* Admin Panel — owner mode only */}
+        {onOpenAdmin && (
         <button
           onClick={onOpenAdmin}
           className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-emerald-300 hover:text-white bg-zinc-900/60 hover:bg-zinc-900 border border-emerald-500/30 transition-colors"
@@ -316,8 +318,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <Settings className="w-4 h-4 text-emerald-400" />
             <span>⚙️ {t.navAdmin}</span>
           </div>
-          <span className="text-[10px] font-mono text-emerald-400">PIN: 1234</span>
+          <span className="text-[10px] font-mono text-emerald-400">OWNER</span>
         </button>
+        )}
 
         {/* About & Version v0.8 Beta */}
         <button

@@ -1,27 +1,93 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { SlyNetSettings, ThemeId } from '../types/radio';
+import { isOwnerMode } from '../utils/owner';
 
-export const SETTINGS_KEY = 'slynet_settings_v2';
-export const PERMANENT_LOGO_KEY = 'slynet_permanent_logo';
+/** Личные настройки посетителя (тема, язык) — хранятся только на его устройстве. */
+export const SETTINGS_KEY = 'slynet_user_prefs_v3';
+/** Черновик владельца: правки из Админ-панели до публикации content.json. */
+export const ADMIN_DRAFT_KEY = 'slynet_admin_draft_v1';
 
-const DEFAULT_SETTINGS: SlyNetSettings = {
+/** Поля контента сайта. Источник — файл public/content.json (одинаков для всех посетителей). */
+export const SITE_FIELDS = [
+  'appTitle',
+  'appSubtitle',
+  'customLogoUrl',
+  'telegramUrl',
+  'customLinks',
+  'customWebcams',
+  'customStations',
+  'customTvChannels',
+  'heroTitle',
+  'heroSubtitle',
+  'appVersion',
+  'versionChangelog',
+  'dmcaPolicy',
+] as const;
+type SiteField = (typeof SITE_FIELDS)[number];
+export type SiteContent = Partial<Pick<SlyNetSettings, SiteField>>;
+
+const USER_FIELDS = ['isPro', 'activeTheme', 'language'] as const;
+
+export const APP_VERSION = 'v0.9.0';
+
+export const DEFAULT_SETTINGS: SlyNetSettings = {
   appTitle: 'SlyNet Radio',
-  appSubtitle: 'Global 1000+ Radio Hub & World Webcams',
-  customLogoUrl: '',
+  appSubtitle: 'Радио со всего мира',
+  customLogoUrl: './logo.png',
   telegramUrl: 'https://t.me/slynet_radio',
   customLinks: [
     { id: '1', title: 'Telegram Канал', url: 'https://t.me/slynet_radio' },
     { id: '2', title: 'Чат / Поддержка', url: 'https://t.me/slynet_support' },
   ],
-  adminPin: '1234',
+  customWebcams: [],
+  customStations: [],
+  customTvChannels: [],
   isPro: false,
   activeTheme: 'slynet-original',
   language: 'ru',
   heroTitle: 'SlyNet Radio',
-  appVersion: 'v0.8.6',
-  versionChangelog: 'Версия 0.8.6: Умный фильтр RDS и Shazam (сохранение только реальных проверенных песен с исполнителем), каталог «Исполнители & Группы (A–Z)» и «Саундтреки OST 24/7», точный выбор стран без сбоев (до 200 станций на страну, кнопка Закрыть и Esc), быстрая регистрация без Email (Логин + Пароль + QR-код), строгий PIN админки, 50+ проверенных веб-камер мира без черных окон.',
-  dmcaPolicy: 'SlyNet Radio является свободным программным интернет-тюнером и агрегатором публичных радиовещательных потоков и открытых веб-камер. Приложение не хранит, не ретранслирует и не изменяет аудио- и видеоматериалы на своих серверах. Все аудиопотоки воспроизводятся напрямую из открытой базы Radio Browser API.\n\nВсе персональные настройки (избранные станции, кастомный логотип, темы) сохраняются исключительно в локальном хранилище вашего браузера (localStorage).\n\nЕсли вы являетесь правообладателем или представителем вещателя и хотите обновить метаданные или удалить поток из каталога, направьте официальный запрос разработчикам SlyNet Radio через наш официальный Telegram-канал.',
+  appVersion: APP_VERSION,
+  versionChangelog: '',
+  dmcaPolicy:
+    'SlyNet Radio — программный интернет-тюнер и каталог публичных радиопотоков и открытых веб-камер. Приложение не хранит, не ретранслирует и не изменяет аудио- и видеоматериалы: все потоки воспроизводятся напрямую с серверов вещателей, каталог станций — открытая база Radio Browser.\n\nВаши настройки (избранное, тема, язык) хранятся только на вашем устройстве.\n\nЕсли вы правообладатель или представитель вещателя и хотите изменить или удалить поток, напишите нам через официальный Telegram-канал.',
 };
+
+function pick<T extends object>(obj: any, keys: readonly string[]): Partial<T> {
+  const out: any = {};
+  if (!obj || typeof obj !== 'object') return out;
+  for (const k of keys) if (obj[k] !== undefined) out[k] = obj[k];
+  return out;
+}
+
+function readJson(key: string): any {
+  try {
+    const v = localStorage.getItem(key);
+    return v ? JSON.parse(v) : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Только проверенные поля из content.json, чтобы битый файл не уронил сайт. */
+export function sanitizeSiteContent(raw: any): SiteContent {
+  const c: any = pick(raw, SITE_FIELDS as unknown as string[]);
+  for (const k of ['customLinks', 'customWebcams', 'customStations', 'customTvChannels']) {
+    if (c[k] !== undefined && !Array.isArray(c[k])) delete c[k];
+  }
+  for (const k of ['appTitle', 'appSubtitle', 'customLogoUrl', 'telegramUrl', 'heroTitle', 'heroSubtitle', 'appVersion', 'versionChangelog', 'dmcaPolicy']) {
+    if (c[k] !== undefined && typeof c[k] !== 'string') delete c[k];
+  }
+  // Версию задаёт код, а не файл контента
+  delete c.appVersion;
+  return c;
+}
+
+/** Собирает content.json из текущих настроек (для кнопки «Скачать content.json»). */
+export function buildSiteContent(settings: SlyNetSettings): SiteContent {
+  const c = pick<SiteContent>(settings, SITE_FIELDS as unknown as string[]);
+  delete (c as any).appVersion;
+  return c;
+}
 
 export function optimizeImageFile(file: File, maxDim = 512): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -76,6 +142,11 @@ interface SlyNetSettingsContextType {
   updateSettings: (updates: Partial<SlyNetSettings>) => void;
   updateLogo: (base64OrUrl: string) => void;
   resetLogo: () => void;
+  /** Контент сайта из опубликованного content.json (без черновика владельца) */
+  publishedContent: SiteContent;
+  /** Есть ли неопубликованные правки владельца */
+  hasDraft: boolean;
+  discardDraft: () => void;
   togglePro: () => void;
   setTheme: (themeId: ThemeId) => void;
   setLanguage: (lang: import('../types/radio').Language) => void;
@@ -84,119 +155,88 @@ interface SlyNetSettingsContextType {
 const SlyNetSettingsContext = createContext<SlyNetSettingsContextType | null>(null);
 
 export const SlyNetSettingsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [settings, setSettings] = useState<SlyNetSettings>(() => {
-    let initial = { ...DEFAULT_SETTINGS };
-    try {
-      const saved = localStorage.getItem(SETTINGS_KEY);
-      if (saved) {
-        initial = { ...initial, ...JSON.parse(saved) };
-      }
-      const permanentLogo = localStorage.getItem(PERMANENT_LOGO_KEY);
-      if (permanentLogo) {
-        initial.customLogoUrl = permanentLogo;
-      }
-      // Ensure custom links migration
-      if (!initial.customLinks || initial.customLinks.length === 0) {
-        initial.customLinks = DEFAULT_SETTINGS.customLinks;
-      }
-      // Version bump to v0.8.5
-      if (!initial.appVersion || initial.appVersion !== 'v0.8.5') {
-        initial.appVersion = 'v0.8.5';
-        initial.versionChangelog = DEFAULT_SETTINGS.versionChangelog;
-      }
-      // Clean up any legacy fields
-      ['telegram' + 'Ip' + 'tv' + 'Url'].forEach((k) => delete (initial as any)[k]);
-    } catch (e) {
-      console.warn('Failed to read settings from localStorage', e);
-    }
-    return initial;
-  });
+  const [published, setPublished] = useState<SiteContent>({});
+  const [draft, setDraft] = useState<SiteContent>(() =>
+    isOwnerMode ? sanitizeSiteContent(readJson(ADMIN_DRAFT_KEY)) : {}
+  );
+  const [userPrefs, setUserPrefs] = useState<Partial<SlyNetSettings>>(() =>
+    pick<SlyNetSettings>(readJson(SETTINGS_KEY), USER_FIELDS as unknown as string[])
+  );
 
-  // Apply active theme to DOM root
+  // Опубликованный контент сайта
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`./content.json?v=${Date.now()}`, { cache: 'no-store' })
+      .then((r) => (r.ok ? r.json() : {}))
+      .then((json) => {
+        if (!cancelled) setPublished(sanitizeSiteContent(json));
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const settings: SlyNetSettings = {
+    ...DEFAULT_SETTINGS,
+    ...published,
+    ...draft,
+    ...userPrefs,
+    appVersion: APP_VERSION,
+  } as SlyNetSettings;
+  if (!settings.customLogoUrl) settings.customLogoUrl = DEFAULT_SETTINGS.customLogoUrl;
+
+  // Тема
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', settings.activeTheme || 'slynet-original');
   }, [settings.activeTheme]);
 
-  // Persist settings (without bloating with huge strings if possible)
+  // Сохраняем только личные настройки
   useEffect(() => {
     try {
-      localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-    } catch (e) {
-      console.warn('Failed to save settings to localStorage', e);
-    }
-  }, [settings]);
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(userPrefs));
+    } catch {}
+  }, [userPrefs]);
 
-  // Listen to external logo changes across tabs or instances
+  // Черновик владельца
   useEffect(() => {
-    const handleLogoUpdate = (e: Event) => {
-      const customEvent = e as CustomEvent<string>;
-      if (customEvent && customEvent.detail !== undefined) {
-        setSettings((prev) => {
-          if (prev.customLogoUrl === customEvent.detail) return prev;
-          return { ...prev, customLogoUrl: customEvent.detail };
-        });
-      }
-    };
-
-    window.addEventListener('slynet_logo_changed', handleLogoUpdate);
-    return () => window.removeEventListener('slynet_logo_changed', handleLogoUpdate);
-  }, []);
+    if (!isOwnerMode) return;
+    try {
+      if (Object.keys(draft).length) localStorage.setItem(ADMIN_DRAFT_KEY, JSON.stringify(draft));
+      else localStorage.removeItem(ADMIN_DRAFT_KEY);
+    } catch (e) {
+      console.warn('Черновик слишком большой для хранилища браузера', e);
+    }
+  }, [draft]);
 
   const updateSettings = useCallback((updates: Partial<SlyNetSettings>) => {
-    setSettings((prev) => {
-      const next = { ...prev, ...updates };
-      if (updates.customLogoUrl !== undefined) {
-        try {
-          if (updates.customLogoUrl) {
-            localStorage.setItem(PERMANENT_LOGO_KEY, updates.customLogoUrl);
-          } else {
-            localStorage.removeItem(PERMANENT_LOGO_KEY);
-          }
-          window.dispatchEvent(
-            new CustomEvent('slynet_logo_changed', { detail: updates.customLogoUrl || '' })
-          );
-        } catch (e) {
-          console.warn('Failed to persist permanent logo', e);
-        }
-      }
-      return next;
-    });
+    const user = pick<SlyNetSettings>(updates, USER_FIELDS as unknown as string[]);
+    const site = pick<SiteContent>(updates, SITE_FIELDS as unknown as string[]);
+    delete (site as any).appVersion;
+    if (Object.keys(user).length) setUserPrefs((p) => ({ ...p, ...user }));
+    // Контент сайта меняет только владелец (и только в своём черновике)
+    if (isOwnerMode && Object.keys(site).length) setDraft((p) => ({ ...p, ...site }));
   }, []);
 
-  const updateLogo = useCallback((base64OrUrl: string) => {
-    try {
-      if (base64OrUrl) {
-        localStorage.setItem(PERMANENT_LOGO_KEY, base64OrUrl);
-      } else {
-        localStorage.removeItem(PERMANENT_LOGO_KEY);
-      }
-      window.dispatchEvent(
-        new CustomEvent('slynet_logo_changed', { detail: base64OrUrl || '' })
-      );
-    } catch (e) {
-      console.warn('Failed to persist permanent logo', e);
-    }
-    setSettings((prev) => ({ ...prev, customLogoUrl: base64OrUrl }));
-  }, []);
+  const updateLogo = useCallback(
+    (base64OrUrl: string) => updateSettings({ customLogoUrl: base64OrUrl || DEFAULT_SETTINGS.customLogoUrl }),
+    [updateSettings]
+  );
 
-  const resetLogo = useCallback(() => {
-    try {
-      localStorage.removeItem(PERMANENT_LOGO_KEY);
-      window.dispatchEvent(new CustomEvent('slynet_logo_changed', { detail: '' }));
-    } catch {}
-    setSettings((prev) => ({ ...prev, customLogoUrl: '' }));
-  }, []);
+  const resetLogo = useCallback(() => updateSettings({ customLogoUrl: DEFAULT_SETTINGS.customLogoUrl }), [updateSettings]);
+
+  const discardDraft = useCallback(() => setDraft({}), []);
 
   const togglePro = useCallback(() => {
-    setSettings((prev) => ({ ...prev, isPro: !prev.isPro }));
+    setUserPrefs((prev) => ({ ...prev, isPro: !prev.isPro }));
   }, []);
 
   const setTheme = useCallback((themeId: ThemeId) => {
-    setSettings((prev) => ({ ...prev, activeTheme: themeId }));
+    setUserPrefs((prev) => ({ ...prev, activeTheme: themeId }));
   }, []);
 
   const setLanguage = useCallback((language: import('../types/radio').Language) => {
-    setSettings((prev) => ({ ...prev, language }));
+    setUserPrefs((prev) => ({ ...prev, language }));
   }, []);
 
   return (
@@ -207,6 +247,9 @@ export const SlyNetSettingsProvider: React.FC<{ children: React.ReactNode }> = (
         updateSettings,
         updateLogo,
         resetLogo,
+        publishedContent: published,
+        hasDraft: Object.keys(draft).length > 0,
+        discardDraft,
         togglePro,
         setTheme,
         setLanguage,
@@ -220,21 +263,19 @@ export const SlyNetSettingsProvider: React.FC<{ children: React.ReactNode }> = (
 export function useSlyNetSettings() {
   const context = useContext(SlyNetSettingsContext);
   if (!context) {
-    // Graceful fallback if called outside provider (e.g. initial setup)
-    let fallbackLogo = '';
-    try {
-      fallbackLogo = localStorage.getItem(PERMANENT_LOGO_KEY) || '';
-    } catch {}
     return {
-      settings: { ...DEFAULT_SETTINGS, customLogoUrl: fallbackLogo },
-      customLogoUrl: fallbackLogo,
+      settings: { ...DEFAULT_SETTINGS },
+      customLogoUrl: DEFAULT_SETTINGS.customLogoUrl,
       updateSettings: () => {},
       updateLogo: () => {},
       resetLogo: () => {},
+      publishedContent: {},
+      hasDraft: false,
+      discardDraft: () => {},
       togglePro: () => {},
       setTheme: () => {},
       setLanguage: () => {},
-    };
+    } as SlyNetSettingsContextType;
   }
   return context;
 }

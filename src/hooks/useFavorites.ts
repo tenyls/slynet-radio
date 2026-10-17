@@ -1,54 +1,60 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Station } from '../types/radio';
 
-const FAVORITES_STORAGE_KEY = 'pcradio_favorites_v1';
+export const FAVORITES_STORAGE_KEY = 'slynet_favorites_v2';
+const LEGACY_KEYS = ['pcradio_favorites_v1', 'slynet_radio_favorites', 'slynet_favorites_v1'];
+const CHANGE_EVENT = 'slynet_favorites_changed';
+
+function load(): Station[] {
+  try {
+    const saved = localStorage.getItem(FAVORITES_STORAGE_KEY);
+    if (saved) return JSON.parse(saved);
+    // Переносим избранное из старых версий сайта
+    for (const k of LEGACY_KEYS) {
+      const old = localStorage.getItem(k);
+      if (old) {
+        const parsed = JSON.parse(old);
+        if (Array.isArray(parsed) && parsed.length) {
+          localStorage.setItem(FAVORITES_STORAGE_KEY, old);
+          return parsed;
+        }
+      }
+    }
+  } catch {}
+  return [];
+}
+
+/** Записать избранное (используется и при импорте/переносе с другого устройства). */
+export function saveFavorites(list: Station[]) {
+  try {
+    localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(list));
+  } catch {}
+  window.dispatchEvent(new CustomEvent(CHANGE_EVENT));
+}
 
 export function useFavorites() {
-  const [favorites, setFavorites] = useState<Station[]>(() => {
-    try {
-      const saved = localStorage.getItem(FAVORITES_STORAGE_KEY);
-      return saved ? JSON.parse(saved) : [];
-    } catch (e) {
-      console.warn('Failed to load favorites from localStorage', e);
-      return [];
-    }
-  });
+  const [favorites, setFavorites] = useState<Station[]>(load);
 
+  // Все места сайта видят одно и то же избранное
   useEffect(() => {
-    try {
-      localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(favorites));
-    } catch (e) {
-      console.warn('Failed to persist favorites to localStorage', e);
-    }
-  }, [favorites]);
+    const sync = () => setFavorites(load());
+    window.addEventListener(CHANGE_EVENT, sync);
+    window.addEventListener('storage', sync);
+    return () => {
+      window.removeEventListener(CHANGE_EVENT, sync);
+      window.removeEventListener('storage', sync);
+    };
+  }, []);
 
-  const isFavorite = useCallback(
-    (stationuuid: string) => {
-      return favorites.some((s) => s.stationuuid === stationuuid);
-    },
-    [favorites]
-  );
+  const isFavorite = useCallback((stationuuid: string) => favorites.some((s) => s.stationuuid === stationuuid), [favorites]);
 
   const toggleFavorite = useCallback((station: Station) => {
-    setFavorites((prev) => {
-      const exists = prev.some((s) => s.stationuuid === station.stationuuid);
-      if (exists) {
-        return prev.filter((s) => s.stationuuid !== station.stationuuid);
-      } else {
-        return [station, ...prev];
-      }
-    });
+    const prev = load();
+    const exists = prev.some((s) => s.stationuuid === station.stationuuid);
+    saveFavorites(exists ? prev.filter((s) => s.stationuuid !== station.stationuuid) : [station, ...prev]);
   }, []);
 
-  const clearFavorites = useCallback(() => {
-    setFavorites([]);
-  }, []);
+  const clearFavorites = useCallback(() => saveFavorites([]), []);
 
-  return {
-    favorites,
-    isFavorite,
-    toggleFavorite,
-    clearFavorites,
-    favoritesCount: favorites.length,
-  };
+  return { favorites, isFavorite, toggleFavorite, clearFavorites, favoritesCount: favorites.length };
 }

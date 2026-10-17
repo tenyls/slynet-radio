@@ -28,7 +28,7 @@ import {
 } from 'lucide-react';
 import { SlyNetSettings, Station, CustomSocialLink, WebcamCity } from '../types/radio';
 import { SlyNetLogo } from './SlyNetLogo';
-import { optimizeImageFile } from '../context/SlyNetSettingsContext';
+import { optimizeImageFile, buildSiteContent, sanitizeSiteContent, useSlyNetSettings } from '../context/SlyNetSettingsContext';
 
 interface AdminModalProps {
   isOpen: boolean;
@@ -60,21 +60,18 @@ export const AdminModal: React.FC<AdminModalProps> = ({
   onAddCustomStation,
   onDeleteCustomStation,
 }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [enteredPin, setEnteredPin] = useState('');
-  const [pinError, setPinError] = useState(false);
+  const { hasDraft, discardDraft } = useSlyNetSettings();
   const [activeTab, setActiveTab] = useState<'brand' | 'cms' | 'webcams' | 'backup' | 'scanner' | 'stations'>('brand');
 
   // Brand edit state
   const [appSubtitle, setAppSubtitle] = useState(settings.appSubtitle);
-  const [newAdminPin, setNewAdminPin] = useState(settings.adminPin);
   const [logoUrlInput, setLogoUrlInput] = useState(settings.customLogoUrl || '');
   const [logoPreview, setLogoPreview] = useState(settings.customLogoUrl || '');
   const [savedNotice, setSavedNotice] = useState(false);
   const [copiedNotice, setCopiedNotice] = useState(false);
 
   // CMS state
-  const [appVersion, setAppVersion] = useState(settings.appVersion || 'v0.8.6');
+  const [appVersion, setAppVersion] = useState(settings.appVersion || '');
   const [heroTitle, setHeroTitle] = useState(settings.heroTitle || settings.appTitle);
   const [heroSubtitle, setHeroSubtitle] = useState(settings.heroSubtitle || settings.appSubtitle);
   const [telegramUrl, setTelegramUrl] = useState(settings.telegramUrl || 'https://t.me/slynet_radio');
@@ -160,18 +157,6 @@ export const AdminModal: React.FC<AdminModalProps> = ({
 
   if (!isOpen) return null;
 
-  // PIN check: strict comparison against settings.adminPin (fallback to '1234' only if user hasn't set custom PIN)
-  const handlePinSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const effectiveAdminPin = (settings.adminPin && settings.adminPin.trim()) ? settings.adminPin.trim() : '1234';
-    if (enteredPin.trim() === effectiveAdminPin) {
-      setIsAuthenticated(true);
-      setPinError(false);
-    } else {
-      setPinError(true);
-    }
-  };
-
   // Image file upload handler with canvas optimization
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -221,15 +206,8 @@ export const AdminModal: React.FC<AdminModalProps> = ({
   };
 
   const handleSaveBrandSettings = () => {
-    try {
-      if (logoUrlInput) {
-        localStorage.setItem('slynet_permanent_logo', logoUrlInput);
-        window.dispatchEvent(new CustomEvent('slynet_logo_changed', { detail: logoUrlInput }));
-      }
-    } catch {}
     onUpdateSettings({
       appSubtitle,
-      adminPin: newAdminPin || '1234',
       customLogoUrl: logoUrlInput,
     });
     setSavedNotice(true);
@@ -292,39 +270,13 @@ export const AdminModal: React.FC<AdminModalProps> = ({
   // 💾 FULL SERVER/SITE BACKUP (.JSON)
   const handleDownloadBackup = () => {
     try {
-      const backupData = {
-        meta: {
-          app: 'SlyNet Radio',
-          version: appVersion || 'v0.8.3',
-          exportedAt: new Date().toISOString(),
-          type: 'full-server-site-backup',
-        },
-        settings: {
-          ...settings,
-          appVersion,
-          heroTitle,
-          heroSubtitle,
-          customLinks,
-          dmcaPolicy,
-          versionChangelog,
-          customWebcams,
-        },
-        customStations: customStations || [],
-        customWebcams: customWebcams || [],
-        clientStorage: {
-          favorites: localStorage.getItem('slynet_favorites_v1'),
-          history: localStorage.getItem('slynet_play_history_v1'),
-          permanentLogo: localStorage.getItem('slynet_permanent_logo'),
-          eqSettings: localStorage.getItem('slynet_eq_settings_v1'),
-        },
-      };
-
-      const jsonStr = JSON.stringify(backupData, null, 2);
+      const content = buildSiteContent(settings);
+      const jsonStr = JSON.stringify(content, null, 2);
       const blob = new Blob([jsonStr], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `slynet-radio-full-backup-${appVersion || 'v0.8.3'}-${new Date().toISOString().slice(0, 10)}.json`;
+      link.download = 'content.json';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -333,8 +285,8 @@ export const AdminModal: React.FC<AdminModalProps> = ({
       setBackupDownloadNotice(true);
       setTimeout(() => setBackupDownloadNotice(false), 3000);
     } catch (err) {
-      console.error('Backup export failed:', err);
-      alert('Не удалось создать файл бэкапа');
+      console.error('content.json export failed:', err);
+      alert('Не удалось создать файл content.json');
     }
   };
 
@@ -351,14 +303,14 @@ export const AdminModal: React.FC<AdminModalProps> = ({
         const text = event.target?.result as string;
         const data = JSON.parse(text);
 
-        if (!data || (!data.settings && !data.meta)) {
-          throw new Error('Некорректный формат файла бэкапа SlyNet Radio');
+        if (!data || typeof data !== 'object') {
+          throw new Error('Некорректный формат файла');
         }
 
-        const restoredSettings = data.settings || {};
+        // Поддерживаем и content.json, и старые бэкапы v0.8.x
+        const restoredSettings: any = sanitizeSiteContent(data.settings ? { ...data.settings, customStations: data.customStations } : data);
         if (restoredSettings.customLinks) setCustomLinks(restoredSettings.customLinks);
         if (restoredSettings.customWebcams) setCustomWebcams(restoredSettings.customWebcams);
-        if (restoredSettings.appVersion) setAppVersion(restoredSettings.appVersion);
         if (restoredSettings.dmcaPolicy) setDmcaPolicy(restoredSettings.dmcaPolicy);
         if (restoredSettings.heroTitle) setHeroTitle(restoredSettings.heroTitle);
         if (restoredSettings.heroSubtitle) setHeroSubtitle(restoredSettings.heroSubtitle);
@@ -367,25 +319,10 @@ export const AdminModal: React.FC<AdminModalProps> = ({
           setLogoUrlInput(restoredSettings.customLogoUrl);
         }
 
-        // Restore custom stations if present
-        if (Array.isArray(data.customStations) && data.customStations.length > 0) {
-          localStorage.setItem('slynet_custom_stations_v1', JSON.stringify(data.customStations));
-        }
-
-        // Restore client storage if present
-        if (data.clientStorage) {
-          if (data.clientStorage.favorites) {
-            localStorage.setItem('slynet_favorites_v1', data.clientStorage.favorites);
-          }
-          if (data.clientStorage.permanentLogo) {
-            localStorage.setItem('slynet_permanent_logo', data.clientStorage.permanentLogo);
-          }
-        }
-
         onUpdateSettings(restoredSettings);
 
         setRestoreNotice(
-          `✓ Сайт успешно восстановлен из бэкапа (${restoredSettings.appVersion || 'v0.8.3'})! Восстановлены тексты CMS, ссылки, радиостанции и веб-камеры.`
+          '✓ Файл загружен в черновик. Проверьте сайт и скачайте content.json для публикации.'
         );
       } catch (err: any) {
         setRestoreError(`Ошибка восстановления: ${err.message || 'Не удалось прочитать JSON'}`);
@@ -422,7 +359,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({
   // Stream link scanner
   const runStreamScanner = async () => {
     // Gather stations to test: custom stations first, plus stations from favorites
-    const favsStr = localStorage.getItem('slynet_radio_favorites');
+    const favsStr = localStorage.getItem('slynet_favorites_v2');
     const favs: Station[] = favsStr ? JSON.parse(favsStr) : [];
     const stationsToTest = [...customStations, ...favs].slice(0, 30);
 
@@ -530,48 +467,46 @@ export const AdminModal: React.FC<AdminModalProps> = ({
           </button>
         </div>
 
-        {/* PIN Screen if not authenticated */}
-        {!isAuthenticated ? (
-          <div className="p-8 text-center max-w-sm mx-auto">
-            <div className="w-16 h-16 rounded-2xl bg-zinc-800 border border-zinc-700 flex items-center justify-center mx-auto mb-4 text-amber-400">
-              <Lock className="w-8 h-8" />
+        {/* Публикация изменений */}
+        <div className="m-4 sm:m-5 mb-0 p-4 rounded-2xl bg-emerald-950/40 border border-emerald-500/30 text-xs text-zinc-300 space-y-3">
+          <div className="flex items-start gap-3">
+            <Globe className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+            <div className="space-y-1">
+              <p className="font-bold text-sm text-white">
+                {hasDraft ? 'Есть неопубликованные изменения' : 'Изменений нет — сайт совпадает с опубликованным'}
+              </p>
+              <p className="leading-relaxed">
+                Правки здесь видите только вы. Чтобы их увидели все: нажмите «Сохранить» во вкладке → «Скачать content.json» →
+                на GitHub откройте папку <span className="font-mono text-emerald-300">public</span> → Add file → Upload files → загрузите файл с заменой → Commit changes. Через 1–2 минуты сайт обновится у всех.
+              </p>
             </div>
-            <h3 className="text-lg font-bold text-white mb-1">Вход для администратора</h3>
-            <p className="text-xs text-zinc-400 mb-6">
-              Введите ваш персональный PIN-код для доступа{!settings.adminPin || settings.adminPin === '1234' ? (
-                <> (по умолчанию: <span className="font-mono text-amber-400 font-bold">1234</span>)</>
-              ) : null}
-            </p>
-
-            <form onSubmit={handlePinSubmit} className="flex flex-col gap-3">
-              <input
-                type="password"
-                maxLength={8}
-                value={enteredPin}
-                onChange={(e) => {
-                  setEnteredPin(e.target.value);
-                  setPinError(false);
-                }}
-                placeholder="Пин-код..."
-                className="w-full text-center tracking-[0.4em] font-mono text-lg py-3 px-4 rounded-xl bg-zinc-800 border border-zinc-700 focus:border-amber-400 focus:outline-none text-white"
-                autoFocus
-              />
-
-              {pinError && (
-                <div className="text-xs text-red-400 font-medium">
-                  Неверный PIN-код. Доступ запрещен.
-                </div>
-              )}
-
-              <button
-                type="submit"
-                className="w-full py-3 bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold text-sm rounded-xl transition-colors mt-2"
-              >
-                Войти в панель
-              </button>
-            </form>
           </div>
-        ) : (
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={handleDownloadBackup}
+              className="px-4 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold rounded-xl flex items-center gap-2"
+            >
+              <Download className="w-4 h-4" />
+              Скачать content.json
+            </button>
+            {hasDraft && (
+              <button
+                type="button"
+                onClick={() => {
+                  if (confirm('Удалить все неопубликованные правки и вернуть опубликованную версию?')) discardDraft();
+                }}
+                className="px-4 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-semibold rounded-xl flex items-center gap-2"
+              >
+                <RotateCcw className="w-4 h-4" />
+                Сбросить черновик
+              </button>
+            )}
+            {backupDownloadNotice && <span className="self-center text-emerald-400 font-medium">✓ Файл скачан</span>}
+          </div>
+        </div>
+
+        {(
           /* Authenticated Admin Views */
           <div>
             {/* Tabs Bar */}
@@ -621,7 +556,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({
                 }`}
               >
                 <HardDrive className="w-4 h-4 text-emerald-400" />
-                <span>💾 Полный Бэкап</span>
+                <span>💾 content.json</span>
               </button>
 
               <button
@@ -751,23 +686,13 @@ export const AdminModal: React.FC<AdminModalProps> = ({
                       type="text"
                       value={appSubtitle}
                       onChange={(e) => setAppSubtitle(e.target.value)}
-                      placeholder="Global 1000+ Radio Hub"
+                      placeholder="Радио со всего мира"
                       className="w-full text-xs py-2.5 px-3.5 rounded-xl bg-zinc-950 border border-zinc-800 focus:border-amber-400 focus:outline-none text-white"
                     />
                   </div>
 
-                  <div>
-                    <label className="text-xs font-bold text-zinc-300 block mb-1.5">
-                      Новый PIN-код админки
-                    </label>
-                    <input
-                      type="text"
-                      maxLength={8}
-                      value={newAdminPin}
-                      onChange={(e) => setNewAdminPin(e.target.value)}
-                      placeholder="1234"
-                      className="w-full text-xs py-2.5 px-3.5 rounded-xl bg-zinc-950 border border-zinc-800 focus:border-amber-400 focus:outline-none text-white font-mono"
-                    />
+                  <div className="text-[11px] text-zinc-400 leading-relaxed self-end">
+                    Совет: лучше загрузить файл логотипа прямо в GitHub (public/logo.png) — так сайт грузится быстрее. Загрузка здесь встраивает картинку внутрь content.json.
                   </div>
                 </div>
 
@@ -1149,10 +1074,10 @@ export const AdminModal: React.FC<AdminModalProps> = ({
                   <HardDrive className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
                   <div>
                     <h3 className="font-bold text-sm text-white mb-1">
-                      💾 Полный Бэкап Сервера и Настроек Сайта (.json)
+                      💾 Файл контента сайта — content.json
                     </h3>
                     <p className="text-zinc-300 leading-relaxed">
-                      Экспортируйте и сохраняйте полную конфигурацию вашего сайта в один компактный .json файл: все тексты CMS, ссылки соцсетей, Политику DMCA, версию, кастомный логотип, базу добавленных станций и веб-камер, а также избранное. Вы всегда сможете восстановить сайт на любом устройстве за 1 секунду.
+                      Весь контент сайта (тексты, ссылки, логотип, свои станции, камеры и ТВ) живёт в одном файле public/content.json в репозитории GitHub. Он же служит резервной копией: скачайте его, чтобы опубликовать изменения или сохранить копию.
                     </p>
                   </div>
                 </div>
@@ -1181,10 +1106,10 @@ export const AdminModal: React.FC<AdminModalProps> = ({
                         <Download className="w-6 h-6" />
                       </div>
                       <h4 className="text-sm font-bold text-white mb-1">
-                        1. Скачать полный бэкап сайта
+                        1. Скачать content.json
                       </h4>
                       <p className="text-xs text-zinc-400 leading-relaxed mb-4">
-                        Формирует резервную копию .json со всеми текущими параметрами CMS, ссылками, станциями и веб-камерами.
+                        Файл с текущими (сохранёнными) правками. Загрузите его в папку public на GitHub с заменой.
                       </p>
                     </div>
 
@@ -1194,12 +1119,12 @@ export const AdminModal: React.FC<AdminModalProps> = ({
                       className="w-full py-3 bg-gradient-to-r from-cyan-500 to-emerald-400 hover:brightness-110 text-zinc-950 font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg active:scale-95"
                     >
                       <Download className="w-4 h-4" />
-                      <span>Скачать бэкап (.json)</span>
+                      <span>Скачать content.json</span>
                     </button>
 
                     {backupDownloadNotice && (
                       <span className="text-[11px] text-emerald-400 font-medium text-center mt-2">
-                        ✓ Файл бэкапа успешно скачан!
+                        ✓ Файл скачан!
                       </span>
                     )}
                   </div>
@@ -1211,10 +1136,10 @@ export const AdminModal: React.FC<AdminModalProps> = ({
                         <Upload className="w-6 h-6" />
                       </div>
                       <h4 className="text-sm font-bold text-white mb-1">
-                        2. Восстановить сайт из бэкапа
+                        2. Загрузить файл в черновик
                       </h4>
                       <p className="text-xs text-zinc-400 leading-relaxed mb-4">
-                        Загрузите ранее сохраненный .json файл для мгновенного восстановления всех текстов, брендинга, станций и ссылок.
+                        Откройте ранее сохранённый content.json (или старый бэкап v0.8) — он попадёт в черновик для проверки.
                       </p>
                     </div>
 
@@ -1232,7 +1157,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({
                         className="w-full py-3 bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 border border-zinc-700 transition-all shadow active:scale-95"
                       >
                         <Upload className="w-4 h-4 text-emerald-400" />
-                        <span>Выбрать файл бэкапа (.json)</span>
+                        <span>Выбрать файл (.json)</span>
                       </button>
                     </div>
                   </div>
@@ -1241,15 +1166,14 @@ export const AdminModal: React.FC<AdminModalProps> = ({
                 {/* Backup Summary Statistics */}
                 <div className="p-4 rounded-2xl bg-zinc-950/40 border border-zinc-800/80">
                   <h4 className="text-xs font-bold text-zinc-300 uppercase tracking-wider mb-2">
-                    Что входит в файл полного бэкапа:
+                    Что входит в content.json:
                   </h4>
                   <ul className="text-xs text-zinc-400 space-y-1.5 list-disc list-inside">
-                    <li>Версия и Changelog: <strong className="text-emerald-400">{appVersion}</strong></li>
-                    <li>Полный текст Политики конфиденциальности & DMCA Notice ({dmcaPolicy.length} симв.)</li>
+                                        <li>Полный текст Политики конфиденциальности & DMCA Notice ({dmcaPolicy.length} симв.)</li>
                     <li>Динамические социальные сети и ссылки ({customLinks.length} шт.)</li>
                     <li>Пользовательские веб-камеры ({customWebcams.length} шт.)</li>
                     <li>Пользовательские радиостанции ({customStations.length} шт.)</li>
-                    <li>Брендинг: Заголовки Hero, подзаголовки, логотип и PIN-код</li>
+                    <li>Брендинг: заголовки, подзаголовок и логотип</li>
                   </ul>
                 </div>
               </div>

@@ -18,7 +18,8 @@ import { useSlyNetSettings } from '../context/SlyNetSettingsContext';
 
 interface InfoTelegramViewProps {
   telegramUrl: string;
-  onOpenAdmin: () => void;
+  /** Только в режиме владельца (#admin) */
+  onOpenAdmin?: () => void;
   onSuggestStation: () => void;
 }
 
@@ -144,6 +145,7 @@ export const InfoTelegramView: React.FC<InfoTelegramViewProps> = ({
         </button>
 
         {/* Admin Panel Entry */}
+        {onOpenAdmin && (
         <button
           onClick={onOpenAdmin}
           className="p-5 rounded-2xl bg-zinc-900/70 hover:bg-zinc-800/80 border border-zinc-800/80 text-left transition-all flex items-start gap-4 group"
@@ -156,15 +158,13 @@ export const InfoTelegramView: React.FC<InfoTelegramViewProps> = ({
               <h3 className="text-sm font-bold text-white group-hover:text-amber-400 transition-colors">
                 Админ-панель SlyNet
               </h3>
-              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400">
-                PIN: 1234
-              </span>
             </div>
             <p className="text-xs text-zinc-400 mt-1">
               Управление ссылками, редактирование Политики DMCA, добавление радиостанций и сканер потоков.
             </p>
           </div>
         </button>
+        )}
       </div>
 
       {/* Database & Architecture info */}

@@ -1,45 +1,14 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback } from 'react';
 import { Station } from '../types/radio';
+import { useSlyNetSettings } from '../context/SlyNetSettingsContext';
 
-const CUSTOM_STATIONS_KEY = 'slynet_custom_stations_v1';
-
-const INITIAL_DEMO_CUSTOM: Station[] = [
-  {
-    stationuuid: 'custom-slynet-exclusive',
-    name: 'SlyNet Ultra Beats (Exclusive)',
-    url: 'https://dancewave.online/dance.mp3',
-    url_resolved: 'https://dancewave.online/dance.mp3',
-    tags: 'dance,electronic,exclusive,club',
-    country: 'SlyNet Cloud',
-    countrycode: 'SN',
-    codec: 'MP3',
-    bitrate: 320,
-    clickcount: 99999,
-    votes: 8888,
-    isCustom: true,
-  },
-];
-
+/**
+ * Свои станции владельца сайта. Хранятся в content.json (поле customStations),
+ * поэтому их видят все посетители после публикации.
+ */
 export function useCustomStations() {
-  const [customStations, setCustomStations] = useState<Station[]>(() => {
-    try {
-      const saved = localStorage.getItem(CUSTOM_STATIONS_KEY);
-      if (saved) {
-        return JSON.parse(saved);
-      }
-    } catch (e) {
-      console.warn('Failed to load custom stations', e);
-    }
-    return INITIAL_DEMO_CUSTOM;
-  });
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(CUSTOM_STATIONS_KEY, JSON.stringify(customStations));
-    } catch (e) {
-      console.warn('Failed to save custom stations', e);
-    }
-  }, [customStations]);
+  const { settings, updateSettings } = useSlyNetSettings();
+  const customStations: Station[] = (settings.customStations || []).map((s) => ({ ...s, isCustom: true }));
 
   const addCustomStation = useCallback(
     (station: {
@@ -57,29 +26,26 @@ export function useCustomStations() {
         name: station.name.trim(),
         url: station.url.trim(),
         url_resolved: station.url.trim(),
-        tags: station.tags?.trim() || 'custom,radio',
-        country: station.country?.trim() || 'Custom',
-        countrycode: (station.countrycode?.trim() || 'SN').toUpperCase().slice(0, 3),
-        bitrate: station.bitrate || 320,
-        codec: station.codec || 'MP3',
+        tags: station.tags?.trim() || '',
+        country: station.country?.trim() || '',
+        countrycode: (station.countrycode?.trim() || '').toUpperCase().slice(0, 2),
+        bitrate: station.bitrate || 0,
+        codec: station.codec || '',
         favicon: station.favicon?.trim() || '',
         isCustom: true,
-        clickcount: 1000,
       };
-
-      setCustomStations((prev) => [newStation, ...prev]);
+      updateSettings({ customStations: [newStation, ...(settings.customStations || [])] });
       return newStation;
     },
-    []
+    [settings.customStations, updateSettings]
   );
 
-  const deleteCustomStation = useCallback((stationuuid: string) => {
-    setCustomStations((prev) => prev.filter((s) => s.stationuuid !== stationuuid));
-  }, []);
+  const deleteCustomStation = useCallback(
+    (stationuuid: string) => {
+      updateSettings({ customStations: (settings.customStations || []).filter((s) => s.stationuuid !== stationuuid) });
+    },
+    [settings.customStations, updateSettings]
+  );
 
-  return {
-    customStations,
-    addCustomStation,
-    deleteCustomStation,
-  };
+  return { customStations, addCustomStation, deleteCustomStation };
 }

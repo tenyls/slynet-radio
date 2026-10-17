@@ -197,8 +197,9 @@ export interface SlyNetSettings {
   customLogoUrl: string; // Base64 or direct URL, empty if using vector SlyNet logo
   telegramUrl: string; // @slynet_radio
   customLinks?: CustomSocialLink[]; // Dynamic social/community links configured in CMS
-  customWebcams?: WebcamCity[]; // User added webcams via Admin
-  adminPin: string;
+  customWebcams?: WebcamCity[]; // Webcams added via Admin (content.json)
+  customStations?: Station[]; // Stations added via Admin (content.json)
+  customTvChannels?: LiveTvChannel[]; // TV channels added via Admin (content.json)
   isPro: boolean;
   activeTheme: ThemeId;
   language: Language;
@@ -207,14 +208,6 @@ export interface SlyNetSettings {
   appVersion?: string; // e.g. 'v0.8.3'
   versionChangelog?: string;
   dmcaPolicy?: string;
-  userProfile?: {
-    name: string;
-    email: string;
-    syncId: string;
-    passwordKey?: string;
-    avatarUrl?: string;
-    createdAt?: string;
-  };
 }
 
 

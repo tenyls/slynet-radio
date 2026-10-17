@@ -8,7 +8,7 @@ import { AudioProvider, useAudio } from './context/AudioPlayerContext';
 import { useFavorites } from './hooks/useFavorites';
 import { useSlyNetSettings, SlyNetSettingsProvider } from './context/SlyNetSettingsContext';
 import { useCustomStations } from './hooks/useCustomStations';
-import { fetchStations } from './services/radioApi';
+import { fetchStations, fetchCatalogStats } from './services/radioApi';
 import { Station, MainTab, BitrateFilter, GenreCategory } from './types/radio';
 import { GENRES } from './constants/genres';
 import { Sidebar } from './components/Sidebar';
@@ -22,6 +22,7 @@ import { SleepTimerModal } from './components/SleepTimerModal';
 import { ProView } from './components/ProView';
 import { InfoTelegramView } from './components/InfoTelegramView';
 import { AdminModal } from './components/AdminModal';
+import { isOwnerMode } from './utils/owner';
 import { SuggestStationModal } from './components/SuggestStationModal';
 import { SlyNetLogo } from './components/SlyNetLogo';
 import { MoodsView } from './components/MoodsView';
@@ -31,7 +32,7 @@ import { EqualizerModal } from './components/EqualizerModal';
 import { RecorderModal } from './components/RecorderModal';
 import { AlarmModal } from './components/AlarmModal';
 import { WebcamsView } from './components/WebcamsView';
-import { SyncModal } from './components/SyncModal';
+import { SyncModal, importFavoritesFromLink } from './components/SyncModal';
 import { AboutModal } from './components/AboutModal';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ArtistsView } from './components/ArtistsView';
@@ -96,6 +97,19 @@ function RadioApp() {
   const [isSuggestModalOpen, setIsSuggestModalOpen] = useState(false);
   const [isSyncModalOpen, setIsSyncModalOpen] = useState(false);
   const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
+  const [catalogCount, setCatalogCount] = useState<number | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+
+  // Размер каталога для главной + перенос избранного по ссылке/QR (#fav=...)
+  useEffect(() => {
+    fetchCatalogStats().then((st) => st?.stations && setCatalogCount(Number(st.stations)));
+    importFavoritesFromLink(customStations).then((n) => {
+      if (n === null) return;
+      setNotice(n > 0 ? `Добавлено в избранное: ${n} станций` : 'Эти станции уже есть в избранном');
+      setTimeout(() => setNotice(null), 4000);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Load stations based on active tab and parameters
   const loadStations = useCallback(async () => {
@@ -282,7 +296,7 @@ function RadioApp() {
         onOpenSleepTimer={() => setIsSleepModalOpen(true)}
         settings={settings}
         onUploadLogo={(base64) => updateSettings({ customLogoUrl: base64 })}
-        onOpenAdmin={() => setIsAdminModalOpen(true)}
+        onOpenAdmin={isOwnerMode ? () => setIsAdminModalOpen(true) : undefined}
         onOpenSync={() => setIsSyncModalOpen(true)}
         onOpenAbout={() => setIsAboutModalOpen(true)}
         onSelectLanguage={setLanguage}
@@ -296,15 +310,15 @@ function RadioApp() {
             <SlyNetLogo
               customLogoUrl={settings.customLogoUrl}
               size="sm"
-              allowUpload={true}
-              onUploadLogo={(base64) => updateSettings({ customLogoUrl: base64 })}
+              allowUpload={false}
+              isSpinning={false}
             />
             <div className="min-w-0">
               <span className="text-sm font-extrabold tracking-tight text-white block truncate">
                 {settings.appTitle || 'SlyNet Radio'}
               </span>
               <span className="text-[10px] font-medium text-emerald-400 block truncate font-mono">
-                {settings.appSubtitle || 'Global 1000+ Radio Hub'}
+                {settings.appSubtitle}
               </span>
             </div>
           </div>
@@ -373,7 +387,7 @@ function RadioApp() {
             isLoading={isLoadingStations}
             language={settings.language || 'ru'}
             onSelectLanguage={setLanguage}
-            onOpenAdmin={() => setIsAdminModalOpen(true)}
+            onOpenAdmin={isOwnerMode ? () => setIsAdminModalOpen(true) : undefined}
             onOpenSync={() => setIsSyncModalOpen(true)}
             onOpenAbout={() => setIsAboutModalOpen(true)}
             currentTab={currentTab}
@@ -381,6 +395,12 @@ function RadioApp() {
             artistsCategory={artistsCategory}
             onSelectArtistsCategory={setArtistsCategory}
           />
+        )}
+
+        {notice && (
+          <div className="mx-4 sm:mx-6 mt-4 p-3 bg-emerald-950/60 border border-emerald-700/60 rounded-2xl text-xs text-emerald-200 font-semibold">
+            ✓ {notice}
+          </div>
         )}
 
         {/* Error notification bar if stream error occurs */}
@@ -465,18 +485,21 @@ function RadioApp() {
                   <div className="flex items-start sm:items-center gap-5 sm:gap-6 min-w-0">
                     <SlyNetLogo
                       size="xl"
-                      allowUpload={true}
+                      allowUpload={false}
+                      isSpinning={false}
                       className="w-20 h-20 sm:w-24 sm:h-24 rounded-full shadow-[0_0_35px_rgba(16,185,129,0.5)] border-2 border-emerald-400/50 shrink-0"
                     />
 
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-lime-400/20 text-lime-300 border border-lime-400/30">
-                          OFFICIAL HUB
+                          FREE RADIO
                         </span>
-                        <span className="text-xs text-cyan-300 font-mono font-semibold flex items-center gap-1">
-                          <Wifi className="w-3.5 h-3.5 text-lime-400 animate-pulse" /> 1000+ Online
-                        </span>
+                        {catalogCount ? (
+                          <span className="text-xs text-cyan-300 font-mono font-semibold flex items-center gap-1">
+                            <Wifi className="w-3.5 h-3.5 text-lime-400" /> {catalogCount.toLocaleString('ru-RU')} станций в каталоге
+                          </span>
+                        ) : null}
                       </div>
 
                       <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white">
@@ -484,22 +507,22 @@ function RadioApp() {
                       </h1>
                       <p className="text-xs sm:text-sm text-zinc-300 mt-1 max-w-xl leading-relaxed">
                         {settings.heroSubtitle ||
-                          'Глобальный радио-хаб со станциями со всего мира, трансляциями в чистом качестве Ultra HD до 320 kbps и поддержкой экрана блокировки.'}
+                          'Тысячи бесплатных радиостанций со всего мира: жанры, страны, подборки по настроению. Без рекламы и регистрации.'}
                       </p>
 
                       {/* Micro badges */}
                       <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-3 text-[11px] text-zinc-400 font-mono">
                         <span className="px-2 py-0.5 rounded-md bg-black/40 border border-white/10 text-zinc-300">
-                          320 kbps HD
+                          Без рекламы
                         </span>
                         <span className="px-2 py-0.5 rounded-md bg-black/40 border border-white/10 text-zinc-300">
-                          MediaSession
+                          Экран блокировки
                         </span>
                         <span className="px-2 py-0.5 rounded-md bg-black/40 border border-white/10 text-zinc-300">
                           Sleep Timer
                         </span>
                         <span className="px-2 py-0.5 rounded-md bg-black/40 border border-white/10 text-emerald-400 font-bold">
-                          100% Free
+                          Бесплатно
                         </span>
                       </div>
                     </div>
@@ -669,7 +692,7 @@ function RadioApp() {
                 <p className="text-xs sm:text-sm text-zinc-400 mt-1">
                   {searchQuery
                     ? `Результаты по запросу: "${searchQuery}"`
-                    : 'Поиск по 1000+ радиостанциям мира из базы Radio Browser и SlyNet Choice'}
+                    : 'Поиск по названию станции в мировом каталоге Radio Browser'}
                 </p>
               </div>
 
@@ -762,7 +785,7 @@ function RadioApp() {
           {currentTab === 'info' && (
             <InfoTelegramView
               telegramUrl={settings.telegramUrl}
-              onOpenAdmin={() => setIsAdminModalOpen(true)}
+              onOpenAdmin={isOwnerMode ? () => setIsAdminModalOpen(true) : undefined}
               onSuggestStation={() => setIsSuggestModalOpen(true)}
             />
           )}
