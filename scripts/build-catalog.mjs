@@ -79,6 +79,8 @@ const norm = (s) =>
     .replace(/ё/g, 'е')
     .replace(/[^\p{L}\p{N}/]+/gu, ' ')
     .trim();
+const ADULT_RE = /(?<![\p{L}])(xxx|porn\p{L}*|sex|sexy|erotic\p{L}*|nsfw|hentai|эрот\p{L}*|порн\p{L}*|секс\p{L}*)(?![\p{L}])/iu;
+const familySafe = (s) => !ADULT_RE.test(`${s.name} ${s.tags || ''}`);
 const nameMatches = (name, v) => ` ${norm(name)} `.includes(` ${norm(v)} `);
 
 /** Поток жив: сервер отвечает и отдаёт аудио/плейлист */
@@ -138,7 +140,7 @@ const slim = (s) => ({
 async function searchRB(params) {
   const q = new URLSearchParams({ hidebroken: 'true', is_https: 'true', order: 'clickcount', reverse: 'true', limit: '100', ...params });
   const list = await rb(`/json/stations/search?${q}`);
-  return (Array.isArray(list) ? list : []).filter((s) => (s.url_resolved || s.url || '').startsWith('https://'));
+  return (Array.isArray(list) ? list : []).filter((s) => (s.url_resolved || s.url || '').startsWith('https://') && familySafe(s));
 }
 
 async function searchLaut(query) {

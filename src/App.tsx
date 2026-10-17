@@ -8,7 +8,8 @@ import { AudioProvider, useAudio } from './context/AudioPlayerContext';
 import { useFavorites } from './hooks/useFavorites';
 import { useSlyNetSettings, SlyNetSettingsProvider } from './context/SlyNetSettingsContext';
 import { useCustomStations } from './hooks/useCustomStations';
-import { fetchStations, fetchCatalogStats } from './services/radioApi';
+import { fetchStations, fetchCatalogStats, fetchStationsByUuids, guessUserCountry } from './services/radioApi';
+import { MobileHome } from './components/MobileHome';
 import { Station, MainTab, BitrateFilter, GenreCategory } from './types/radio';
 import { GENRES } from './constants/genres';
 import { Sidebar } from './components/Sidebar';
@@ -75,6 +76,8 @@ function RadioApp() {
     isAlarmOpen,
     setIsAlarmOpen,
     setIsFullScreenOpen,
+    togglePlayPause,
+    isLoading: isAudioLoading,
   } = useAudio();
 
   const { favorites, isFavorite, toggleFavorite, favoritesCount } = useFavorites();
@@ -100,6 +103,15 @@ function RadioApp() {
   const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
   const [catalogCount, setCatalogCount] = useState<number | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+
+  // Ссылка «поделиться станцией»: #station=<uuid>
+  const [sharedStation, setSharedStation] = useState<Station | null>(null);
+  useEffect(() => {
+    const m = /#station=([0-9a-f-]{36})/i.exec(window.location.hash);
+    if (!m) return;
+    history.replaceState(null, '', window.location.pathname + window.location.search);
+    fetchStationsByUuids([m[1]]).then((l) => l[0] && setSharedStation(l[0])).catch(() => {});
+  }, []);
 
   // Размер каталога для главной + перенос избранного по ссылке/QR (#fav=...)
   useEffect(() => {
@@ -274,6 +286,24 @@ function RadioApp() {
     }
   };
 
+  const userCountry = useMemo(() => guessUserCountry(), []);
+
+  const playList = (list: Station[]) => {
+    if (!list.length) {
+      setNotice('Сейчас не удалось получить станции. Попробуйте ещё раз.');
+      setTimeout(() => setNotice(null), 3500);
+      return;
+    }
+    playStation(list[0], list);
+  };
+  const handleRandom = async () => playList(await fetchStations({ order: 'random', limit: 40 }));
+  const handleTrending = async () => playList(await fetchStations({ order: 'clicktrend', limit: 60 }));
+  const handleMyCountry = () => {
+    if (!userCountry) return;
+    setSelectedCountry(userCountry);
+    window.scrollTo({ top: 400, behavior: 'smooth' });
+  };
+
   const formatRemaining = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -403,6 +433,29 @@ function RadioApp() {
           />
         )}
 
+        {sharedStation && (
+          <div className="mx-4 sm:mx-6 mt-4 p-3 rounded-2xl bg-gradient-to-r from-emerald-950/80 to-cyan-950/60 border border-emerald-500/40 flex items-center gap-3">
+            <button
+              onClick={() => {
+                playStation(sharedStation, [sharedStation]);
+                setIsFullScreenOpen(true);
+                setSharedStation(null);
+              }}
+              className="w-12 h-12 shrink-0 rounded-full bg-emerald-400 text-zinc-950 flex items-center justify-center"
+              aria-label="Слушать"
+            >
+              <Play className="w-6 h-6 fill-current ml-0.5" />
+            </button>
+            <div className="min-w-0 flex-1">
+              <div className="text-[11px] text-emerald-300">Вам прислали станцию</div>
+              <div className="text-sm font-bold text-white truncate">{sharedStation.name}</div>
+            </div>
+            <button onClick={() => setSharedStation(null)} className="p-2 text-zinc-400" aria-label="Закрыть">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+
         {notice && (
           <div className="mx-4 sm:mx-6 mt-4 p-3 bg-emerald-950/60 border border-emerald-700/60 rounded-2xl text-xs text-emerald-200 font-semibold">
             ✓ {notice}
@@ -480,8 +533,23 @@ function RadioApp() {
           {/* TAB: POPULAR */}
           {currentTab === 'popular' && (
             <div className="flex flex-col gap-8">
+              <MobileHome
+                title={settings.appTitle}
+                featured={featured}
+                currentStation={currentStation}
+                isPlaying={isPlaying}
+                isLoading={isAudioLoading}
+                userCountry={userCountry}
+                onPlayMain={handlePlayFirstStation}
+                onTogglePlay={togglePlayPause}
+                onOpenPlayer={() => setIsFullScreenOpen(true)}
+                onRandom={handleRandom}
+                onTrending={handleTrending}
+                onMyCountry={handleMyCountry}
+              />
+
               {/* BRAND CYBER HERO BANNER IN SLYNET COLORS */}
-              <div className="relative overflow-hidden rounded-3xl p-6 sm:p-8 bg-gradient-to-br from-slate-950 via-[#040e1a] to-[#03150e] border border-cyan-500/25 shadow-[0_10px_35px_-10px_rgba(6,182,212,0.3)]">
+              <div className="hidden md:block relative overflow-hidden rounded-3xl p-6 sm:p-8 bg-gradient-to-br from-slate-950 via-[#040e1a] to-[#03150e] border border-cyan-500/25 shadow-[0_10px_35px_-10px_rgba(6,182,212,0.3)]">
                 {/* Glow accents */}
                 <div className="absolute top-0 right-0 w-80 h-80 bg-lime-400/10 rounded-full blur-[100px] pointer-events-none" />
                 <div className="absolute -bottom-10 -left-10 w-80 h-80 bg-cyan-500/15 rounded-full blur-[100px] pointer-events-none" />
@@ -553,6 +621,14 @@ function RadioApp() {
                     >
                       <LayoutGrid className="w-4 h-4 text-cyan-400" />
                       <span>Каталог жанров</span>
+                    </button>
+
+                    <button
+                      onClick={handleRandom}
+                      className="px-5 py-3 rounded-2xl bg-zinc-900/80 hover:bg-zinc-800 text-white font-semibold text-xs border border-lime-500/30 flex items-center justify-center gap-2 transition-colors"
+                    >
+                      <Sparkles className="w-4 h-4 text-lime-400" />
+                      <span>Мне повезёт</span>
                     </button>
                   </div>
                 </div>
@@ -795,6 +871,12 @@ function RadioApp() {
               onSuggestStation={() => setIsSuggestModalOpen(true)}
             />
           )}
+          <footer className="mt-12 pt-5 border-t border-zinc-900 text-[11px] text-zinc-500 flex flex-wrap gap-x-4 gap-y-1">
+            <span>© {new Date().getFullYear()} {settings.appTitle}</span>
+            <a href="./privacy.html" className="hover:text-zinc-300 underline-offset-2 hover:underline">Политика конфиденциальности</a>
+            <span>Каталог станций: Radio Browser · laut.fm</span>
+            <span>Эфиры принадлежат их правообладателям</span>
+          </footer>
         </main>
       </div>
 

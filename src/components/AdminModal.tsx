@@ -101,6 +101,8 @@ export const AdminModal: React.FC<AdminModalProps> = ({
       'SlyNet Radio является свободным программным интернет-тюнером и агрегатором публичных радиовещательных потоков и открытых веб-камер. Приложение не хранит, не ретранслирует и не изменяет аудио- и видеоматериалы на своих серверах. Все аудиопотоки воспроизводятся напрямую из открытой базы Radio Browser API.\n\nВсе персональные настройки (избранные станции, кастомный логотип, темы) сохраняются исключительно в локальном хранилище вашего браузера (localStorage).\n\nЕсли вы являетесь правообладателем или представителем вещателя и хотите обновить метаданные или удалить поток из каталога, направьте официальный запрос разработчикам SlyNet Radio через наш официальный Telegram-канал.'
   );
   const [cmsSavedNotice, setCmsSavedNotice] = useState(false);
+  const [contactEmail, setContactEmail] = useState(settings.contactEmail || '');
+  const [legalContact, setLegalContact] = useState(settings.legalContact || '');
 
   // Custom Webcams State
   const [customWebcams, setCustomWebcams] = useState<WebcamCity[]>(
@@ -230,6 +232,8 @@ export const AdminModal: React.FC<AdminModalProps> = ({
       appVersion,
       versionChangelog,
       dmcaPolicy,
+      contactEmail: contactEmail.trim(),
+      legalContact: legalContact.trim(),
     });
     setCmsSavedNotice(true);
     setTimeout(() => setCmsSavedNotice(false), 2500);
@@ -933,6 +937,26 @@ export const AdminModal: React.FC<AdminModalProps> = ({
                   <p className="text-[11px] text-zinc-400">
                     Текст из этого поля моментально отображается на сайте в разделе «Информация» в блоке DMCA Notice.
                   </p>
+                </div>
+
+                <div className="grid grid-cols-1 gap-3 p-4 rounded-2xl bg-zinc-950/60 border border-amber-500/30">
+                  <p className="text-xs text-amber-200">
+                    Нужно для App Store / Google Play и законов ЕС: e-mail для связи и (в Германии) Impressum. Показываются на странице «Политика конфиденциальности».
+                  </p>
+                  <input
+                    type="email"
+                    value={contactEmail}
+                    onChange={(e) => setContactEmail(e.target.value)}
+                    placeholder="E-mail для связи: you@example.com"
+                    className="w-full text-xs py-2.5 px-3.5 rounded-xl bg-zinc-950 border border-zinc-800 focus:border-amber-400 focus:outline-none text-white"
+                  />
+                  <textarea
+                    rows={4}
+                    value={legalContact}
+                    onChange={(e) => setLegalContact(e.target.value)}
+                    placeholder={'Impressum: Имя Фамилия\nУлица, дом\nИндекс, город, Германия'}
+                    className="w-full text-xs p-3.5 rounded-xl bg-zinc-950 border border-zinc-800 focus:border-amber-400 focus:outline-none text-white"
+                  />
                 </div>
 
                 {/* Save CMS button */}

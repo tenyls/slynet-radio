@@ -1,3 +1,4 @@
+import { FEATURES } from '../utils/platform';
 import React from 'react';
 import { MainTab, SlyNetSettings, Language } from '../types/radio';
 import {
@@ -240,6 +241,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <span className="text-[9px] font-medium">{t.equalizer}</span>
           </button>
 
+          {FEATURES.recorder && (
           <button
             onClick={() => setIsRecorderOpen(true)}
             title="Запись прямого эфира"
@@ -252,6 +254,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <Disc className="w-4 h-4 text-rose-400" />
             <span className="text-[9px] font-medium">{isRecording ? t.recordingActive : t.recorder}</span>
           </button>
+          )}
 
           <button
             onClick={() => setIsAlarmOpen(true)}

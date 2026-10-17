@@ -1,3 +1,4 @@
+import { FEATURES } from '../utils/platform';
 import { liveFallbackLabel } from '../services/rdsService';
 import React, { useState, useEffect } from 'react';
 import { useAudio } from '../context/AudioPlayerContext';
@@ -250,7 +251,7 @@ export const BottomPlayer: React.FC<BottomPlayerProps> = ({
                 <Circle className="w-3 h-3 fill-rose-500" />
                 <span>REC {formatRemaining(recordingDurationSec)}</span>
               </button>
-            ) : (
+            ) : FEATURES.recorder ? (
               <button
                 onClick={() => setIsRecorderOpen(true)}
                 title="Запись эфира"
@@ -258,7 +259,7 @@ export const BottomPlayer: React.FC<BottomPlayerProps> = ({
               >
                 <Disc className="w-4 h-4" />
               </button>
-            )}
+            ) : null}
 
             {/* Equalizer */}
             <button

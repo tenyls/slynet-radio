@@ -18,6 +18,8 @@ export const SITE_FIELDS = [
   'customStations',
   'customTvChannels',
   'featuredStation',
+  'contactEmail',
+  'legalContact',
   'heroTitle',
   'heroSubtitle',
   'appVersion',
@@ -75,7 +77,7 @@ export function sanitizeSiteContent(raw: any): SiteContent {
   for (const k of ['customLinks', 'customWebcams', 'customStations', 'customTvChannels']) {
     if (c[k] !== undefined && !Array.isArray(c[k])) delete c[k];
   }
-  for (const k of ['appTitle', 'appSubtitle', 'customLogoUrl', 'telegramUrl', 'heroTitle', 'heroSubtitle', 'appVersion', 'versionChangelog', 'dmcaPolicy']) {
+  for (const k of ['contactEmail', 'legalContact', 'appTitle', 'appSubtitle', 'customLogoUrl', 'telegramUrl', 'heroTitle', 'heroSubtitle', 'appVersion', 'versionChangelog', 'dmcaPolicy']) {
     if (c[k] !== undefined && typeof c[k] !== 'string') delete c[k];
   }
   const fs = c.featuredStation;

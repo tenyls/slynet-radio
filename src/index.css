@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+@theme {
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
 :root {
   --accent: #10b981;
   --accent-hover: #059669;
@@ -58,7 +62,7 @@
   body {
     background-color: #09090b;
     color: #f4f4f5;
-    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    font-family: 'Manrope Variable', system-ui, -apple-system, sans-serif;
   }
 }
 

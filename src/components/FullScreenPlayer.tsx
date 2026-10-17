@@ -1,3 +1,4 @@
+import { FEATURES } from '../utils/platform';
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAudio } from '../context/AudioPlayerContext';
 import { StationFallbackIcon } from './StationFallbackIcon';
@@ -39,6 +40,7 @@ import {
   Mic2,
   X,
   Loader2,
+  Share2,
 } from 'lucide-react';
 
 interface FullScreenPlayerProps {
@@ -191,6 +193,23 @@ export const FullScreenPlayer: React.FC<FullScreenPlayerProps> = ({ isFavorite, 
     }
   };
 
+  const onShare = async () => {
+    if (!/^[0-9a-f-]{36}$/i.test(currentStation.stationuuid)) {
+      setSavedNotice('Этой станцией нельзя поделиться ссылкой');
+      setTimeout(() => setSavedNotice(null), 2200);
+      return;
+    }
+    const url = `${window.location.href.split('#')[0]}#station=${currentStation.stationuuid}`;
+    try {
+      if (navigator.share) await navigator.share({ title: currentStation.name, text: `Слушаю «${currentStation.name}» в SlyNet Radio`, url });
+      else {
+        await navigator.clipboard.writeText(url);
+        setSavedNotice('Ссылка скопирована');
+        setTimeout(() => setSavedNotice(null), 2200);
+      }
+    } catch {}
+  };
+
   const onBookmark = () => {
     const ok = bookmarkCurrentTrack();
     if (!ok) return;
@@ -336,6 +355,14 @@ export const FullScreenPlayer: React.FC<FullScreenPlayerProps> = ({ isFavorite, 
               </p>
             </div>
             <button
+              onClick={onShare}
+              aria-label="Поделиться станцией"
+              title="Поделиться станцией"
+              className="w-10 h-10 rounded-xl flex items-center justify-center active:scale-95 bg-zinc-800/70 hover:bg-zinc-800 text-zinc-300"
+            >
+              <Share2 className="w-4 h-4" />
+            </button>
+            <button
               onClick={onBookmark}
               aria-label="Сохранить трек"
               title="Сохранить трек"
@@ -433,6 +460,7 @@ export const FullScreenPlayer: React.FC<FullScreenPlayerProps> = ({ isFavorite, 
               <Sliders className="w-4 h-4 text-emerald-400" />
               <span>Эквалайзер</span>
             </button>
+            {FEATURES.recorder && (
             <button
               onClick={() => (isRecording ? stopRecording() : setIsRecorderOpen(true))}
               className={`${toolBtn} ${isRecording ? 'bg-rose-600/30 border-rose-500/50 text-rose-300' : toolIdle}`}
@@ -440,6 +468,7 @@ export const FullScreenPlayer: React.FC<FullScreenPlayerProps> = ({ isFavorite, 
               {isRecording ? <Circle className="w-4 h-4 fill-rose-500 text-rose-500" /> : <Disc className="w-4 h-4 text-rose-400" />}
               <span>{isRecording ? formatTime(recordingDurationSec) : 'Запись'}</span>
             </button>
+            )}
             <button
               onClick={() => {
                 setIsFullScreenOpen(false);

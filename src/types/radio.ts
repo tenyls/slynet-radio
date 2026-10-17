@@ -200,7 +200,9 @@ export interface SlyNetSettings {
   customWebcams?: WebcamCity[]; // Webcams added via Admin (content.json)
   customStations?: Station[]; // Stations added via Admin (content.json)
   customTvChannels?: LiveTvChannel[]; // TV channels added via Admin (content.json)
-  featuredStation?: Station | null; // «Станция SlyNet Radio» — назначается в админке
+  featuredStation?: Station | null;
+  contactEmail?: string; // e-mail для связи (политика конфиденциальности, магазины)
+  legalContact?: string; // Impressum / контактные данные владельца // «Станция SlyNet Radio» — назначается в админке
   isPro: boolean;
   activeTheme: ThemeId;
   language: Language;

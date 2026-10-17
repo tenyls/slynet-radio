@@ -19,6 +19,12 @@ export const HTTPS_ONLY =
   window.location.protocol === 'https:' &&
   !(window as any).Capacitor?.isNativePlatform?.();
 
+/** Фильтр «18+»: такие станции не показываем (требование рейтинга в App Store / Google Play) */
+const ADULT_RE = /(?<![\p{L}])(xxx|porn\p{L}*|sex|sexy|erotic\p{L}*|nsfw|hentai|эрот\p{L}*|порн\p{L}*|секс\p{L}*)(?![\p{L}])/iu;
+export function isFamilySafe(st: Station): boolean {
+  return !ADULT_RE.test(`${st.name} ${st.tags || ''}`);
+}
+
 export function isPlayableHere(st: Station): boolean {
   const u = st.url_resolved || st.url || '';
   if (!u) return false;
@@ -168,6 +174,8 @@ export interface FetchOptions {
   name?: string;
   countrycode?: string;
   limit?: number;
+  /** clickcount (по умолчанию), clicktrend — «в тренде», random — случайные */
+  order?: 'clickcount' | 'clicktrend' | 'random' | 'votes';
 }
 
 import { isStationQuarantined } from './quarantineService';
@@ -197,6 +205,7 @@ export function deduplicateStations(stations: Station[]): Station[] {
   for (const st of stations) {
     if (!st || !st.stationuuid) continue;
     if (!st.isCustom && !isPlayableHere(st)) continue;
+    if (!st.isCustom && !isFamilySafe(st)) continue;
     if (isStationQuarantined(st.stationuuid)) continue;
 
     // Normalizing stream host and path
@@ -231,10 +240,10 @@ export function deduplicateStations(stations: Station[]): Station[] {
 }
 
 export async function fetchStations(options: FetchOptions = {}): Promise<Station[]> {
-  const { tag, name, countrycode, limit = 120 } = options;
+  const { tag, name, countrycode, limit = 120, order = 'clickcount' } = options;
   const query = new URLSearchParams({
     hidebroken: 'true',
-    order: 'clickcount',
+    order,
     reverse: 'true',
     // Берём с запасом: часть отсеется как дубли/http
     limit: String(Math.min(Math.round(limit * 1.6), 400)),
@@ -330,5 +339,20 @@ export async function fetchCatalogStats(): Promise<{ stations?: number } | null>
     return await res.json();
   } catch {
     return null;
+  }
+}
+
+/** Страна пользователя по языку браузера (ru-RU → RU, de-DE → DE) */
+export function guessUserCountry(): string {
+  try {
+    const langs = navigator.languages?.length ? navigator.languages : [navigator.language];
+    for (const l of langs) {
+      const m = /[-_]([A-Za-z]{2})$/.exec(l || '');
+      if (m) return m[1].toUpperCase();
+    }
+    const base = (langs[0] || '').slice(0, 2).toLowerCase();
+    return ({ ru: 'RU', uk: 'UA', de: 'DE', be: 'BY', kk: 'KZ', fr: 'FR', it: 'IT', es: 'ES', pl: 'PL', tr: 'TR', en: 'US' } as Record<string, string>)[base] || '';
+  } catch {
+    return '';
   }
 }

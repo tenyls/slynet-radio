@@ -53,12 +53,12 @@ export const MOOD_CATEGORIES: MoodCategory[] = [
   },
   {
     id: 'romantic',
-    name: 'Для интима и романтики',
-    subTitle: 'Romantic / Sensual / Slow Love',
+    name: 'Романтика',
+    subTitle: 'Romantic / Love songs',
     emoji: '🔥',
     gradient: 'from-rose-500 via-pink-600 to-purple-600',
     accentColor: '#f43f5e',
-    tags: ['romantic', 'slow', 'smooth jazz', 'rnb', 'love songs', 'sensual'],
+    tags: ['romantic', 'love songs', 'smooth jazz', 'slow'],
     description: 'Чувственный соул, бархатный саксофон, страстные баллады для вечера вдвоем.',
   },
   {
