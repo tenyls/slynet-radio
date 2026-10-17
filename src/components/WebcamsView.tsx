@@ -148,8 +148,8 @@ export const WebcamsView: React.FC<WebcamsViewProps> = ({ onOpenAdmin }) => {
             Веб-камеры городов мира
           </h1>
           <p className="text-xs sm:text-sm text-zinc-400 mt-1 max-w-2xl">
-            Прямые трансляции мегаполисов, Альп, океанских пляжей и космоса без внешних блокировок.
-            Слушайте радио на фоне живых кадров планеты Земля!
+            Открытые веб-камеры городов, курортов и природы. Трансляция открывается на официальном сайте камеры —
+            а радио продолжает играть.
           </p>
         </div>
 
@@ -283,25 +283,17 @@ export const WebcamsView: React.FC<WebcamsViewProps> = ({ onOpenAdmin }) => {
 
         {/* Live Camera Frame (High-Definition Direct Frame without black screen) */}
         <div className="relative aspect-video w-full bg-zinc-950 flex items-center justify-center overflow-hidden group">
-          <img
-            key={`${selectedCity.id}-${refreshKey}`}
-            src={mediaError ? selectedCity.thumbnail : (selectedCity.streamUrl || selectedCity.thumbnail)}
-            alt={selectedCity.name}
-            onError={(e) => {
-              if (!mediaError) {
-                setMediaError(true);
-              } else {
-                (e.target as HTMLImageElement).src =
-                  'https://images.unsplash.com/photo-1514890547357-a9ee288728e0?w=1600&auto=format&fit=crop&q=85';
-              }
-            }}
-            className="w-full h-full object-cover animate-fade-in"
-          />
+          <div className="absolute inset-0 bg-gradient-to-br from-cyan-950 via-zinc-950 to-emerald-950" />
+          <div className="relative z-[1] text-center px-6">
+            <div className="text-6xl mb-3">{selectedCity.flag}</div>
+            <div className="text-xl sm:text-2xl font-extrabold text-white">{selectedCity.name}</div>
+            <div className="text-xs text-zinc-400 mt-1">{selectedCity.country}</div>
+          </div>
 
           {/* Это фото города, а не кадр камеры — честно говорим об этом */}
           <div className="absolute top-3 left-3 z-10 pointer-events-none">
             <span className="px-2.5 py-1 rounded-md bg-black/75 backdrop-blur-md text-[10px] font-medium text-zinc-300 border border-white/10">
-              Фото города · эфир на официальном сайте камеры
+              Нажмите ▶ — эфир откроется на официальном сайте камеры
             </span>
           </div>
 
@@ -310,7 +302,7 @@ export const WebcamsView: React.FC<WebcamsViewProps> = ({ onOpenAdmin }) => {
               href={selectedCity.directPortalUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="absolute inset-0 z-[5] flex items-center justify-center bg-black/25 hover:bg-black/35 transition-colors"
+              className="absolute inset-0 z-[5] flex items-end justify-center pb-16 sm:pb-20 hover:bg-white/5 transition-colors"
               aria-label="Смотреть прямой эфир на официальном сайте"
             >
               <span className="w-20 h-20 rounded-full bg-gradient-to-r from-cyan-500 to-emerald-400 text-zinc-950 flex items-center justify-center shadow-2xl">
@@ -528,16 +520,9 @@ export const WebcamsView: React.FC<WebcamsViewProps> = ({ onOpenAdmin }) => {
               >
                 {/* Thumbnail Container */}
                 <div className="relative aspect-video w-full overflow-hidden bg-zinc-900">
-                  <img
-                    src={city.thumbnail}
-                    alt={city.name}
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src =
-                        'https://images.unsplash.com/photo-1513622470522-26c3c8a854bc?w=600&auto=format&fit=crop&q=80';
-                    }}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    loading="lazy"
-                  />
+                  <div className="absolute inset-0 bg-gradient-to-br from-cyan-950 via-zinc-900 to-emerald-950 flex items-center justify-center text-5xl">
+                    {city.flag}
+                  </div>
                   <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/20 to-transparent" />
 
                   {/* Badges on Thumbnail */}
