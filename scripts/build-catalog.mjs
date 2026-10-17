@@ -264,6 +264,43 @@ function looksOfficial(streamUrl, website) {
   return false;
 }
 
+
+// ---------- 3b. Free-TV/IPTV: курируемый список только бесплатных официальных каналов ----------
+const ISO_CODES = 'AD AE AF AG AL AM AO AR AT AU AZ BA BB BD BE BF BG BH BI BJ BN BO BR BS BT BW BY BZ CA CD CF CG CH CI CL CM CN CO CR CU CV CY CZ DE DJ DK DM DO DZ EC EE EG ER ES ET FI FJ FO FR GA GB GD GE GH GL GM GN GQ GR GT GW GY HK HN HR HT HU ID IE IL IN IQ IR IS IT JM JO JP KE KG KH KM KN KP KR KW KZ LA LB LC LI LK LR LS LT LU LV LY MA MC MD ME MG MK ML MM MN MO MR MT MU MV MW MX MY MZ NA NE NG NI NL NO NP NZ OM PA PE PG PH PK PL PR PS PT PY QA RO RS RU RW SA SC SD SE SG SI SK SL SM SN SO SR SS SV SY SZ TD TG TH TJ TL TM TN TR TT TW TZ UA UG US UY UZ VA VE VN XK YE ZA ZM ZW'.split(' ');
+const EN_NAMES = new Intl.DisplayNames(['en'], { type: 'region' });
+const COUNTRY_BY_NAME = new Map(ISO_CODES.map((c) => [EN_NAMES.of(c).toLowerCase(), c]));
+COUNTRY_BY_NAME.set('usa', 'US').set('uk', 'GB').set('united states of america', 'US').set('south korea', 'KR').set('russia', 'RU');
+
+async function freeTvCandidates() {
+  const r = await fetchWithTimeout('https://raw.githubusercontent.com/Free-TV/IPTV/master/playlist.m3u8', {}, 30000);
+  if (!r.ok) throw new Error('Free-TV ' + r.status);
+  const lines = (await r.text()).split(/\r?\n/);
+  const out = [];
+  for (let i = 0; i < lines.length; i++) {
+    const l = lines[i];
+    if (!l.startsWith('#EXTINF')) continue;
+    const url = (lines[i + 1] || '').trim();
+    if (!url.startsWith('https://') || !/\.m3u8(\?|$)/i.test(url)) continue;
+    const attr = (k) => (l.match(new RegExp(k + '="([^"]*)"')) || [])[1] || '';
+    const name = l.split(',').pop().trim().replace(/\s*[Ⓖ Ⓨ Ⓢ]+\s*$/u, '').trim();
+    if (/Ⓖ|Ⓨ/u.test(l)) continue; // Ⓖ — гео-блок, Ⓨ — только YouTube
+    const group = attr('group-title').toLowerCase();
+    const tvgId = attr('tvg-id');
+    const cc = COUNTRY_BY_NAME.get(group) || (tvgId.match(/\.([a-z]{2})(@|$)/i)?.[1] || '').toUpperCase();
+    out.push({
+      id: 'freetv-' + (tvgId || name).replace(/[^\w.-]+/g, '_'),
+      name,
+      country: cc,
+      categories: ['general'],
+      website: '',
+      logo: attr('tvg-logo').startsWith('https://') ? attr('tvg-logo') : '',
+      stream: url,
+      quality: '',
+    });
+  }
+  return out;
+}
+
 async function buildTv() {
   const base = 'https://iptv-org.github.io/api';
   const [channels, streams, logos, blocklist] = await Promise.all(['channels', 'streams', 'logos', 'blocklist'].map((n) => getJson(`${base}/${n}.json`, 60000)));
@@ -299,6 +336,16 @@ async function buildTv() {
       quality: st.quality,
     };
   });
+  // Второй источник — Free-TV (если недоступен, просто пропускаем)
+  try {
+    const seen = new Set(cand.map((c) => c.stream));
+    const seenName = new Set(cand.map((c) => `${c.country}|${c.name.toLowerCase()}`));
+    const extra = (await freeTvCandidates()).filter((c) => !seen.has(c.stream) && !seenName.has(`${c.country}|${c.name.toLowerCase()}`));
+    stats.tvFreeTv = extra.length;
+    cand.push(...extra);
+  } catch (e) {
+    log('Free-TV пропущен:', e.message);
+  }
   stats.tvCandidates = cand.length;
   log(`ТВ: кандидатов ${cand.length}, проверяем…`);
   const ok = await pool(cand, 30, (c) => hlsPlayableInBrowser(c.stream));
@@ -324,6 +371,108 @@ async function buildDeadLinks() {
   return dead;
 }
 
+
+// ---------- 5. Эксклюзив: официальные станции с собственными открытыми потоками ----------
+const exStation = (src, id, name, url, extra = {}) => ({
+  stationuuid: `ex-${src}-${id}`,
+  name,
+  url,
+  url_resolved: url,
+  homepage: extra.homepage || '',
+  favicon: (extra.favicon || '').startsWith('https://') ? extra.favicon : '',
+  tags: extra.tags || '',
+  country: extra.country || '',
+  countrycode: extra.countrycode || '',
+  codec: extra.codec || 'MP3',
+  bitrate: extra.bitrate || 128,
+  clickcount: 0,
+});
+
+const STATIC_GROUPS = [
+  {
+    id: 'radioparadise', name: 'Radio Paradise', note: 'Без рекламы, живые ведущие · Калифорния',
+    stations: [
+      ['main', 'Radio Paradise — Main Mix', 'https://stream.radioparadise.com/aac-320', 'eclectic,rock,indie', 320, 'AAC'],
+      ['mellow', 'Radio Paradise — Mellow Mix', 'https://stream.radioparadise.com/mellow-320', 'chillout,mellow', 320, 'AAC'],
+      ['rock', 'Radio Paradise — Rock Mix', 'https://stream.radioparadise.com/rock-320', 'rock', 320, 'AAC'],
+      ['global', 'Radio Paradise — Global Mix', 'https://stream.radioparadise.com/global-320', 'world,eclectic', 320, 'AAC'],
+    ].map(([id, n, u, t, b, c]) => exStation('rp', id, n, u, { tags: t, bitrate: b, codec: c, homepage: 'https://radioparadise.com', country: 'The United States Of America', countrycode: 'US' })),
+  },
+  {
+    id: 'fip', name: 'FIP (Radio France)', note: 'Государственное радио Франции · без рекламы',
+    stations: [
+      ['fip', 'FIP', 'fip'], ['rock', 'FIP Rock', 'fiprock'], ['jazz', 'FIP Jazz', 'fipjazz'], ['groove', 'FIP Groove', 'fipgroove'],
+      ['world', 'FIP Monde', 'fipworld'], ['new', 'FIP Nouveautés', 'fipnouveautes'], ['reggae', 'FIP Reggae', 'fipreggae'],
+      ['electro', 'FIP Electro', 'fipelectro'], ['metal', 'FIP Metal', 'fipmetal'], ['hiphop', 'FIP Hip-Hop', 'fiphiphop'], ['pop', 'FIP Pop', 'fippop'],
+    ].map(([id, n, k]) => exStation('fip', id, n, `https://icecast.radiofrance.fr/${k}-hifi.aac`, { tags: 'eclectic,' + id, bitrate: 192, codec: 'AAC', homepage: 'https://www.radiofrance.fr/fip', country: 'France', countrycode: 'FR' })),
+  },
+  {
+    id: 'swiss', name: 'Radio Swiss (SRG SSR)', note: 'Общественное радио Швейцарии · без рекламы и болтовни',
+    stations: [
+      ['jazz', 'Radio Swiss Jazz', 'rsj', 'jazz'], ['classic', 'Radio Swiss Classic', 'rsc_de', 'classical'], ['pop', 'Radio Swiss Pop', 'rsp', 'pop,easy listening'],
+    ].map(([id, n, k, t]) => exStation('swiss', id, n, `https://stream.srg-ssr.ch/m/${k}/mp3_128`, { tags: t, homepage: 'https://www.radioswiss' + id + '.ch', country: 'Switzerland', countrycode: 'CH' })),
+  },
+  {
+    id: 'indie', name: 'Независимые станции мира', note: 'Известные некоммерческие станции с открытыми потоками',
+    stations: [
+      exStation('kexp', 'main', 'KEXP 90.3 Seattle', 'https://kexp.streamguys1.com/kexp160.aac', { tags: 'indie,alternative', bitrate: 160, codec: 'AAC', homepage: 'https://www.kexp.org', country: 'The United States Of America', countrycode: 'US' }),
+      exStation('nts', '1', 'NTS Radio 1 (London)', 'https://stream-relay-geo.ntslive.net/stream', { tags: 'eclectic,underground', homepage: 'https://www.nts.live', country: 'The United Kingdom', countrycode: 'GB' }),
+      exStation('nts', '2', 'NTS Radio 2 (London)', 'https://stream-relay-geo.ntslive.net/stream2', { tags: 'eclectic,underground', homepage: 'https://www.nts.live', country: 'The United Kingdom', countrycode: 'GB' }),
+      ...['nightride', 'chillsynth', 'darksynth', 'datawave', 'spacesynth', 'horrorsynth'].map((k) =>
+        exStation('nightride', k, `Nightride FM — ${k[0].toUpperCase() + k.slice(1)}`, `https://stream.nightride.fm/${k}.mp3`, { tags: 'synthwave,retrowave', bitrate: 320, homepage: 'https://nightride.fm' })
+      ),
+    ],
+  },
+];
+
+async function somaGroup() {
+  const j = await getJson('https://api.somafm.com/channels.json');
+  const stations = (j.channels || []).map((c) =>
+    exStation('soma', c.id, `SomaFM — ${c.title}`, `https://ice1.somafm.com/${c.id}-128-mp3`, {
+      tags: c.genre || '', favicon: c.largeimage || c.image || '', homepage: `https://somafm.com/${c.id}/`, country: 'The United States Of America', countrycode: 'US',
+    })
+  );
+  return { id: 'somafm', name: 'SomaFM', note: 'Слушательское радио без рекламы · Сан-Франциско', stations };
+}
+
+async function recordGroup() {
+  const j = await getJson('https://www.radiorecord.ru/api/stations/');
+  const list = j?.result?.stations || j?.stations || [];
+  const stations = list
+    .map((c) => {
+      const url = c.stream_320 || c.stream_128 || c.stream_64;
+      if (!url || !String(url).startsWith('https://')) return null;
+      return exStation('record', c.prefix || c.id, `Record — ${c.title}`, url, {
+        tags: ['dance', ...(c.genre || []).map((g) => g.name)].join(',').toLowerCase(),
+        favicon: c.icon_fill_colored || c.icon_fill_white || '', homepage: 'https://www.radiorecord.ru', bitrate: c.stream_320 ? 320 : 128,
+        country: 'Russia', countrycode: 'RU',
+      });
+    })
+    .filter(Boolean);
+  return { id: 'record', name: 'Радио Record', note: 'Официальные каналы Radio Record (танцевальная музыка)', stations };
+}
+
+async function buildExclusive() {
+  const groups = [...STATIC_GROUPS];
+  for (const [name, fn] of [['SomaFM', somaGroup], ['Record', recordGroup]]) {
+    try {
+      groups.push(await fn());
+    } catch (e) {
+      log(`эксклюзив: ${name} пропущен — ${e.message}`);
+    }
+  }
+  const all = groups.flatMap((g) => g.stations);
+  log(`эксклюзив: проверяем ${all.length} потоков…`);
+  const ok = await pool(all, 20, (s) => audioAlive(s.url));
+  const alive = new Set(all.filter((_, i) => ok[i]).map((s) => s.stationuuid));
+  const result = groups
+    .map((g) => ({ ...g, stations: g.stations.filter((s) => alive.has(s.stationuuid)) }))
+    .filter((g) => g.stations.length);
+  stats.exclusive = result.reduce((n, g) => n + g.stations.length, 0);
+  log(`эксклюзив: работают ${stats.exclusive}`);
+  return result;
+}
+
 // ---------- запуск ----------
 const prev = await fs.readFile(OUT, 'utf8').then(JSON.parse).catch(() => ({}));
 const safe = async (name, fn, fallback) => {
@@ -337,11 +486,12 @@ const safe = async (name, fn, fallback) => {
 
 const catalog = {
   generatedAt: new Date().toISOString(),
-  sources: ['Radio Browser (radio-browser.info)', 'laut.fm', 'iptv-org (открытая база телеканалов)'],
+  sources: ['Radio Browser (radio-browser.info)', 'laut.fm', 'iptv-org (открытая база телеканалов)', 'Free-TV/IPTV', 'SomaFM', 'Radio Paradise', 'Radio France (FIP)', 'SRG SSR (Radio Swiss)', 'KEXP', 'NTS', 'Nightride FM', 'Radio Record'],
   artists: await safe('артисты', buildArtists, prev.artists || {}),
   series: await safe('серии', buildSeries, prev.series || []),
   tv: await safe('ТВ', buildTv, prev.tv || []),
   deadLinks: await safe('ссылки', buildDeadLinks, prev.deadLinks || []),
+  exclusive: await safe('эксклюзив', buildExclusive, prev.exclusive || []),
 };
 catalog.stats = stats;
 

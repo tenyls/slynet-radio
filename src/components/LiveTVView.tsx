@@ -42,6 +42,7 @@ const OFFICIAL_LINKS: OfficialLink[] = [
 ];
 
 const CATEGORY_RU: Record<string, string> = {
+  general: 'Общие',
   all: 'Все',
   news: 'Новости',
   music: 'Музыка',

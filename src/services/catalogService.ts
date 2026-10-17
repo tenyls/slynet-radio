@@ -22,6 +22,7 @@ export interface Catalog {
   series: Station[];
   tv: CatalogTvChannel[];
   deadLinks: string[];
+  exclusive?: { id: string; name: string; note: string; stations: Station[] }[];
 }
 
 const EMPTY: Catalog = { generatedAt: null, artists: {}, series: [], tv: [], deadLinks: [] };
