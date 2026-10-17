@@ -141,8 +141,13 @@ export const LiveTVView: React.FC = () => {
         hls.loadSource(ch.stream);
         hls.attachMedia(video);
       }
-      await video.play();
-      setVideoState('playing');
+      try {
+        await video.play();
+        setVideoState('playing');
+      } catch (err: any) {
+        // Браузер запретил автозапуск — просто ждём нажатия ▶ в самом плеере
+        setVideoState(err?.name === 'NotAllowedError' ? 'idle' : 'error');
+      }
     } catch {
       setVideoState('error');
     }
