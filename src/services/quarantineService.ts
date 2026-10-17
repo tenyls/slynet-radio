@@ -53,7 +53,7 @@ export function quarantineStation(
   stationuuid: string,
   stationName?: string,
   url?: string,
-  reason = 'Не отвечает > 4.5 сек или ошибка потока'
+  reason = 'Не отвечает > 9 сек или ошибка потока'
 ): void {
   if (!stationuuid || stationuuid.startsWith('fallback-')) return;
   const map = getQuarantinedMap();

@@ -455,11 +455,11 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         return updated;
       });
 
-      // 4.5s connection timeout: quarantine & auto-skip to next station
+      // 9s connection timeout (мобильный интернет бывает медленным): quarantine & auto-skip to next station
       connectTimeoutRef.current = setTimeout(() => {
         if (!audioRef.current || audioRef.current.paused) {
           quarantineStation(station.stationuuid, station.name, streamUrl, 'Таймаут подключения > 4.5 сек');
-          setError(`Станция «${station.name}» не ответила за 4.5с. Переключаем...`);
+          setError(`Станция «${station.name}» не ответила за 9 секунд. Переключаем...`);
           setIsLoading(false);
           const pl = playlistRef.current;
           if (pl && pl.length > 1) {
@@ -470,7 +470,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             }
           }
         }
-      }, 4500);
+      }, 9000);
 
       try {
         // Direct stream loading without crossOrigin to prevent CORS rejection on Icecast/Shoutcast

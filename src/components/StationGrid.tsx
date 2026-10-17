@@ -1,8 +1,11 @@
 import React from 'react';
 import { Station } from '../types/radio';
 import { StationCard } from './StationCard';
-import { Radio } from 'lucide-react';
+import { Radio, LayoutGrid, List } from 'lucide-react';
 import { SlyNetLogo } from './SlyNetLogo';
+import { StationRow } from './StationRow';
+import { useViewMode } from '../hooks/useViewMode';
+import { useAudio } from '../context/AudioPlayerContext';
 
 interface StationGridProps {
   stations: Station[];
@@ -29,6 +32,8 @@ export const StationGrid: React.FC<StationGridProps> = ({
   emptySubtitle = 'Попробуйте изменить поисковый запрос или фильтры по странам',
   onResetFilters,
 }) => {
+  const { mode, setMode } = useViewMode();
+  const { currentTrackTitle } = useAudio();
   // Skeleton loader when initial loading
   if (isLoading && stations.length === 0) {
     return (
@@ -39,7 +44,7 @@ export const StationGrid: React.FC<StationGridProps> = ({
             <SlyNetLogo size="lg" className="w-16 h-16 shadow-[0_0_30px_rgba(16,185,129,0.5)]" />
           </div>
           <span className="text-xs font-medium text-emerald-400 font-mono tracking-wider">
-            ПОДКЛЮЧЕНИЕ К ЭФИРУ SLYNET RADIO...
+            ЗАГРУЖАЕМ СТАНЦИИ…
           </span>
         </div>
 
@@ -80,7 +85,52 @@ export const StationGrid: React.FC<StationGridProps> = ({
     );
   }
 
+  const toggle = (
+    <div className="flex justify-end mb-3">
+      <div className="inline-flex p-1 rounded-xl bg-zinc-900/90 border border-zinc-800">
+        <button
+          onClick={() => setMode('grid')}
+          aria-label="Плитка"
+          className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 ${mode === 'grid' ? 'bg-zinc-700 text-white' : 'text-zinc-400 hover:text-white'}`}
+        >
+          <LayoutGrid className="w-3.5 h-3.5" /> Плитка
+        </button>
+        <button
+          onClick={() => setMode('list')}
+          aria-label="Список"
+          className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 ${mode === 'list' ? 'bg-zinc-700 text-white' : 'text-zinc-400 hover:text-white'}`}
+        >
+          <List className="w-3.5 h-3.5" /> Список
+        </button>
+      </div>
+    </div>
+  );
+
+  if (mode === 'list') {
+    return (
+      <div>
+        {toggle}
+        <div className="flex flex-col gap-1.5">
+          {stations.map((station) => (
+            <StationRow
+              key={station.stationuuid}
+              station={station}
+              isCurrent={currentStation?.stationuuid === station.stationuuid}
+              isPlaying={isPlaying}
+              isFavorite={isFavorite(station.stationuuid)}
+              trackTitle={currentTrackTitle}
+              onPlay={() => onPlayStation(station, stations)}
+              onToggleFavorite={onToggleFavorite}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
+    <div>
+    {toggle}
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
       {stations.map((station) => {
         const isCurrent = currentStation?.stationuuid === station.stationuuid;
@@ -96,6 +146,7 @@ export const StationGrid: React.FC<StationGridProps> = ({
           />
         );
       })}
+    </div>
     </div>
   );
 };

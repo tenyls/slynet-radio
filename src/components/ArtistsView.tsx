@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { ARTISTS_DATA, ArtistItem } from '../constants/artists';
 import { Station } from '../types/radio';
 import { useAudio } from '../context/AudioPlayerContext';
+import { findArtistStations } from '../services/artistService';
 import {
   Mic2,
   Play,
@@ -24,8 +25,6 @@ interface ArtistsViewProps {
   onCategoryChange?: (category: 'all' | 'cis' | 'world' | 'ost') => void;
 }
 
-// In-memory cache for resolved live streams per artist id
-const resolvedArtistStreams = new Map<string, string>();
 
 export const ArtistsView: React.FC<ArtistsViewProps> = ({
   onToggleFavorite,
@@ -94,130 +93,39 @@ export const ArtistsView: React.FC<ArtistsViewProps> = ({
     });
   }, [activeCategory, selectedLetter, searchQuery]);
 
-  // Guaranteed fallback streams by category & genre
-  const getReliableGenreFallback = (artist: ArtistItem): string => {
-    if (artist.category === 'ost') {
-      return 'https://stream.cinemix.us';
-    }
-    if (artist.category === 'cis') {
-      if (artist.genre.includes('рок') || artist.genre.includes('Рок')) {
-        return 'https://nashe1.hostingradio.ru/nashe-128.mp3';
-      }
-      return 'https://dorognoe.hostingradio.ru/dorognoe128.mp3';
-    }
-    if (artist.genre.includes('Метал') || artist.genre.includes('Рок') || artist.genre.includes('Rock')) {
-      return 'https://stream.rockantenne.de/rockantenne/stream/mp3';
-    }
-    return 'https://streams.ilovemusic.de/iloveradio1.mp3';
-  };
+  // Найденные станции по каждому исполнителю (только с его именем в названии)
+  const [found, setFound] = useState<Record<string, Station[]>>({});
+  const [notice, setNotice] = useState<string | null>(null);
 
-  const resolveLiveStreamUrl = async (artist: ArtistItem): Promise<string> => {
-    // 1. Check in-memory cache first
-    const cached = resolvedArtistStreams.get(artist.id);
-    if (cached) return cached;
-
-    try {
-      // 2. Real live request to Radio Browser API by artist query / name
-      const searchNameUrl = `https://de1.api.radio-browser.info/json/stations/search?name=${encodeURIComponent(
-        artist.query || artist.name
-      )}&hidebroken=true&order=clickcount&reverse=true&limit=10`;
-      
-      const res = await fetch(searchNameUrl, { signal: AbortSignal.timeout(4000) });
-      if (res.ok) {
-        const list = await res.json();
-        if (Array.isArray(list) && list.length > 0) {
-          const working = list.find((s: any) => s.url_resolved && s.url_resolved.startsWith('http'));
-          if (working) {
-            const chosen = working.url_resolved || working.url;
-            resolvedArtistStreams.set(artist.id, chosen);
-            return chosen;
-          }
-        }
-      }
-    } catch {}
-
-    try {
-      // 3. Fallback request by genre tag (tag=rock, tag=soundtrack, tag=80s, etc.)
-      const searchTagUrl = `https://de1.api.radio-browser.info/json/stations/search?tag=${encodeURIComponent(
-        artist.tag
-      )}&hidebroken=true&order=clickcount&reverse=true&limit=10`;
-      
-      const res2 = await fetch(searchTagUrl, { signal: AbortSignal.timeout(3500) });
-      if (res2.ok) {
-        const list2 = await res2.json();
-        if (Array.isArray(list2) && list2.length > 0) {
-          const working2 = list2.find((s: any) => s.url_resolved && s.url_resolved.startsWith('http'));
-          if (working2) {
-            const chosen2 = working2.url_resolved || working2.url;
-            resolvedArtistStreams.set(artist.id, chosen2);
-            return chosen2;
-          }
-        }
-      }
-    } catch {}
-
-    // 4. Return guaranteed high-quality HTTPS genre fallback
-    const reliableFallback = getReliableGenreFallback(artist);
-    resolvedArtistStreams.set(artist.id, reliableFallback);
-    return reliableFallback;
-  };
+  const isArtistPlaying = (artistId: string) =>
+    !!currentStation && (found[artistId] || []).some((s) => s.stationuuid === currentStation.stationuuid);
 
   const handlePlayArtist = async (artist: ArtistItem) => {
-    const isThisPlaying =
-      currentStation?.stationuuid === `artist_${artist.id}` && isPlaying;
-
-    if (isThisPlaying) {
+    if (isArtistPlaying(artist.id)) {
       togglePlayPause();
       return;
     }
-
     setLoadingArtistId(artist.id);
+    setNotice(null);
     try {
-      const liveStreamUrl = await resolveLiveStreamUrl(artist);
-
-      const stationObj: Station = {
-        stationuuid: `artist_${artist.id}`,
-        name: `${artist.name} 24/7`,
-        url: liveStreamUrl,
-        url_resolved: liveStreamUrl,
-        favicon: artist.avatar,
-        tags: `${artist.tag}, discography, 24/7, ${artist.genre}`,
-        country:
-          artist.category === 'cis'
-            ? 'Россия / СНГ'
-            : artist.category === 'ost'
-            ? 'Саундтреки OST'
-            : 'Мировые группы',
-        countrycode: artist.category === 'cis' ? 'RU' : 'US',
-        bitrate: 320,
-        isCustom: true,
-      };
-
-      playStation(stationObj);
+      const list = await findArtistStations(artist);
+      setFound((prev) => ({ ...prev, [artist.id]: list }));
+      if (list.length) {
+        playStation(list[0], list);
+      } else {
+        setNotice(
+          artist.category === 'ost'
+            ? `Сейчас нет доступных станций подборки «${artist.name}». Попробуйте позже.`
+            : `Пока нет отдельной станции «${artist.name}» в открытом каталоге. Мы не подменяем её случайной.`
+        );
+        setTimeout(() => setNotice(null), 5000);
+      }
+    } catch {
+      setNotice('Каталог станций сейчас недоступен. Попробуйте ещё раз.');
+      setTimeout(() => setNotice(null), 4000);
     } finally {
       setLoadingArtistId(null);
     }
-  };
-
-  const getArtistStationObj = (artist: ArtistItem): Station => {
-    const stream = resolvedArtistStreams.get(artist.id) || getReliableGenreFallback(artist);
-    return {
-      stationuuid: `artist_${artist.id}`,
-      name: `${artist.name} 24/7`,
-      url: stream,
-      url_resolved: stream,
-      favicon: artist.avatar,
-      tags: `${artist.tag}, discography, 24/7, ${artist.genre}`,
-      country:
-        artist.category === 'cis'
-          ? 'Россия / СНГ'
-          : artist.category === 'ost'
-          ? 'Саундтреки OST'
-          : 'Мировые группы',
-      countrycode: artist.category === 'cis' ? 'RU' : 'US',
-      bitrate: 320,
-      isCustom: true,
-    };
   };
 
   return (
@@ -228,11 +136,11 @@ export const ArtistsView: React.FC<ArtistsViewProps> = ({
           <div>
             <div className="flex items-center gap-2 mb-2">
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-gradient-to-r from-cyan-500/20 to-emerald-400/20 text-cyan-300 border border-cyan-400/30">
-                DISCOGRAPHIES 24/7
+                ИСПОЛНИТЕЛИ & OST
               </span>
               <span className="text-xs text-emerald-400 font-mono font-semibold flex items-center gap-1">
                 <Sparkles className="w-3.5 h-3.5 animate-pulse" />
-                Только песни артиста
+                Только станции с именем артиста
               </span>
             </div>
 
@@ -244,7 +152,7 @@ export const ArtistsView: React.FC<ArtistsViewProps> = ({
             </h1>
 
             <p className="text-xs sm:text-sm text-zinc-300 mt-2 max-w-2xl leading-relaxed">
-              Персональные 24/7 радиостанции любимых музыкальных групп, легенд русского рока, мировых звезд и культовых саундтреков из кино, игр и аниме без лишней болтовни.
+              Станции, посвящённые конкретным исполнителям (ищем по имени в названии станции), и подборки саундтреков из кино, игр и аниме. Если отдельной станции нет — так и скажем, без подмены.
             </p>
           </div>
 
@@ -256,7 +164,7 @@ export const ArtistsView: React.FC<ArtistsViewProps> = ({
                 {filteredArtists.length}
               </div>
               <div className="text-[10px] font-mono uppercase text-zinc-400">
-                станций найдено
+                в каталоге
               </div>
             </div>
           </div>
@@ -266,7 +174,7 @@ export const ArtistsView: React.FC<ArtistsViewProps> = ({
       {/* Main Category Tabs */}
       <div className="flex flex-wrap items-center gap-2 p-1.5 bg-zinc-900/90 border border-zinc-800 rounded-2xl w-fit shadow-lg">
         {[
-          { id: 'all', label: 'Все станции 24/7', icon: Flame },
+          { id: 'all', label: 'Все', icon: Flame },
           { id: 'cis', label: '🇷🇺 СНГ / Рок и Поп', icon: Mic2 },
           { id: 'world', label: '🌍 Мировые группы & Легенды', icon: Globe },
           { id: 'ost', label: '🎬 Саундтреки (OST)', icon: Film },
@@ -289,6 +197,10 @@ export const ArtistsView: React.FC<ArtistsViewProps> = ({
           );
         })}
       </div>
+
+      {notice && (
+        <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200 font-medium">{notice}</div>
+      )}
 
       {/* Search & Alphabet Filter Row */}
       <div className="flex flex-col gap-3">
@@ -348,10 +260,8 @@ export const ArtistsView: React.FC<ArtistsViewProps> = ({
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {filteredArtists.map((artist) => {
-            const stationUuid = `artist_${artist.id}`;
-            const isPlayingThis =
-              currentStation?.stationuuid === stationUuid && isPlaying;
-            const fav = isFavorite(stationUuid);
+            const isPlayingThis = isArtistPlaying(artist.id) && isPlaying;
+            const foundList = found[artist.id];
 
             return (
               <div
@@ -372,34 +282,19 @@ export const ArtistsView: React.FC<ArtistsViewProps> = ({
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/30 to-transparent" />
 
-                  {/* 24/7 Badge */}
-                  <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-black/70 backdrop-blur-md border border-white/10 text-[10px] font-mono font-bold text-cyan-300 shadow">
-                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" />
-                    <span>24/7 ОНЛАЙН</span>
-                  </div>
-
-                  {/* Favorite Heart Button */}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onToggleFavorite(getArtistStationObj(artist));
-                    }}
-                    className="absolute top-3 right-3 p-2 rounded-xl bg-black/60 hover:bg-black/90 backdrop-blur-md border border-white/10 text-white transition-all active:scale-90"
-                    title={fav ? 'Удалить из избранного' : 'Добавить в избранное'}
-                  >
-                    <Heart
-                      className={`w-4 h-4 transition-colors ${
-                        fav ? 'fill-rose-500 text-rose-500' : 'text-zinc-300'
-                      }`}
-                    />
-                  </button>
+                  {/* Сколько станций найдено */}
+                  {foundList && (
+                    <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-black/70 backdrop-blur-md border border-white/10 text-[10px] font-mono font-bold text-cyan-300 shadow">
+                      {foundList.length ? `${foundList.length} станц.` : 'нет станции'}
+                    </div>
+                  )}
 
                   {/* Floating Play Button */}
                   <button
                     onClick={() => handlePlayArtist(artist)}
                     disabled={loadingArtistId === artist.id}
                     className="absolute bottom-3 right-3 w-12 h-12 rounded-2xl bg-gradient-to-r from-cyan-500 to-emerald-400 hover:brightness-110 text-zinc-950 flex items-center justify-center shadow-xl shadow-cyan-500/30 group-hover:scale-110 transition-transform active:scale-95"
-                    title={isPlayingThis ? 'Пауза' : 'Включить дискографию'}
+                    title={isPlayingThis ? 'Пауза' : 'Найти и включить'}
                   >
                     {loadingArtistId === artist.id ? (
                       <div className="w-5 h-5 border-2 border-zinc-950 border-t-transparent rounded-full animate-spin" />
@@ -441,14 +336,14 @@ export const ArtistsView: React.FC<ArtistsViewProps> = ({
                   {/* Footer Action */}
                   <div className="pt-2 border-t border-zinc-800/80 flex items-center justify-between">
                     <span className="text-[10px] font-mono text-zinc-500">
-                      320 KBPS ULTRA HD
+                      {foundList ? (foundList.length ? `Найдено станций: ${foundList.length}` : 'Станции нет') : artist.category === 'ost' ? 'Подборка' : 'Исполнитель'}
                     </span>
 
                     <button
                       onClick={() => handlePlayArtist(artist)}
                       className="text-xs font-bold text-cyan-400 hover:text-emerald-300 transition-colors flex items-center gap-1"
                     >
-                      <span>{isPlayingThis ? 'Остановить' : 'Слушать 24/7'}</span>
+                      <span>{isPlayingThis ? 'Пауза' : 'Слушать'}</span>
                       <Play className="w-3 h-3 fill-current" />
                     </button>
                   </div>

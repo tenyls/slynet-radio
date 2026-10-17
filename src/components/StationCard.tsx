@@ -35,7 +35,7 @@ export const StationCard: React.FC<StationCardProps> = ({
   const isActivelyPlaying = Boolean(isCurrent && isPlaying);
   const flag = getCountryFlag(station?.countrycode || '');
   const countryName = station?.country || station?.countrycode || 'Мир';
-  const bitrateText = station?.bitrate && station.bitrate > 0 ? `${station.bitrate} kbps` : '128 kbps';
+  const bitrateText = station?.bitrate && station.bitrate > 0 ? `${station.bitrate} kbps` : '';
 
   return (
     <div

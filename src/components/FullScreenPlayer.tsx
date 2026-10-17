@@ -1,12 +1,17 @@
-import { liveFallbackLabel } from '../services/rdsService';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useAudio } from '../context/AudioPlayerContext';
 import { StationFallbackIcon } from './StationFallbackIcon';
 import { SlyNetLogo } from './SlyNetLogo';
 import { SleepTimerModal } from './SleepTimerModal';
-import { CityWeather } from '../types/radio';
+import { CityWeather, Station, GenreCategory } from '../types/radio';
 import { getStationWeather } from '../services/weatherService';
 import { fetchAlbumArtFromItunes } from '../services/itunesService';
+import { liveFallbackLabel } from '../services/rdsService';
+import { fetchStations } from '../services/radioApi';
+import { findArtistStations } from '../services/artistService';
+import { GENRES } from '../constants/genres';
+import { COUNTRIES } from '../constants/countries';
+import { ARTISTS_DATA, ArtistItem } from '../constants/artists';
 import {
   ChevronDown,
   Play,
@@ -20,17 +25,19 @@ import {
   Moon,
   Clock,
   ExternalLink,
-  Wifi,
-  Sparkles,
   Sliders,
   Disc,
   Circle,
   Car,
   Bell,
-  CloudSun,
-  Wind,
   Bookmark,
   Check,
+  Globe,
+  Music2,
+  ListMusic,
+  Mic2,
+  X,
+  Loader2,
 } from 'lucide-react';
 
 interface FullScreenPlayerProps {
@@ -38,10 +45,15 @@ interface FullScreenPlayerProps {
   onToggleFavorite: () => void;
 }
 
-export const FullScreenPlayer: React.FC<FullScreenPlayerProps> = ({
-  isFavorite,
-  onToggleFavorite,
-}) => {
+type SheetTab = 'stations' | 'country' | 'genre' | 'artists' | 'results';
+
+const formatTime = (seconds: number) => {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m}:${s < 10 ? '0' : ''}${s}`;
+};
+
+export const FullScreenPlayer: React.FC<FullScreenPlayerProps> = ({ isFavorite, onToggleFavorite }) => {
   const {
     currentStation,
     currentTrackTitle,
@@ -50,6 +62,8 @@ export const FullScreenPlayer: React.FC<FullScreenPlayerProps> = ({
     togglePlayPause,
     playNext,
     playPrevious,
+    playStation,
+    playlist,
     volume,
     setVolume,
     isMuted,
@@ -57,14 +71,12 @@ export const FullScreenPlayer: React.FC<FullScreenPlayerProps> = ({
     isFullScreenOpen,
     setIsFullScreenOpen,
     sleepTimerRemainingSec,
-    error,
     setIsCarModeOpen,
     setIsEqualizerOpen,
     setIsRecorderOpen,
     setIsAlarmOpen,
     isRecording,
     recordingDurationSec,
-    startRecording,
     stopRecording,
     bookmarkCurrentTrack,
   } = useAudio();
@@ -72,321 +84,329 @@ export const FullScreenPlayer: React.FC<FullScreenPlayerProps> = ({
   const [isSleepModalOpen, setIsSleepModalOpen] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [weather, setWeather] = useState<CityWeather | null>(null);
-  const [itunesArtwork, setItunesArtwork] = useState<string | null>(null);
-  const [savedNotice, setSavedNotice] = useState(false);
+  const [artwork, setArtwork] = useState<string | null>(null);
+  const [savedNotice, setSavedNotice] = useState<string | null>(null);
 
-  // Auto-fetch artist & album cover via iTunes Search API
+  // Шторка быстрого выбора (не выходя из плеера)
+  const [sheet, setSheet] = useState<SheetTab | null>(null);
+  const [sheetCountry, setSheetCountry] = useState('');
+  const [sheetGenre, setSheetGenre] = useState<GenreCategory | null>(null);
+  const [results, setResults] = useState<Station[]>([]);
+  const [resultsTitle, setResultsTitle] = useState('');
+  const [sheetLoading, setSheetLoading] = useState(false);
+  const [sheetMessage, setSheetMessage] = useState<string | null>(null);
+
+  // Обложка из iTunes — только для настоящей песни (а не по названию станции)
   useEffect(() => {
-    if (!currentStation) {
-      setItunesArtwork(null);
-      return;
-    }
+    setArtwork(null);
+    if (!currentTrackTitle) return;
     let cancelled = false;
-    const query = currentTrackTitle || currentStation.name;
-    fetchAlbumArtFromItunes(query).then((art) => {
-      if (!cancelled && art) {
-        setItunesArtwork(art);
-      }
+    fetchAlbumArtFromItunes(currentTrackTitle).then((art) => {
+      if (!cancelled && art) setArtwork(art);
     });
     return () => {
       cancelled = true;
     };
-  }, [currentStation?.stationuuid, currentTrackTitle]);
+  }, [currentTrackTitle]);
 
-  // Fetch weather for broadcasting city
   useEffect(() => {
-    if (!currentStation) {
-      setWeather(null);
-      return;
-    }
+    if (!currentStation || !isFullScreenOpen) return;
     let cancelled = false;
+    setWeather(null);
     getStationWeather(currentStation).then((w) => {
-      if (!cancelled && w) {
-        setWeather(w);
-      }
+      if (!cancelled && w) setWeather(w);
     });
     return () => {
       cancelled = true;
     };
-  }, [currentStation]);
+  }, [currentStation?.stationuuid, isFullScreenOpen]);
 
+  useEffect(() => setImageError(false), [currentStation?.stationuuid]);
+
+  // Esc закрывает шторку, затем плеер
   useEffect(() => {
-    setImageError(false);
-  }, [currentStation?.stationuuid]);
+    if (!isFullScreenOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      if (sheet) setSheet(null);
+      else setIsFullScreenOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [isFullScreenOpen, sheet, setIsFullScreenOpen]);
+
+  const tags = useMemo(
+    () =>
+      (currentStation?.tags || '')
+        .split(',')
+        .map((t) => t.trim())
+        .filter(Boolean)
+        .slice(0, 4),
+    [currentStation?.tags]
+  );
 
   if (!isFullScreenOpen || !currentStation) return null;
 
-  const formatRemaining = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  const coverSrc = artwork || (currentStation.favicon && !imageError ? currentStation.favicon : '');
+
+  const runSearch = async (country: string, genre: GenreCategory | null) => {
+    setSheet('results');
+    setSheetLoading(true);
+    setSheetMessage(null);
+    const cName = COUNTRIES.find((c) => c.code === country);
+    setResultsTitle([cName && country ? `${cName.flag} ${cName.name}` : '🌍 Весь мир', genre?.tag ? genre.name : 'Все жанры'].join(' · '));
+    try {
+      const list = await fetchStations({ countrycode: country || undefined, tag: genre?.tag || undefined, limit: 80 });
+      setResults(list);
+      if (!list.length) setSheetMessage('По этому сочетанию станций не найдено. Попробуйте другой жанр или страну.');
+    } catch {
+      setResults([]);
+      setSheetMessage('Каталог сейчас недоступен. Попробуйте ещё раз.');
+    } finally {
+      setSheetLoading(false);
+    }
   };
 
-  const cleanTags =
-    currentStation.tags
-      ?.split(',')
-      .slice(0, 3)
-      .map((t) => `#${t.trim()}`)
-      .join(' ') ||
-    currentStation.country ||
-    '#Radio';
+  const openArtist = async (artist: ArtistItem) => {
+    setSheet('results');
+    setSheetLoading(true);
+    setSheetMessage(null);
+    setResultsTitle(`🎤 ${artist.name}`);
+    try {
+      const list = await findArtistStations(artist);
+      setResults(list);
+      if (!list.length) setSheetMessage(`Отдельной станции «${artist.name}» пока нет в открытом каталоге.`);
+    } catch {
+      setResults([]);
+      setSheetMessage('Каталог сейчас недоступен. Попробуйте ещё раз.');
+    } finally {
+      setSheetLoading(false);
+    }
+  };
+
+  const onBookmark = () => {
+    const ok = bookmarkCurrentTrack();
+    if (!ok) return;
+    setSavedNotice(currentTrackTitle ? 'Трек сохранён' : 'Станция без названия песни — сохранено в историю');
+    setTimeout(() => setSavedNotice(null), 2200);
+  };
+
+  const toolBtn = 'flex-1 min-w-0 py-2 rounded-xl border flex flex-col items-center gap-0.5 text-[10px] font-medium transition-colors';
+  const toolIdle = 'bg-zinc-900/80 hover:bg-zinc-800 border-white/5 text-zinc-300';
+  const quickBtn =
+    'flex-1 min-w-0 py-2 px-1 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 border border-cyan-500/20 text-[11px] font-semibold text-zinc-200 flex items-center justify-center gap-1.5 truncate';
+
+  const stationRow = (st: Station, list: Station[]) => {
+    const active = st.stationuuid === currentStation.stationuuid;
+    return (
+      <button
+        key={st.stationuuid}
+        onClick={() => {
+          playStation(st, list);
+          setSheet(null);
+        }}
+        className={`w-full flex items-center gap-3 p-2 rounded-xl text-left transition-colors ${
+          active ? 'bg-emerald-500/15 border border-emerald-500/40' : 'hover:bg-zinc-800/80 border border-transparent'
+        }`}
+      >
+        <span className="w-10 h-10 rounded-lg overflow-hidden bg-zinc-800 shrink-0 flex items-center justify-center">
+          {st.favicon ? (
+            <img src={st.favicon} alt="" loading="lazy" referrerPolicy="no-referrer" className="w-full h-full object-cover" onError={(e) => ((e.target as HTMLImageElement).style.display = 'none')} />
+          ) : (
+            <Music2 className="w-4 h-4 text-zinc-500" />
+          )}
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-sm font-semibold text-white truncate">{st.name}</span>
+          <span className="block text-[11px] text-zinc-400 truncate">
+            {[st.country, (st.tags || '').split(',')[0], st.bitrate ? `${st.bitrate} kbps` : ''].filter(Boolean).join(' · ')}
+          </span>
+        </span>
+        {active && isPlaying && <span className="text-[10px] font-bold text-emerald-400 shrink-0">В ЭФИРЕ</span>}
+      </button>
+    );
+  };
 
   return (
     <>
-      <div className="fixed inset-0 h-[100dvh] max-h-[100dvh] overflow-hidden flex flex-col justify-between p-3 sm:p-4 md:p-6 z-50 bg-gradient-to-b from-zinc-950 via-zinc-900 to-black select-none animate-fade-in">
-        {/* Full-bleed blurred cover background */}
-        {(itunesArtwork || (currentStation.favicon && !imageError)) && (
+      <div className="fixed inset-0 z-50 h-[100dvh] overflow-hidden bg-gradient-to-b from-zinc-950 via-zinc-900 to-black select-none animate-fade-in">
+        {coverSrc && (
           <div
-            className="absolute inset-0 bg-cover bg-center blur-3xl opacity-20 scale-125 pointer-events-none transition-all duration-1000"
-            style={{ backgroundImage: `url(${itunesArtwork || currentStation.favicon})` }}
+            className="absolute inset-0 bg-cover bg-center blur-3xl opacity-25 scale-125 pointer-events-none"
+            style={{ backgroundImage: `url("${coverSrc.replace(/"/g, '')}")` }}
           />
         )}
 
-        {/* Subtle background glow */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-emerald-500/10 rounded-full blur-[120px] pointer-events-none" />
-
-        {/* Top bar with back button & brand title */}
-        <div className="relative z-10 flex items-center justify-between px-2 py-1 max-w-2xl w-full mx-auto shrink-0">
-          <button
-            onClick={() => setIsFullScreenOpen(false)}
-            aria-label="Свернуть плеер"
-            className="w-10 h-10 flex items-center justify-center rounded-2xl bg-zinc-900/80 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-white/5 transition-colors"
-          >
-            <ChevronDown className="w-5 h-5" />
-          </button>
-
-          <div className="flex flex-col items-center">
-            <span className="text-[9px] font-bold tracking-widest text-zinc-400 uppercase">
-              СЕЙЧАС ИГРАЕТ
-            </span>
-            <div className="flex items-center gap-1.5 mt-0.5">
-              <SlyNetLogo
-                size="xs"
-                className="w-4 h-4 shadow-[0_0_10px_rgba(16,185,129,0.4)] border border-emerald-500/40"
-                isSpinning={isPlaying}
-              />
-              <span className="text-xs text-theme-accent font-bold">SlyNet Radio</span>
+        {/* Всё содержимое — строго в один экран */}
+        <div
+          className="relative z-10 h-full max-w-md mx-auto flex flex-col px-4"
+          style={{
+            paddingTop: 'max(10px, env(safe-area-inset-top))',
+            paddingBottom: 'max(10px, env(safe-area-inset-bottom))',
+          }}
+        >
+          {/* Верхняя панель */}
+          <div className="flex items-center justify-between shrink-0">
+            <button
+              onClick={() => setIsFullScreenOpen(false)}
+              aria-label="Свернуть плеер"
+              className="w-10 h-10 flex items-center justify-center rounded-2xl bg-zinc-900/80 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-white/5"
+            >
+              <ChevronDown className="w-5 h-5" />
+            </button>
+            <div className="flex flex-col items-center min-w-0">
+              <span className="text-[9px] font-bold tracking-widest text-zinc-400 uppercase">Сейчас играет</span>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <SlyNetLogo size="xs" className="w-4 h-4" isSpinning={isPlaying} />
+                <span className="text-xs text-theme-accent font-bold">SlyNet Radio</span>
+              </div>
             </div>
-          </div>
-
-          <div className="flex items-center gap-2">
             <button
               onClick={() => setIsSleepModalOpen(true)}
               aria-label="Таймер сна"
-              className={`w-10 h-10 flex items-center justify-center rounded-2xl transition-all ${
+              className={`h-10 min-w-10 px-2 flex items-center justify-center gap-1 rounded-2xl border ${
                 sleepTimerRemainingSec !== null
-                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                  : 'bg-zinc-900/80 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-white/5'
+                  ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+                  : 'bg-zinc-900/80 hover:bg-zinc-800 text-zinc-300 border-white/5'
               }`}
             >
               {sleepTimerRemainingSec !== null ? (
-                <Clock className="w-4 h-4 animate-pulse text-emerald-400" />
+                <>
+                  <Clock className="w-4 h-4" />
+                  <span className="text-[11px] font-mono tabular-nums">{formatTime(sleepTimerRemainingSec)}</span>
+                </>
               ) : (
                 <Moon className="w-4 h-4" />
               )}
             </button>
           </div>
-        </div>
 
-        {/* Center content container - strictly fits 1 screen */}
-        <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 max-w-md w-full mx-auto py-1 min-h-0 overflow-hidden">
-          {/* Weather of broadcasting city */}
+          {/* Погода в городе станции (только на высоких экранах) */}
           {weather && (
-            <div className="mb-2 px-3 py-1 rounded-xl bg-zinc-900/90 border border-white/10 flex items-center gap-2 text-[11px] text-zinc-300 shadow shrink-0">
-              <span className="text-sm">{weather.icon}</span>
-              <span className="font-bold text-white font-mono">
-                {(weather.temp ?? 0) > 0 ? `+${weather.temp}` : weather.temp}°C
-              </span>
-              <span className="text-zinc-400">{weather.condition}</span>
-              <span className="text-zinc-600">·</span>
-              <span className="text-cyan-400 font-mono font-medium truncate max-w-[140px]">
-                {weather.city} ({weather.localTime})
+            <div className="hidden [@media(min-height:760px)]:flex self-center mt-2 px-3 py-1 rounded-xl bg-zinc-900/80 border border-white/10 items-center gap-2 text-[11px] text-zinc-300 shrink-0">
+              <span>{weather.icon}</span>
+              <span className="font-bold text-white font-mono">{(weather.temp ?? 0) > 0 ? `+${weather.temp}` : weather.temp}°C</span>
+              <span className="text-cyan-400 truncate max-w-[160px]">
+                {weather.city} · {weather.localTime}
               </span>
             </div>
           )}
 
-          {/* Adaptively sized cover art (w-44 to w-64) */}
-          <div className="relative w-44 h-44 sm:w-56 sm:h-56 md:w-64 md:h-64 rounded-3xl overflow-hidden shadow-2xl border border-zinc-800/80 mb-2 sm:mb-3 flex items-center justify-center bg-zinc-950 shrink-0">
-            {itunesArtwork ? (
-              <img
-                src={itunesArtwork}
-                alt={currentStation?.name || 'Радио'}
-                className="w-full h-full object-cover animate-fade-in"
-              />
-            ) : typeof currentStation?.favicon === 'string' && currentStation.favicon && !imageError ? (
-              <img
-                src={currentStation.favicon}
-                alt={currentStation?.name || 'Радио'}
-                referrerPolicy="no-referrer"
-                onError={() => setImageError(true)}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <StationFallbackIcon
-                name={currentStation?.name || 'Радио'}
-                size="xl"
-                className="w-full h-full rounded-3xl"
-              />
-            )}
-
-            {/* iTunes HD Artwork Badge */}
-            {itunesArtwork && (
-              <div className="absolute bottom-2.5 left-2.5 bg-black/80 backdrop-blur-md px-2 py-0.5 rounded-lg border border-cyan-500/30 text-[9px] font-mono text-cyan-300 flex items-center gap-1 shadow-lg">
-                <Sparkles className="w-3 h-3 text-cyan-400" />
-                <span>iTunes Cover</span>
-              </div>
-            )}
-
-            {/* Custom Station Badge */}
-            {currentStation?.isCustom && (
-              <div className="absolute top-3 left-3 bg-emerald-500 text-zinc-950 px-2.5 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 shadow-lg">
-                <Sparkles className="w-3 h-3 fill-zinc-950" />
-                <span>SlyNet Choice</span>
-              </div>
-            )}
-
-            {/* Pulsing visualizer badge when playing */}
-            {isPlaying && (
-              <div className="absolute top-3 right-3 bg-black/70 backdrop-blur-md px-2.5 py-1 rounded-full flex items-center gap-1 border border-white/10">
-                <span className="w-1.5 h-3 bg-emerald-400 rounded-full animate-bounce" />
-                <span className="w-1.5 h-4 bg-cyan-400 rounded-full animate-bounce delay-75" />
-                <span className="w-1.5 h-2 bg-lime-400 rounded-full animate-bounce delay-150" />
-                <span className="text-[10px] font-mono font-bold text-white ml-0.5">LIVE</span>
-              </div>
-            )}
-          </div>
-
-          {/* Station metadata & favorite row */}
-          <div className="w-full flex items-center justify-between gap-3 mb-1.5 shrink-0">
-            <div className="flex-1 min-w-0 text-left">
-              <h2 className="text-base sm:text-lg md:text-xl font-extrabold tracking-tight text-white truncate">
-                {currentStation?.name || 'Радиостанция'}
-              </h2>
-              <p className="text-[11px] text-zinc-400 truncate">{cleanTags}</p>
-            </div>
-
-            <div className="flex items-center gap-1.5 shrink-0">
-              {/* Bookmark track button */}
-              <button
-                onClick={() => {
-                  const ok = bookmarkCurrentTrack();
-                  if (ok) {
-                    setSavedNotice(true);
-                    setTimeout(() => setSavedNotice(false), 2000);
-                  }
-                }}
-                aria-label="Запомнить трек"
-                title={savedNotice ? 'Трек сохранен в историю!' : 'Запомнить трек (RDS)'}
-                className={`w-9 h-9 rounded-xl flex items-center justify-center transition-transform active:scale-95 ${
-                  savedNotice
-                    ? 'bg-cyan-500/30 text-cyan-300 border border-cyan-400/50'
-                    : 'bg-zinc-800/70 hover:bg-zinc-800 text-zinc-300'
-                }`}
-              >
-                {savedNotice ? <Check className="w-4 h-4 text-cyan-400" /> : <Bookmark className="w-4 h-4" />}
-              </button>
-
-              <button
-                onClick={onToggleFavorite}
-                aria-label={isFavorite ? 'Удалить из избранного' : 'Добавить в избранное'}
-                className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-transform active:scale-95 ${
-                  isFavorite
-                    ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
-                    : 'bg-zinc-800/70 hover:bg-zinc-800 text-zinc-300'
-                }`}
-              >
-                <Heart className={`w-5 h-5 ${isFavorite ? 'fill-rose-500 text-rose-500' : ''}`} />
-              </button>
+          {/* Обложка: сама подстраивается под оставшееся место */}
+          <div className="flex-1 min-h-[96px] my-2 flex items-center justify-center" style={{ containerType: 'size' }}>
+            <div
+              className="relative rounded-3xl overflow-hidden shadow-2xl border border-zinc-800/80 bg-zinc-950"
+              style={{ width: 'min(100cqw, 100cqh, 320px)', height: 'min(100cqw, 100cqh, 320px)' }}
+            >
+              {coverSrc ? (
+                <img
+                  src={coverSrc}
+                  alt=""
+                  referrerPolicy="no-referrer"
+                  onError={() => (artwork ? setArtwork(null) : setImageError(true))}
+                  className="w-full h-full object-cover bg-white/5"
+                />
+              ) : (
+                <StationFallbackIcon name={currentStation.name} size="xl" className="!w-full !h-full rounded-3xl" />
+              )}
+              {isPlaying && (
+                <div className="absolute top-2.5 right-2.5 bg-black/70 backdrop-blur-md px-2 py-0.5 rounded-full flex items-center gap-1 border border-white/10">
+                  <span className="w-1 h-2.5 bg-emerald-400 rounded-full animate-bounce" />
+                  <span className="w-1 h-3.5 bg-cyan-400 rounded-full animate-bounce [animation-delay:120ms]" />
+                  <span className="w-1 h-2 bg-lime-400 rounded-full animate-bounce [animation-delay:240ms]" />
+                  <span className="text-[10px] font-mono font-bold text-white ml-0.5">LIVE</span>
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Prominent Pulsing/Running RDS Live Banner */}
-          <div className="w-full mb-2 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-950/80 via-zinc-900/90 to-cyan-950/80 border border-emerald-500/40 flex items-center gap-2 shadow-lg shadow-emerald-950/20 overflow-hidden shrink-0">
-            <div className="flex items-center gap-1.5 text-emerald-400 shrink-0 font-mono text-[10px] font-bold">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-              <span>🎵 СЕЙЧАС В ЭФИРЕ:</span>
+          {/* Название станции + закладка + избранное */}
+          <div className="flex items-center gap-2 shrink-0">
+            <div className="flex-1 min-w-0">
+              <h2 className="text-lg font-extrabold tracking-tight text-white truncate">{currentStation.name}</h2>
+              <p className="text-[11px] text-zinc-400 truncate">
+                {[currentStation.country, currentStation.bitrate ? `${currentStation.bitrate} kbps` : '', currentStation.codec].filter(Boolean).join(' · ')}
+              </p>
             </div>
+            <button
+              onClick={onBookmark}
+              aria-label="Сохранить трек"
+              title="Сохранить трек"
+              className={`w-10 h-10 rounded-xl flex items-center justify-center active:scale-95 ${
+                savedNotice ? 'bg-cyan-500/30 text-cyan-300' : 'bg-zinc-800/70 hover:bg-zinc-800 text-zinc-300'
+              }`}
+            >
+              {savedNotice ? <Check className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
+            </button>
+            <button
+              onClick={onToggleFavorite}
+              aria-label={isFavorite ? 'Удалить из избранного' : 'В избранное'}
+              className={`w-10 h-10 rounded-xl flex items-center justify-center active:scale-95 ${
+                isFavorite ? 'bg-rose-500/20 text-rose-400' : 'bg-zinc-800/70 hover:bg-zinc-800 text-zinc-300'
+              }`}
+            >
+              <Heart className={`w-5 h-5 ${isFavorite ? 'fill-rose-500 text-rose-500' : ''}`} />
+            </button>
+          </div>
+
+          {/* Что сейчас играет (честный RDS) */}
+          <div className="mt-2 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-950/80 via-zinc-900/90 to-cyan-950/80 border border-emerald-500/40 flex items-center gap-2 overflow-hidden shrink-0">
+            <span className="text-[10px] font-mono font-bold text-emerald-400 shrink-0">{currentTrackTitle ? '🎵 ПЕСНЯ' : '📡 ЭФИР'}</span>
             <div className="flex-1 overflow-hidden whitespace-nowrap">
-              <div className="animate-marquee inline-block font-mono text-xs sm:text-sm font-bold text-white drop-shadow">
+              <div className={`${(currentTrackTitle || '').length > 34 ? 'animate-marquee inline-block' : 'truncate'} text-xs sm:text-sm font-bold text-white`}>
                 {currentTrackTitle || liveFallbackLabel(currentStation)}
               </div>
             </div>
           </div>
+          {savedNotice && <p className="text-[11px] text-cyan-300 text-center mt-1 shrink-0">{savedNotice}</p>}
 
-          {/* Badges / Station specifications */}
-          <div className="w-full flex items-center gap-1.5 mb-2 text-[11px] text-zinc-400 shrink-0">
-            {currentStation.country && (
-              <span className="px-2 py-0.5 rounded-lg bg-zinc-800/60 border border-zinc-700/60 font-medium text-zinc-300 truncate max-w-[120px]">
-                {currentStation.country}
-              </span>
-            )}
-            {currentStation.bitrate && currentStation.bitrate > 0 && (
-              <span className="px-2 py-0.5 rounded-lg bg-zinc-800/60 border border-zinc-700/60 font-mono tabular-nums text-emerald-400 font-bold">
-                {currentStation.bitrate} kbps
-              </span>
-            )}
-            {currentStation.codec && (
-              <span className="px-2 py-0.5 rounded-lg bg-zinc-800/60 border border-zinc-700/60 font-mono uppercase text-zinc-300">
-                {currentStation.codec}
-              </span>
-            )}
-            <div className="ml-auto flex items-center gap-1 text-emerald-400 font-mono text-[11px]">
-              <Wifi className="w-3 h-3 animate-pulse" />
-              <span>Ultra HD</span>
+          {/* Жанры/теги станции */}
+          {tags.length > 0 && (
+            <div className="hidden [@media(min-height:700px)]:flex flex-wrap gap-1.5 mt-2 shrink-0 max-h-6 overflow-hidden">
+              {tags.map((t) => (
+                <span key={t} className="px-2 py-0.5 rounded-lg bg-zinc-800/70 text-[10px] text-zinc-300">
+                  #{t}
+                </span>
+              ))}
             </div>
-          </div>
+          )}
 
-          {/* Primary Playback Controls */}
-          <div className="w-full flex items-center justify-center gap-5 mb-2 shrink-0">
+          {/* Управление: крупная кнопка Play по центру */}
+          <div className="flex items-center justify-center gap-6 my-2 [@media(min-height:740px)]:my-3 shrink-0">
             <button
               onClick={playPrevious}
               aria-label="Предыдущая станция"
-              className="w-11 h-11 rounded-2xl flex items-center justify-center text-zinc-300 hover:text-white bg-zinc-900 border border-white/5 active:scale-95"
+              className="w-12 h-12 rounded-2xl flex items-center justify-center text-zinc-200 bg-zinc-900 border border-white/5 active:scale-95"
             >
               <SkipBack className="w-5 h-5" />
             </button>
-
             <button
               onClick={togglePlayPause}
-              disabled={isLoading}
               aria-label={isPlaying ? 'Пауза' : 'Слушать'}
-              className="w-16 h-16 sm:w-18 sm:h-18 rounded-3xl bg-gradient-to-r from-cyan-500 via-emerald-500 to-lime-400 text-zinc-950 flex items-center justify-center shadow-xl shadow-emerald-500/25 transition-transform active:scale-95 hover:scale-105"
+              className="w-[72px] h-[72px] [@media(min-height:740px)]:w-20 [@media(min-height:740px)]:h-20 rounded-full bg-gradient-to-br from-cyan-400 via-emerald-500 to-lime-400 text-zinc-950 flex items-center justify-center shadow-xl shadow-emerald-500/30 active:scale-95 hover:scale-105 transition-transform"
             >
               {isLoading ? (
-                <div className="w-6 h-6 border-3 border-zinc-950 border-t-transparent rounded-full animate-spin" />
+                <Loader2 className="w-8 h-8 animate-spin" />
               ) : isPlaying ? (
-                <Pause className="w-7 h-7 fill-zinc-950" />
+                <Pause className="w-8 h-8 fill-zinc-950" />
               ) : (
-                <Play className="w-7 h-7 fill-zinc-950 ml-1" />
+                <Play className="w-8 h-8 fill-zinc-950 ml-1" />
               )}
             </button>
-
             <button
               onClick={playNext}
               aria-label="Следующая станция"
-              className="w-11 h-11 rounded-2xl flex items-center justify-center text-zinc-300 hover:text-white bg-zinc-900 border border-white/5 active:scale-95"
+              className="w-12 h-12 rounded-2xl flex items-center justify-center text-zinc-200 bg-zinc-900 border border-white/5 active:scale-95"
             >
               <SkipForward className="w-5 h-5" />
             </button>
           </div>
 
-          {/* Volume Control Bar */}
-          <div className="w-full flex items-center gap-2 px-2 mb-2 shrink-0">
-            <button
-              onClick={toggleMute}
-              aria-label={isMuted ? 'Включить звук' : 'Без звука'}
-              className="text-zinc-400 hover:text-white p-1.5"
-            >
-              {isMuted || volume === 0 ? (
-                <VolumeX className="w-4 h-4 text-red-400" />
-              ) : volume < 0.5 ? (
-                <Volume1 className="w-4 h-4" />
-              ) : (
-                <Volume2 className="w-4 h-4 text-lime-400" />
-              )}
+          {/* Громкость */}
+          <div className="flex items-center gap-2 shrink-0">
+            <button onClick={toggleMute} aria-label={isMuted ? 'Включить звук' : 'Без звука'} className="text-zinc-400 hover:text-white p-1">
+              {isMuted || volume === 0 ? <VolumeX className="w-4 h-4 text-red-400" /> : volume < 0.5 ? <Volume1 className="w-4 h-4" /> : <Volume2 className="w-4 h-4 text-lime-400" />}
             </button>
-
             <input
               type="range"
               min="0"
@@ -395,86 +415,203 @@ export const FullScreenPlayer: React.FC<FullScreenPlayerProps> = ({
               value={isMuted ? 0 : volume}
               onChange={(e) => setVolume(parseFloat(e.target.value))}
               aria-label="Громкость"
-              className="flex-1 h-1.5 accent-emerald-400 cursor-pointer bg-zinc-800 rounded-lg"
+              className="flex-1 h-1.5 accent-emerald-400 cursor-pointer"
             />
-
-            <span className="text-[11px] font-mono font-bold text-zinc-300 w-8 text-right">
-              {Math.round((isMuted ? 0 : volume) * 100)}%
-            </span>
+            <span className="text-[11px] font-mono text-zinc-300 w-9 text-right">{Math.round((isMuted ? 0 : volume) * 100)}%</span>
           </div>
 
-          {/* QUICK TOOLS ROW: Equalizer, Record, Car Mode, Alarm */}
-          <div className="w-full grid grid-cols-4 gap-2 pt-1 border-t border-zinc-800/80 shrink-0">
-            {/* Equalizer */}
-            <button
-              onClick={() => setIsEqualizerOpen(true)}
-              className="py-2 px-1 rounded-xl bg-zinc-900/80 hover:bg-zinc-800 border border-white/5 flex flex-col items-center gap-0.5 text-[10px] font-medium text-zinc-300 transition-colors"
-            >
-              <Sliders className="w-3.5 h-3.5 text-emerald-400" />
+          {/* Инструменты */}
+          <div className="flex gap-1.5 mt-2 shrink-0">
+            <button onClick={() => setIsEqualizerOpen(true)} className={`${toolBtn} ${toolIdle}`}>
+              <Sliders className="w-4 h-4 text-emerald-400" />
               <span>Эквалайзер</span>
             </button>
-
-            {/* Recorder */}
             <button
               onClick={() => (isRecording ? stopRecording() : setIsRecorderOpen(true))}
-              className={`py-2 px-1 rounded-xl border flex flex-col items-center gap-0.5 text-[10px] font-medium transition-colors ${
-                isRecording
-                  ? 'bg-rose-600/30 border-rose-500/50 text-rose-300 animate-pulse'
-                  : 'bg-zinc-900/80 hover:bg-zinc-800 border-white/5 text-zinc-300'
-              }`}
+              className={`${toolBtn} ${isRecording ? 'bg-rose-600/30 border-rose-500/50 text-rose-300' : toolIdle}`}
             >
-              {isRecording ? (
-                <Circle className="w-3.5 h-3.5 fill-rose-500 text-rose-500" />
-              ) : (
-                <Disc className="w-3.5 h-3.5 text-rose-400" />
-              )}
-              <span>{isRecording ? formatRemaining(recordingDurationSec) : 'Запись'}</span>
+              {isRecording ? <Circle className="w-4 h-4 fill-rose-500 text-rose-500" /> : <Disc className="w-4 h-4 text-rose-400" />}
+              <span>{isRecording ? formatTime(recordingDurationSec) : 'Запись'}</span>
             </button>
-
-            {/* Car Mode */}
             <button
               onClick={() => {
                 setIsFullScreenOpen(false);
                 setIsCarModeOpen(true);
               }}
-              className="py-2 px-1 rounded-xl bg-zinc-900/80 hover:bg-zinc-800 border border-white/5 flex flex-col items-center gap-0.5 text-[10px] font-medium text-zinc-300 transition-colors"
+              className={`${toolBtn} ${toolIdle}`}
             >
-              <Car className="w-3.5 h-3.5 text-cyan-400" />
-              <span>За рулем</span>
+              <Car className="w-4 h-4 text-cyan-400" />
+              <span>За рулём</span>
             </button>
-
-            {/* Alarm */}
-            <button
-              onClick={() => setIsAlarmOpen(true)}
-              className="py-2 px-1 rounded-xl bg-zinc-900/80 hover:bg-zinc-800 border border-white/5 flex flex-col items-center gap-0.5 text-[10px] font-medium text-zinc-300 transition-colors"
-            >
-              <Bell className="w-3.5 h-3.5 text-lime-400" />
+            <button onClick={() => setIsAlarmOpen(true)} className={`${toolBtn} ${toolIdle}`}>
+              <Bell className="w-4 h-4 text-lime-400" />
               <span>Будильник</span>
             </button>
+            <button
+              onClick={() => setIsSleepModalOpen(true)}
+              className={`${toolBtn} ${sleepTimerRemainingSec !== null ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300' : toolIdle}`}
+            >
+              <Moon className="w-4 h-4 text-violet-300" />
+              <span>{sleepTimerRemainingSec !== null ? formatTime(sleepTimerRemainingSec) : 'Сон'}</span>
+            </button>
           </div>
-        </div>
 
-        {/* Footer website link */}
-        <div className="relative z-10 py-1 text-center shrink-0">
-          {currentStation.homepage && (
+          {/* Горячие кнопки: выбор без выхода из плеера */}
+          <div className="flex gap-1.5 mt-1.5 shrink-0">
+            <button onClick={() => setSheet('country')} className={quickBtn}>
+              <Globe className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+              <span className="truncate">{sheetCountry ? COUNTRIES.find((c) => c.code === sheetCountry)?.flag : 'Страна'}</span>
+            </button>
+            <button onClick={() => setSheet('genre')} className={quickBtn}>
+              <Music2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+              <span className="truncate">{sheetGenre?.tag ? sheetGenre.name : 'Жанр'}</span>
+            </button>
+            <button onClick={() => setSheet('stations')} className={quickBtn}>
+              <ListMusic className="w-3.5 h-3.5 text-lime-400 shrink-0" />
+              <span className="truncate">Станции</span>
+            </button>
+            <button onClick={() => setSheet('artists')} className={quickBtn}>
+              <Mic2 className="w-3.5 h-3.5 text-violet-300 shrink-0" />
+              <span className="truncate">Артисты</span>
+            </button>
+          </div>
+
+          {/* Сайт станции */}
+          {currentStation.homepage && /^https?:\/\//.test(currentStation.homepage) && (
             <a
               href={currentStation.homepage}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-1.5 text-[11px] text-zinc-400 hover:text-white transition-colors"
+              className="self-center mt-1.5 inline-flex items-center gap-1.5 text-[11px] text-zinc-400 hover:text-white shrink-0"
             >
-              <span>Сайт радиостанции</span>
-              <ExternalLink className="w-3 h-3" />
+              Сайт радиостанции <ExternalLink className="w-3 h-3" />
             </a>
           )}
         </div>
+
+        {/* Шторка быстрого выбора */}
+        {sheet && (
+          <div className="absolute inset-0 z-20 flex flex-col justify-end bg-black/60 backdrop-blur-sm" onClick={() => setSheet(null)}>
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-md mx-auto max-h-[78dvh] flex flex-col rounded-t-3xl bg-zinc-950 border-t border-x border-zinc-800 shadow-2xl animate-fade-in"
+              style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+            >
+              <div className="flex items-center gap-1 p-2 border-b border-zinc-800 shrink-0 overflow-x-auto scrollbar-none">
+                {(
+                  [
+                    ['country', 'Страна'],
+                    ['genre', 'Жанр'],
+                    ['stations', 'Станции'],
+                    ['artists', 'Артисты/OST'],
+                  ] as Array<[SheetTab, string]>
+                ).map(([id, label]) => (
+                  <button
+                    key={id}
+                    onClick={() => setSheet(id)}
+                    className={`px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap ${
+                      sheet === id ? 'bg-emerald-500 text-zinc-950' : 'text-zinc-400 hover:text-white'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+                <button onClick={() => setSheet(null)} aria-label="Закрыть" className="ml-auto p-2 text-zinc-400 hover:text-white shrink-0">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="overflow-y-auto p-3">
+                {sheet === 'country' && (
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {COUNTRIES.map((c) => (
+                      <button
+                        key={c.code || 'all'}
+                        onClick={() => {
+                          setSheetCountry(c.code);
+                          runSearch(c.code, sheetGenre);
+                        }}
+                        className={`px-3 py-2.5 rounded-xl text-left text-xs font-semibold truncate ${
+                          sheetCountry === c.code ? 'bg-cyan-500/20 text-cyan-200 border border-cyan-500/40' : 'bg-zinc-900 text-zinc-200 hover:bg-zinc-800'
+                        }`}
+                      >
+                        {c.flag} {c.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {sheet === 'genre' && (
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {GENRES.map((g) => (
+                      <button
+                        key={g.id}
+                        onClick={() => {
+                          const genre = g.tag ? g : null;
+                          setSheetGenre(genre);
+                          runSearch(sheetCountry, genre);
+                        }}
+                        className={`px-3 py-2.5 rounded-xl text-left text-xs font-semibold truncate ${
+                          (sheetGenre?.id || 'popular') === g.id ? 'bg-emerald-500/20 text-emerald-200 border border-emerald-500/40' : 'bg-zinc-900 text-zinc-200 hover:bg-zinc-800'
+                        }`}
+                      >
+                        {g.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {sheet === 'stations' && (
+                  <div className="space-y-1">
+                    <p className="text-[11px] text-zinc-500 px-1 pb-1">Текущий список ({playlist.length})</p>
+                    {playlist.length ? playlist.map((st) => stationRow(st, playlist)) : <p className="text-xs text-zinc-400 p-2">Список пуст — выберите страну или жанр.</p>}
+                  </div>
+                )}
+
+                {sheet === 'artists' && (
+                  <div className="space-y-3">
+                    {(
+                      [
+                        ['cis', '🇷🇺 СНГ'],
+                        ['world', '🌍 Мировые'],
+                        ['ost', '🎬 Саундтреки'],
+                      ] as const
+                    ).map(([cat, label]) => (
+                      <div key={cat}>
+                        <p className="text-[11px] font-bold text-zinc-400 px-1 pb-1">{label}</p>
+                        <div className="grid grid-cols-2 gap-1.5">
+                          {ARTISTS_DATA.filter((a) => a.category === cat).map((a) => (
+                            <button key={a.id} onClick={() => openArtist(a)} className="px-3 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-left text-xs font-semibold text-zinc-200 truncate">
+                              {a.name}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {sheet === 'results' && (
+                  <div className="space-y-1">
+                    <p className="text-xs font-bold text-white px-1 pb-1">{resultsTitle}</p>
+                    {sheetLoading ? (
+                      <div className="flex items-center gap-2 text-xs text-zinc-400 p-3">
+                        <Loader2 className="w-4 h-4 animate-spin" /> Ищем станции…
+                      </div>
+                    ) : sheetMessage ? (
+                      <p className="text-xs text-amber-300 p-2">{sheetMessage}</p>
+                    ) : (
+                      results.map((st) => stationRow(st, results))
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
-
-      <SleepTimerModal
-        isOpen={isSleepModalOpen}
-        onClose={() => setIsSleepModalOpen(false)}
-      />
+      <SleepTimerModal isOpen={isSleepModalOpen} onClose={() => setIsSleepModalOpen(false)} />
     </>
   );
 };

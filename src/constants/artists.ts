@@ -20,7 +20,7 @@ export const ARTISTS_DATA: ArtistItem[] = [
     tag: 'kino',
     query: 'Кино Виктор Цой',
     genre: 'Русский рок / Пост-панк',
-    description: 'Легенда советского рока: Группа крови, Звезда по имени Солнце, Пачка сигарет 24/7',
+    description: 'Легенда советского рока: Группа крови, Звезда по имени Солнце, Пачка сигарет',
     avatar: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&auto=format&fit=crop&q=80',
     fallbackStreamUrl: '',
     alphabetLetter: 'К',
