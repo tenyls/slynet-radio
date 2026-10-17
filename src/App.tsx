@@ -8,6 +8,7 @@ import { AudioProvider, useAudio } from './context/AudioPlayerContext';
 import { useFavorites } from './hooks/useFavorites';
 import { useSlyNetSettings, SlyNetSettingsProvider } from './context/SlyNetSettingsContext';
 import { isSectionHidden, hiddenCountrySet } from './utils/visibility';
+import { ContinueListening } from './components/ContinueListening';
 import { useCustomStations } from './hooks/useCustomStations';
 import { fetchStations, fetchCatalogStats, fetchStationsByUuids, guessUserCountry } from './services/radioApi';
 import { MobileHome } from './components/MobileHome';
@@ -607,6 +608,8 @@ function RadioApp() {
                 onTrending={handleTrending}
                 onMyCountry={handleMyCountry}
               />
+
+              <ContinueListening />
 
               {/* BRAND CYBER HERO BANNER IN SLYNET COLORS */}
               <div className="hidden md:block relative overflow-hidden rounded-3xl p-6 sm:p-8 bg-gradient-to-br from-slate-950 via-[#040e1a] to-[#03150e] border border-cyan-500/25 shadow-[0_10px_35px_-10px_rgba(6,182,212,0.3)]">

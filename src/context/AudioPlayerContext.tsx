@@ -7,6 +7,7 @@ import { fetchLiveTrackTitle, parseAndValidateTrack, liveFallbackLabel } from '.
 import { fetchAlbumArtFromItunes } from '../services/itunesService';
 
 const HISTORY_KEY = 'slynet_play_history_v1';
+const RECENT_KEY = 'slynet_recent_stations_v1';
 const RECOGNIZED_TRACKS_KEY = 'slynet_recognized_tracks_v1';
 const RECORDINGS_KEY = 'slynet_recordings_v1';
 const ALARM_KEY = 'slynet_alarm_settings_v1';
@@ -69,6 +70,7 @@ interface AudioContextType {
   // Track & History
   currentTrackTitle: string;
   history: PlayedTrackHistory[];
+  recentStations: Station[]; // «Продолжить слушать»
   clearHistory: () => void;
   recognizedTracks: RecognizedTrack[];
   clearRecognizedTracks: () => void;
@@ -122,6 +124,14 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   });
 
   // History states
+  const [recentStations, setRecentStations] = useState<Station[]>(() => {
+    try {
+      const v = JSON.parse(localStorage.getItem(RECENT_KEY) || '[]');
+      return Array.isArray(v) ? v.filter((x) => x && x.stationuuid && (x.url_resolved || x.url)).slice(0, 12) : [];
+    } catch {
+      return [];
+    }
+  });
   const [history, setHistory] = useState<PlayedTrackHistory[]>(() => {
     try {
       const saved = localStorage.getItem(HISTORY_KEY);
@@ -437,6 +447,15 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         clearTimeout(connectTimeoutRef.current);
         connectTimeoutRef.current = null;
       }
+
+      // «Продолжить слушать» — полные данные станции, чтобы включить одним нажатием
+      setRecentStations((prev) => {
+        const updated = [station, ...prev.filter((p) => p.stationuuid !== station.stationuuid)].slice(0, 12);
+        try {
+          localStorage.setItem(RECENT_KEY, JSON.stringify(updated));
+        } catch {}
+        return updated;
+      });
 
       // Save to History
       setHistory((prev) => {
@@ -867,8 +886,10 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const clearHistory = useCallback(() => {
     setHistory([]);
+    setRecentStations([]);
     try {
       localStorage.removeItem(HISTORY_KEY);
+      localStorage.removeItem(RECENT_KEY);
     } catch {}
   }, []);
 
@@ -1072,6 +1093,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         // Track & History
         currentTrackTitle,
         history,
+        recentStations,
         clearHistory,
         recognizedTracks,
         clearRecognizedTracks,
