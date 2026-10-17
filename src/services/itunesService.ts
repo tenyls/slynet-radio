@@ -1,41 +1,53 @@
-// In-memory cache for artist and song album art fetched from iTunes Search API
-const itunesCoverCache = new Map<string, string>();
-
 /**
- * Searches iTunes Search API for album cover art matching station name or track title.
- * Returns high-resolution (600x600) artwork URL, or null if not found.
+ * Обложка песни из iTunes Search API.
+ * Берём обложку только если исполнитель в результате совпадает с исполнителем из эфира —
+ * иначе лучше показать логотип станции, чем чужую обложку.
  */
-export async function fetchAlbumArtFromItunes(query: string): Promise<string | null> {
-  const cleanQuery = query
-    .replace(/[\[\(].*?[\]\)]/g, '') // remove brackets
-    .replace(/^(radio|fm|online|stream|live)\s+/i, '')
-    .replace(/\s+(radio|fm|online|stream|live)$/i, '')
+const cache = new Map<string, string>();
+
+const norm = (s: string) =>
+  s
+    .toLowerCase()
+    .replace(/ё/g, 'е')
+    .replace(/\b(feat|ft|featuring)\b.*$/i, '')
+    .replace(/[^\p{L}\p{N}]+/gu, ' ')
     .trim();
 
-  if (!cleanQuery || cleanQuery.length < 3) return null;
+/** «Double Key - We Love To Love - 1990» → { artist: 'Double Key', title: 'We Love To Love' } */
+export function splitTrack(raw: string): { artist: string; title: string } | null {
+  const cleaned = raw
+    .replace(/\s*[-–—]\s*(19|20)\d{2}\s*$/, '') // год в конце
+    .replace(/\s*[\[(](19|20)\d{2}[\])]\s*$/, '')
+    .trim();
+  const m = cleaned.split(/\s+[-–—]\s+/);
+  if (m.length < 2) return null;
+  const artist = m[0].trim();
+  const title = m.slice(1).join(' - ').trim();
+  return artist && title ? { artist, title } : null;
+}
 
-  const cacheKey = cleanQuery.toLowerCase();
-  if (itunesCoverCache.has(cacheKey)) {
-    return itunesCoverCache.get(cacheKey) || null;
-  }
+export async function fetchAlbumArtFromItunes(query: string): Promise<string | null> {
+  const parts = splitTrack(query);
+  if (!parts) return null;
+  const key = `${norm(parts.artist)}|${norm(parts.title)}`;
+  if (cache.has(key)) return cache.get(key) || null;
 
   try {
-    const url = `https://itunes.apple.com/search?term=${encodeURIComponent(cleanQuery)}&media=music&entity=song&limit=1`;
-    const res = await fetch(url, { signal: AbortSignal.timeout(4000) });
+    const term = `${parts.artist} ${parts.title.replace(/[\[(].*?[\])]/g, '')}`;
+    const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(term)}&media=music&entity=song&limit=10`, {
+      signal: AbortSignal.timeout(5000),
+    });
     if (!res.ok) return null;
-
     const data = await res.json();
-    if (data.resultCount > 0 && data.results && data.results[0]?.artworkUrl100) {
-      // Upgrade artwork from 100x100 to 600x600 high definition
-      const highResArt = data.results[0].artworkUrl100.replace('100x100bb', '600x600bb');
-      itunesCoverCache.set(cacheKey, highResArt);
-      return highResArt;
-    }
-
-    itunesCoverCache.set(cacheKey, '');
-    return null;
-  } catch (err) {
-    console.warn('iTunes Search API failed or timed out for:', query, err);
+    const wantArtist = norm(parts.artist);
+    const hit = (data.results || []).find((r: any) => {
+      const a = norm(r.artistName || '');
+      return a && (a.includes(wantArtist) || wantArtist.includes(a));
+    });
+    const art = hit?.artworkUrl100 ? String(hit.artworkUrl100).replace('100x100bb', '600x600bb') : '';
+    cache.set(key, art);
+    return art || null;
+  } catch {
     return null;
   }
 }

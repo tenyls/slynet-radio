@@ -22,6 +22,7 @@ export function cleanTrackTitle(raw: string, stationName?: string): string | nul
   if (!raw || typeof raw !== 'string') return null;
 
   let cleaned = raw
+    .replace(/\s*[-–—]\s*(19|20)\d{2}\s*$/, '')
     .replace(/^[\s\-_:=]+|[\s\-_:=]+$/g, '')
     .replace(/https?:\/\/\S+/gi, '')
     .replace(/\b(www\.\S+|listen live|stream online|radio station|bitrate:\s*\d+)\b/gi, '')

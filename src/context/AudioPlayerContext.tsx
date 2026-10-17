@@ -544,7 +544,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         }
 
         // Fetch artwork in background and update
-        fetchAlbumArtFromItunes(`${validated.artist} ${validated.title}`).then((art) => {
+        fetchAlbumArtFromItunes(`${validated.artist} - ${validated.title}`).then((art) => {
           if (art) {
             setRecognizedTracks((current) => {
               const updatedWithArt = current.map((t) =>

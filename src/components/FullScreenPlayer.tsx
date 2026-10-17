@@ -8,6 +8,7 @@ import { CityWeather, Station, GenreCategory } from '../types/radio';
 import { getStationWeather } from '../services/weatherService';
 import { fetchAlbumArtFromItunes } from '../services/itunesService';
 import { liveFallbackLabel } from '../services/rdsService';
+import { MusicLinks } from './MusicLinks';
 import { fetchStations } from '../services/radioApi';
 import { findArtistStations } from '../services/artistService';
 import { loadCatalog, isCatalogReady } from '../services/catalogService';
@@ -387,12 +388,19 @@ export const FullScreenPlayer: React.FC<FullScreenPlayerProps> = ({ isFavorite, 
           <div className="mt-2 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-950/80 via-zinc-900/90 to-cyan-950/80 border border-emerald-500/40 flex items-center gap-2 overflow-hidden shrink-0">
             <span className="text-[10px] font-mono font-bold text-emerald-400 shrink-0">{currentTrackTitle ? '🎵 ПЕСНЯ' : '📡 ЭФИР'}</span>
             <div className="flex-1 overflow-hidden whitespace-nowrap">
-              <div className={`${(currentTrackTitle || '').length > 34 ? 'animate-marquee inline-block' : 'truncate'} text-xs sm:text-sm font-bold text-white`}>
+              <div className="truncate text-xs sm:text-sm font-bold text-white" title={currentTrackTitle || liveFallbackLabel(currentStation)}>
                 {currentTrackTitle || liveFallbackLabel(currentStation)}
               </div>
             </div>
           </div>
           {savedNotice && <p className="text-[11px] text-cyan-300 text-center mt-1 shrink-0">{savedNotice}</p>}
+
+          {/* Открыть песню в музыкальных сервисах — только когда название настоящее */}
+          {currentTrackTitle && (
+            <div className="mt-1.5 shrink-0">
+              <MusicLinks track={currentTrackTitle} compact />
+            </div>
+          )}
 
           {/* Жанры/теги станции */}
           {tags.length > 0 && (
