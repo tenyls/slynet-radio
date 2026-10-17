@@ -53,7 +53,7 @@ export const AboutModal: React.FC<AboutModalProps> = ({ onClose }) => {
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+    <div className="fixed inset-0 z-[65] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
       <div className="relative w-full max-w-2xl rounded-3xl bg-zinc-950 border border-zinc-800 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
         {/* Header */}
         <div className="relative p-6 border-b border-zinc-800/80 bg-gradient-to-r from-cyan-950/40 via-zinc-950 to-emerald-950/40 flex items-center justify-between">

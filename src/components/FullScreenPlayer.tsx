@@ -258,7 +258,7 @@ export const FullScreenPlayer: React.FC<FullScreenPlayerProps> = ({ isFavorite, 
 
   return (
     <>
-      <div className="fixed inset-0 z-50 h-[100dvh] overflow-hidden bg-gradient-to-b from-zinc-950 via-zinc-900 to-black select-none animate-fade-in">
+      <div className="fixed inset-0 z-[56] h-[100dvh] overflow-hidden bg-gradient-to-b from-zinc-950 via-zinc-900 to-black select-none animate-fade-in">
         {coverSrc && (
           <div
             className="absolute inset-0 bg-cover bg-center blur-3xl opacity-25 scale-125 pointer-events-none"

@@ -166,7 +166,7 @@ export const SyncModal: React.FC<SyncModalProps> = ({ onClose }) => {
   );
 
   return (
-    <div onClick={onClose} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+    <div onClick={onClose} className="fixed inset-0 z-[65] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
       <div
         onClick={(e) => e.stopPropagation()}
         className="relative w-full max-w-md rounded-3xl bg-zinc-950 border border-zinc-800 shadow-2xl overflow-hidden flex flex-col max-h-[90dvh]"

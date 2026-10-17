@@ -93,8 +93,8 @@ export const MobileHome: React.FC<Props> = ({
           <span className="text-xs font-semibold text-zinc-200">В тренде</span>
         </button>
         <button onClick={onMyCountry} className="flex flex-col items-center gap-1.5 py-3.5 rounded-2xl bg-zinc-900 border border-zinc-800 active:scale-95">
-          {userCountry ? <span className="text-2xl leading-6">{getCountryFlag(userCountry)}</span> : <MapPin className="w-6 h-6 text-cyan-400" />}
-          <span className="text-xs font-semibold text-zinc-200 truncate max-w-full px-1">{countryName ? `Радио: ${countryName}` : 'Моя страна'}</span>
+          <MapPin className="w-6 h-6 text-cyan-400" />
+          <span className="text-xs font-semibold text-zinc-200 truncate max-w-full px-1">Моя страна</span>
         </button>
       </div>
 

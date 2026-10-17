@@ -32,7 +32,7 @@ export const SuggestStationModal: React.FC<SuggestStationModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-fade-in">
+    <div className="fixed inset-0 z-[65] flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-fade-in">
       <div
         className="relative w-full max-w-md p-6 bg-zinc-900 border border-zinc-800 rounded-3xl shadow-2xl text-zinc-100"
         onClick={(e) => e.stopPropagation()}

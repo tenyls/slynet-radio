@@ -88,7 +88,7 @@ export const CarModeModal: React.FC<CarModeModalProps> = ({
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex flex-col p-4 sm:p-8 select-none transition-colors duration-500 overflow-y-auto ${
+      className={`fixed inset-0 z-[65] flex flex-col p-4 sm:p-8 select-none transition-colors duration-500 overflow-y-auto ${
         nightMode
           ? 'bg-black text-white'
           : 'bg-zinc-950 text-white'
