@@ -1,0 +1,6 @@
+{
+  "name": "SlyNet Radio",
+  "description": "SlyNet Radio — Global 1000+ Radio Hub. Онлайн-радио со станциями со всего мира, жанровыми подборками, кастомными станциями, темами оформления и таймером сна.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,602 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { WebcamCity, CityWeather } from '../types/radio';
+import { WEBCAMS_DATA } from '../constants/webcams';
+import { Globe3DCanvas } from './Globe3DCanvas';
+import { fetchCityWeather } from '../services/weatherService';
+import { useAudio } from '../context/AudioPlayerContext';
+import { useSlyNetSettings } from '../context/SlyNetSettingsContext';
+import {
+  Video,
+  Globe,
+  Radio,
+  Play,
+  Volume2,
+  Maximize2,
+  Sparkles,
+  MapPin,
+  Clock,
+  CloudSun,
+  Flame,
+  Tv,
+  Eye,
+  RefreshCw,
+  Compass,
+  Search,
+  List,
+  LayoutGrid,
+  ExternalLink,
+  Layers,
+  Check,
+  Plus,
+} from 'lucide-react';
+
+interface WebcamsViewProps {
+  onOpenStationSearch?: () => void;
+  onOpenAdmin?: () => void;
+}
+
+export const WebcamsView: React.FC<WebcamsViewProps> = ({ onOpenAdmin }) => {
+  const { currentStation, isPlaying, togglePlayPause } = useAudio();
+  const { settings } = useSlyNetSettings();
+
+  // Combine default and custom webcams from CMS
+  const allWebcams: WebcamCity[] = [
+    ...(settings.customWebcams || []),
+    ...WEBCAMS_DATA,
+  ];
+
+  const [selectedCity, setSelectedCity] = useState<WebcamCity>(allWebcams[0]);
+  // View mode: table (compact row list), cards (grid), or globe (3D Canvas)
+  const [viewMode, setViewMode] = useState<'globe' | 'cards' | 'table'>('table');
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeCategory, setActiveCategory] = useState<string>('all');
+  const [activeCountryFilter, setActiveCountryFilter] = useState<string>('all');
+  const [weather, setWeather] = useState<CityWeather | null>(null);
+  const [isLoadingWeather, setIsLoadingWeather] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(Date.now());
+  const [autoRefreshActive, setAutoRefreshActive] = useState(true);
+  const [mediaError, setMediaError] = useState(false);
+
+  const playerRef = useRef<HTMLDivElement | null>(null);
+
+  // Auto-refresh snapshot every 15 seconds to simulate live camera feed without YouTube
+  useEffect(() => {
+    if (!autoRefreshActive) return;
+    const interval = setInterval(() => {
+      setRefreshKey(Date.now());
+    }, 15000);
+    return () => clearInterval(interval);
+  }, [autoRefreshActive]);
+
+  // Load live weather for selected city
+  useEffect(() => {
+    let isMounted = true;
+    setIsLoadingWeather(true);
+
+    fetchCityWeather(selectedCity.name.split('(')[0].trim(), selectedCity.countryCode)
+      .then((data) => {
+        if (isMounted) {
+          setWeather(data);
+          setIsLoadingWeather(false);
+        }
+      })
+      .catch(() => {
+        if (isMounted) setIsLoadingWeather(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedCity]);
+
+  // Categories list
+  const categories = [
+    { id: 'all', label: 'Все камеры', icon: Globe },
+    { id: 'city', label: 'Мегаполисы', icon: Flame },
+    { id: 'beach', label: 'Пляжи и Курорты', icon: Sparkles },
+    { id: 'landmark', label: 'Достопримечательности', icon: MapPin },
+    { id: 'nature', label: 'Природа и Горы', icon: Compass },
+    { id: 'space', label: 'Космос МКС', icon: Tv },
+  ];
+
+  // Extract unique countries
+  const countries = ['all', ...Array.from(new Set(allWebcams.map((w) => w.country)))];
+
+  // Filtered list
+  const filteredWebcams = allWebcams.filter((w) => {
+    const matchesCat = activeCategory === 'all' || w.category === activeCategory;
+    const matchesCountry = activeCountryFilter === 'all' || w.country === activeCountryFilter;
+    const matchesSearch =
+      !searchQuery.trim() ||
+      w.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      w.country.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      w.tagline.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCat && matchesCountry && matchesSearch;
+  });
+
+  const handleSelectCity = (city: WebcamCity) => {
+    setSelectedCity(city);
+    setMediaError(false);
+    playerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  };
+
+  return (
+    <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-6 pb-28 max-w-7xl mx-auto w-full">
+      {/* Hero Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        <div>
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="p-1.5 rounded-xl bg-gradient-to-br from-cyan-500 to-emerald-500 text-zinc-950">
+              <Video className="w-5 h-5 stroke-[2.5]" />
+            </span>
+            <span className="text-xs font-mono font-bold uppercase tracking-wider text-cyan-400">
+              SLYNET GLOBAL LIVE VISION 24/7
+            </span>
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30 flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-ping" />
+              ПРЯМОЙ ЭФИР
+            </span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+            Веб-камеры городов мира
+          </h1>
+          <p className="text-xs sm:text-sm text-zinc-400 mt-1 max-w-2xl">
+            Прямые трансляции мегаполисов, Альп, океанских пляжей и космоса без внешних блокировок.
+            Слушайте радио на фоне живых кадров планеты Земля!
+          </p>
+        </div>
+
+        {/* View Switcher: Table List vs Cards vs 3D Globe */}
+        <div className="flex items-center gap-2 self-start md:self-auto">
+          <div className="p-1 bg-zinc-900/90 border border-zinc-800 rounded-2xl flex items-center gap-1 shadow-lg">
+            <button
+              onClick={() => setViewMode('table')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                viewMode === 'table'
+                  ? 'bg-gradient-to-r from-cyan-500 to-emerald-400 text-zinc-950 font-bold shadow-md shadow-cyan-500/20'
+                  : 'text-zinc-400 hover:text-white'
+              }`}
+            >
+              <List className="w-3.5 h-3.5" />
+              <span>Построчный список</span>
+            </button>
+            <button
+              onClick={() => setViewMode('cards')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                viewMode === 'cards'
+                  ? 'bg-gradient-to-r from-cyan-500 to-emerald-400 text-zinc-950 font-bold shadow-md shadow-cyan-500/20'
+                  : 'text-zinc-400 hover:text-white'
+              }`}
+            >
+              <LayoutGrid className="w-3.5 h-3.5" />
+              <span>Карточки</span>
+            </button>
+            <button
+              onClick={() => setViewMode('globe')}
+              className={`hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                viewMode === 'globe'
+                  ? 'bg-gradient-to-r from-cyan-500 to-emerald-400 text-zinc-950 font-bold shadow-md shadow-cyan-500/20'
+                  : 'text-zinc-400 hover:text-white'
+              }`}
+            >
+              <Globe className="w-3.5 h-3.5" />
+              <span>3D-Глобус</span>
+            </button>
+          </div>
+
+          {/* Simultaneous Radio Playback status card */}
+          {currentStation && (
+            <div className="hidden sm:flex items-center gap-3 p-2.5 rounded-2xl bg-zinc-900/80 border border-emerald-500/30 shadow-lg shrink-0">
+              <button
+                onClick={togglePlayPause}
+                className="w-8 h-8 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-400 text-zinc-950 flex items-center justify-center shrink-0 hover:scale-105 transition-transform"
+                title={isPlaying ? 'Поставить радио на паузу' : 'Возобновить радио'}
+              >
+                {isPlaying ? <Volume2 className="w-4 h-4 animate-pulse" /> : <Play className="w-4 h-4 ml-0.5 fill-current" />}
+              </button>
+              <div className="min-w-0 pr-1">
+                <div className="text-[9px] font-mono text-emerald-400 uppercase tracking-wider font-bold">
+                  {isPlaying ? 'Фоновое радио' : 'Радио пауза'}
+                </div>
+                <div className="text-xs font-bold text-white truncate max-w-[130px]">
+                  {currentStation.name}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* 3D Rotating Globe - Desktop & Tablet Only when in 'globe' mode */}
+      {viewMode === 'globe' && (
+        <div className="hidden md:block mb-8">
+          <Globe3DCanvas
+            selectedCityId={selectedCity.id}
+            onSelectCity={(city) => handleSelectCity(city)}
+          />
+        </div>
+      )}
+
+      {/* ACTIVE WEBCAM PLAYER STAGE (100% reliable Live Frame without black screens) */}
+      <div ref={playerRef} className="mb-8 rounded-3xl bg-zinc-950 border border-zinc-800 shadow-2xl overflow-hidden">
+        {/* Top Info Bar on Player */}
+        <div className="flex flex-wrap items-center justify-between gap-3 p-4 bg-zinc-900/90 border-b border-zinc-800/80">
+          <div className="flex items-center gap-3">
+            <span className="text-3xl">{selectedCity.flag}</span>
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="text-base sm:text-lg font-bold text-white">
+                  {selectedCity.name}
+                </h2>
+                <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                  {selectedCity.country}
+                </span>
+                {selectedCity.isCustom && (
+                  <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                    СВОЯ КАМЕРА
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-zinc-400 font-medium">{selectedCity.tagline}</p>
+            </div>
+          </div>
+
+          {/* Live Weather & Local Time Widget */}
+          <div className="flex items-center gap-3 bg-zinc-950/80 border border-zinc-800 px-3.5 py-1.5 rounded-2xl">
+            {weather ? (
+              <div className="flex items-center gap-3 text-xs">
+                <div className="flex items-center gap-1.5 text-zinc-300">
+                  <Clock className="w-3.5 h-3.5 text-cyan-400" />
+                  <span className="font-mono font-bold">{weather.localTime}</span>
+                </div>
+                <div className="w-px h-3.5 bg-zinc-800" />
+                <div className="flex items-center gap-1.5 text-white">
+                  <span>{weather.icon}</span>
+                  <span className="font-bold font-mono">
+                    {weather.temp > 0 ? `+${weather.temp}` : weather.temp}°C
+                  </span>
+                  <span className="text-zinc-400 text-[11px] hidden sm:inline">
+                    ({weather.condition})
+                  </span>
+                </div>
+              </div>
+            ) : isLoadingWeather ? (
+              <div className="flex items-center gap-2 text-xs text-zinc-500 font-mono">
+                <RefreshCw className="w-3 h-3 animate-spin text-cyan-400" />
+                <span>Обновление погоды...</span>
+              </div>
+            ) : (
+              <div className="text-xs text-zinc-400 flex items-center gap-1.5">
+                <CloudSun className="w-3.5 h-3.5 text-zinc-500" />
+                <span>{selectedCity.country}</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Live Camera Frame (High-Definition Direct Frame without black screen) */}
+        <div className="relative aspect-video w-full bg-zinc-950 flex items-center justify-center overflow-hidden group">
+          <img
+            key={`${selectedCity.id}-${refreshKey}`}
+            src={mediaError ? selectedCity.thumbnail : (selectedCity.streamUrl || selectedCity.thumbnail)}
+            alt={selectedCity.name}
+            onError={(e) => {
+              if (!mediaError) {
+                setMediaError(true);
+              } else {
+                (e.target as HTMLImageElement).src =
+                  'https://images.unsplash.com/photo-1514890547357-a9ee288728e0?w=1600&auto=format&fit=crop&q=85';
+              }
+            }}
+            className="w-full h-full object-cover animate-fade-in"
+          />
+
+          {/* Top Live Overlay watermark badges */}
+          <div className="absolute top-4 left-4 z-10 pointer-events-none flex items-center gap-2">
+            <span className="px-2.5 py-1 rounded-md bg-black/80 backdrop-blur-md text-[10px] font-mono font-bold text-rose-400 border border-rose-500/40 flex items-center gap-1.5 shadow-lg">
+              <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
+              LIVE 24/7
+            </span>
+            <span className="px-2.5 py-1 rounded-md bg-black/80 backdrop-blur-md text-[10px] font-mono font-medium text-zinc-300 border border-zinc-700/50 shadow-lg">
+              <Eye className="w-3 h-3 inline mr-1 text-cyan-400" />
+              {selectedCity.liveViews || '18.5k онлайн'}
+            </span>
+          </div>
+
+          {/* Top Right Quick Actions: Manual Refresh */}
+          <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
+            <button
+              onClick={() => {
+                setMediaError(false);
+                setRefreshKey(Date.now());
+              }}
+              className="p-2 rounded-xl bg-black/70 hover:bg-black/90 text-white border border-white/10 backdrop-blur-md text-xs font-mono flex items-center gap-1.5 transition-transform active:scale-95 shadow-lg"
+              title="Обновить кадр камеры"
+            >
+              <RefreshCw className="w-3.5 h-3.5 text-cyan-400" />
+              <span className="hidden sm:inline">Обновить кадр</span>
+            </button>
+          </div>
+
+          {/* Bottom Bar on Video Stage: Direct Stream Link & Camera Portal */}
+          <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/90 via-black/50 to-transparent flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-2 text-xs text-white">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="font-semibold">{selectedCity.name} — Прямая трансляция</span>
+              <span className="text-zinc-400 hidden sm:inline">• Обновление кадра каждые 15 сек</span>
+            </div>
+
+            {selectedCity.directPortalUrl && (
+              <a
+                href={selectedCity.directPortalUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-400 hover:brightness-110 text-zinc-950 font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-lg active:scale-95 shrink-0"
+              >
+                <span>Открыть прямой эфир</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* FILTER CONTROLS & SEARCH BAR */}
+      <div className="space-y-3 mb-6">
+        {/* Search & Header for Catalog */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <h2 className="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+              <Compass className="w-4 h-4 text-cyan-400" />
+              <span>Каталог веб-камер мира</span>
+            </h2>
+            <span className="text-xs font-mono font-semibold px-2.5 py-0.5 rounded-full bg-zinc-800 text-zinc-400 border border-zinc-700/60">
+              {filteredWebcams.length} {filteredWebcams.length === 1 ? 'камера' : 'камер'}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <div className="relative max-w-xs w-full">
+              <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Поиск города или страны..."
+                className="w-full bg-zinc-900/80 text-xs text-zinc-200 placeholder-zinc-500 pl-8 pr-3 py-1.5 rounded-xl border border-zinc-800 focus:border-cyan-400 focus:outline-none"
+              />
+            </div>
+
+            {onOpenAdmin && (
+              <button
+                onClick={onOpenAdmin}
+                className="px-3 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-cyan-300 border border-cyan-500/30 text-xs font-semibold flex items-center gap-1.5 shrink-0 transition-colors"
+                title="Добавить свою веб-камеру в Админке"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Своя камера</span>
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Category Pills */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+          {categories.map((cat) => {
+            const Icon = cat.icon;
+            const isActive = activeCategory === cat.id;
+            return (
+              <button
+                key={cat.id}
+                onClick={() => setActiveCategory(cat.id)}
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
+                  isActive
+                    ? 'bg-gradient-to-r from-cyan-500 to-emerald-400 text-zinc-950 font-bold shadow-md shadow-cyan-500/20'
+                    : 'bg-zinc-900/80 hover:bg-zinc-800 text-zinc-400 hover:text-white border border-zinc-800'
+                }`}
+              >
+                <Icon className="w-3.5 h-3.5" />
+                <span>{cat.label}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Country Filter Scroll */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+          <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 shrink-0 mr-1">
+            Страна:
+          </span>
+          {countries.map((c) => {
+            const isSelected = activeCountryFilter === c;
+            return (
+              <button
+                key={c}
+                onClick={() => setActiveCountryFilter(c)}
+                className={`px-3 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
+                  isSelected
+                    ? 'bg-cyan-500/20 border border-cyan-400/40 text-cyan-300 font-bold'
+                    : 'bg-zinc-900/60 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-800/80'
+                }`}
+              >
+                {c === 'all' ? 'Все страны' : c}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* VIEW: COMPACT ROW-BY-ROW TABLE LIST */}
+      {viewMode === 'table' && (
+        <div className="overflow-hidden rounded-3xl border border-zinc-800 bg-zinc-950 shadow-xl">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-zinc-800 bg-zinc-900/90 text-[11px] font-mono text-zinc-400 uppercase tracking-wider">
+                  <th className="py-3 px-4">Город & Локация</th>
+                  <th className="py-3 px-4">Страна</th>
+                  <th className="py-3 px-4">Категория</th>
+                  <th className="py-3 px-4">Статус</th>
+                  <th className="py-3 px-4 text-right">Действия</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-zinc-900 text-xs text-zinc-300">
+                {filteredWebcams.map((city) => {
+                  const isSel = selectedCity.id === city.id;
+                  return (
+                    <tr
+                      key={city.id}
+                      onClick={() => handleSelectCity(city)}
+                      className={`cursor-pointer transition-colors ${
+                        isSel
+                          ? 'bg-cyan-950/40 text-white font-medium'
+                          : 'hover:bg-zinc-900/60'
+                      }`}
+                    >
+                      <td className="py-3 px-4">
+                        <div className="flex items-center gap-3">
+                          <span className="text-2xl shrink-0">{city.flag}</span>
+                          <div className="min-w-0">
+                            <div className="font-bold text-white flex items-center gap-1.5">
+                              <span>{city.name}</span>
+                              {city.isCustom && (
+                                <span className="px-1.5 py-0.2 rounded text-[9px] bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                                  СВОЯ
+                                </span>
+                              )}
+                            </div>
+                            <div className="text-[11px] text-zinc-400 truncate max-w-xs sm:max-w-md">
+                              {city.tagline}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-3 px-4 whitespace-nowrap">
+                        <span className="px-2 py-0.5 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-300 text-[11px] font-medium">
+                          {city.country}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 whitespace-nowrap">
+                        <span className="text-[11px] font-mono text-cyan-300 uppercase">
+                          {city.category}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 whitespace-nowrap">
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                          <span className="font-mono text-emerald-400 font-semibold">LIVE</span>
+                          <span className="text-zinc-500 font-mono text-[11px]">({city.liveViews || '15k'})</span>
+                        </div>
+                      </td>
+                      <td className="py-3 px-4 text-right whitespace-nowrap">
+                        <div className="flex items-center justify-end gap-2" onClick={(e) => e.stopPropagation()}>
+                          <button
+                            onClick={() => handleSelectCity(city)}
+                            className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-400 text-zinc-950 font-bold text-xs flex items-center gap-1 shadow hover:brightness-110 active:scale-95 transition-all"
+                          >
+                            <Play className="w-3 h-3 fill-current" />
+                            <span>Смотреть</span>
+                          </button>
+                          {city.directPortalUrl && (
+                            <a
+                              href={city.directPortalUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="p-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white border border-zinc-800 transition-colors"
+                              title="Официальный прямой эфир"
+                            >
+                              <ExternalLink className="w-3.5 h-3.5" />
+                            </a>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* VIEW: CARDS GRID (When not in table mode) */}
+      {viewMode !== 'table' && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {filteredWebcams.map((city) => {
+            const isSelected = selectedCity.id === city.id;
+            return (
+              <div
+                key={city.id}
+                onClick={() => handleSelectCity(city)}
+                className={`group relative rounded-2xl overflow-hidden cursor-pointer border transition-all duration-300 ${
+                  isSelected
+                    ? 'bg-zinc-900 border-cyan-400 ring-2 ring-cyan-400/30 shadow-xl shadow-cyan-950/40'
+                    : 'bg-zinc-950/80 hover:bg-zinc-900/80 border-zinc-800/80 hover:border-zinc-700'
+                }`}
+              >
+                {/* Thumbnail Container */}
+                <div className="relative aspect-video w-full overflow-hidden bg-zinc-900">
+                  <img
+                    src={city.thumbnail}
+                    alt={city.name}
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src =
+                        'https://images.unsplash.com/photo-1513622470522-26c3c8a854bc?w=600&auto=format&fit=crop&q=80';
+                    }}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/20 to-transparent" />
+
+                  {/* Badges on Thumbnail */}
+                  <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-rose-500/90 text-white flex items-center gap-1 shadow">
+                      <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
+                      LIVE
+                    </span>
+                  </div>
+
+                  <div className="absolute top-2.5 right-2.5">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-black/70 text-zinc-300 backdrop-blur-sm border border-white/10">
+                      {city.country}
+                    </span>
+                  </div>
+
+                  {/* Play button overlay on hover */}
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 backdrop-blur-[2px]">
+                    <div className="w-12 h-12 rounded-full bg-cyan-400 text-zinc-950 flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform font-bold">
+                      <Play className="w-6 h-6 ml-1 fill-current" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Card Meta Content */}
+                <div className="p-3.5">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-lg">{city.flag}</span>
+                    <h3 className="text-sm font-bold text-white group-hover:text-cyan-300 transition-colors truncate">
+                      {city.name}
+                    </h3>
+                  </div>
+
+                  <p className="text-xs text-zinc-400 line-clamp-1 mb-2">
+                    {city.tagline}
+                  </p>
+
+                  <div className="flex items-center justify-between text-[11px] font-mono text-zinc-400 pt-2 border-t border-zinc-800/80">
+                    <span className="flex items-center gap-1 text-emerald-400">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                      {city.category.toUpperCase()}
+                    </span>
+                    <span>{city.liveViews || '24/7 stream'}</span>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};

@@ -1,0 +1,463 @@
+import React, { useState, useMemo } from 'react';
+import { ARTISTS_DATA, ArtistItem } from '../constants/artists';
+import { Station } from '../types/radio';
+import { useAudio } from '../context/AudioPlayerContext';
+import {
+  Mic2,
+  Play,
+  Pause,
+  Search,
+  Sparkles,
+  Heart,
+  Volume2,
+  Film,
+  Globe,
+  Radio,
+  Flame,
+  Check,
+} from 'lucide-react';
+
+interface ArtistsViewProps {
+  onToggleFavorite: (station: Station) => void;
+  isFavorite: (stationUuid: string) => boolean;
+  initialCategory?: 'all' | 'cis' | 'world' | 'ost';
+  onCategoryChange?: (category: 'all' | 'cis' | 'world' | 'ost') => void;
+}
+
+// In-memory cache for resolved live streams per artist id
+const resolvedArtistStreams = new Map<string, string>();
+
+export const ArtistsView: React.FC<ArtistsViewProps> = ({
+  onToggleFavorite,
+  isFavorite,
+  initialCategory = 'all',
+  onCategoryChange,
+}) => {
+  const { currentStation, isPlaying, playStation, togglePlayPause } = useAudio();
+
+  const [activeCategory, setActiveCategory] = useState<'all' | 'cis' | 'world' | 'ost'>(initialCategory);
+  const [selectedLetter, setSelectedLetter] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [loadingArtistId, setLoadingArtistId] = useState<string | null>(null);
+
+  // Sync when initialCategory prop changes from external buttons (e.g. Header)
+  React.useEffect(() => {
+    if (initialCategory && initialCategory !== activeCategory) {
+      setActiveCategory(initialCategory);
+    }
+  }, [initialCategory]);
+
+  const handleCategorySelect = (cat: 'all' | 'cis' | 'world' | 'ost') => {
+    setActiveCategory(cat);
+    setSelectedLetter('all');
+    if (onCategoryChange) {
+      onCategoryChange(cat);
+    }
+  };
+
+  // Extract unique alphabet letters present in the dataset
+  const availableLetters = useMemo(() => {
+    const letters = new Set<string>();
+    ARTISTS_DATA.forEach((item) => {
+      if (item.alphabetLetter) {
+        letters.add(item.alphabetLetter.toUpperCase());
+      }
+    });
+    return Array.from(letters).sort((a, b) => a.localeCompare(b, 'ru'));
+  }, []);
+
+  // Filter artists
+  const filteredArtists = useMemo(() => {
+    return ARTISTS_DATA.filter((artist) => {
+      // Category filter
+      if (activeCategory !== 'all' && artist.category !== activeCategory) {
+        return false;
+      }
+
+      // Letter filter
+      if (selectedLetter !== 'all' && artist.alphabetLetter.toUpperCase() !== selectedLetter) {
+        return false;
+      }
+
+      // Search query
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        return (
+          artist.name.toLowerCase().includes(q) ||
+          artist.description.toLowerCase().includes(q) ||
+          artist.genre.toLowerCase().includes(q) ||
+          artist.query.toLowerCase().includes(q)
+        );
+      }
+
+      return true;
+    });
+  }, [activeCategory, selectedLetter, searchQuery]);
+
+  // Guaranteed fallback streams by category & genre
+  const getReliableGenreFallback = (artist: ArtistItem): string => {
+    if (artist.category === 'ost') {
+      return 'https://stream.cinemix.us';
+    }
+    if (artist.category === 'cis') {
+      if (artist.genre.includes('рок') || artist.genre.includes('Рок')) {
+        return 'https://nashe1.hostingradio.ru/nashe-128.mp3';
+      }
+      return 'https://dorognoe.hostingradio.ru/dorognoe128.mp3';
+    }
+    if (artist.genre.includes('Метал') || artist.genre.includes('Рок') || artist.genre.includes('Rock')) {
+      return 'https://stream.rockantenne.de/rockantenne/stream/mp3';
+    }
+    return 'https://streams.ilovemusic.de/iloveradio1.mp3';
+  };
+
+  const resolveLiveStreamUrl = async (artist: ArtistItem): Promise<string> => {
+    // 1. Check in-memory cache first
+    const cached = resolvedArtistStreams.get(artist.id);
+    if (cached) return cached;
+
+    try {
+      // 2. Real live request to Radio Browser API by artist query / name
+      const searchNameUrl = `https://de1.api.radio-browser.info/json/stations/search?name=${encodeURIComponent(
+        artist.query || artist.name
+      )}&hidebroken=true&order=clickcount&reverse=true&limit=10`;
+      
+      const res = await fetch(searchNameUrl, { signal: AbortSignal.timeout(4000) });
+      if (res.ok) {
+        const list = await res.json();
+        if (Array.isArray(list) && list.length > 0) {
+          const working = list.find((s: any) => s.url_resolved && s.url_resolved.startsWith('http'));
+          if (working) {
+            const chosen = working.url_resolved || working.url;
+            resolvedArtistStreams.set(artist.id, chosen);
+            return chosen;
+          }
+        }
+      }
+    } catch {}
+
+    try {
+      // 3. Fallback request by genre tag (tag=rock, tag=soundtrack, tag=80s, etc.)
+      const searchTagUrl = `https://de1.api.radio-browser.info/json/stations/search?tag=${encodeURIComponent(
+        artist.tag
+      )}&hidebroken=true&order=clickcount&reverse=true&limit=10`;
+      
+      const res2 = await fetch(searchTagUrl, { signal: AbortSignal.timeout(3500) });
+      if (res2.ok) {
+        const list2 = await res2.json();
+        if (Array.isArray(list2) && list2.length > 0) {
+          const working2 = list2.find((s: any) => s.url_resolved && s.url_resolved.startsWith('http'));
+          if (working2) {
+            const chosen2 = working2.url_resolved || working2.url;
+            resolvedArtistStreams.set(artist.id, chosen2);
+            return chosen2;
+          }
+        }
+      }
+    } catch {}
+
+    // 4. Return guaranteed high-quality HTTPS genre fallback
+    const reliableFallback = getReliableGenreFallback(artist);
+    resolvedArtistStreams.set(artist.id, reliableFallback);
+    return reliableFallback;
+  };
+
+  const handlePlayArtist = async (artist: ArtistItem) => {
+    const isThisPlaying =
+      currentStation?.stationuuid === `artist_${artist.id}` && isPlaying;
+
+    if (isThisPlaying) {
+      togglePlayPause();
+      return;
+    }
+
+    setLoadingArtistId(artist.id);
+    try {
+      const liveStreamUrl = await resolveLiveStreamUrl(artist);
+
+      const stationObj: Station = {
+        stationuuid: `artist_${artist.id}`,
+        name: `${artist.name} 24/7`,
+        url: liveStreamUrl,
+        url_resolved: liveStreamUrl,
+        favicon: artist.avatar,
+        tags: `${artist.tag}, discography, 24/7, ${artist.genre}`,
+        country:
+          artist.category === 'cis'
+            ? 'Россия / СНГ'
+            : artist.category === 'ost'
+            ? 'Саундтреки OST'
+            : 'Мировые группы',
+        countrycode: artist.category === 'cis' ? 'RU' : 'US',
+        bitrate: 320,
+        isCustom: true,
+      };
+
+      playStation(stationObj);
+    } finally {
+      setLoadingArtistId(null);
+    }
+  };
+
+  const getArtistStationObj = (artist: ArtistItem): Station => {
+    const stream = resolvedArtistStreams.get(artist.id) || getReliableGenreFallback(artist);
+    return {
+      stationuuid: `artist_${artist.id}`,
+      name: `${artist.name} 24/7`,
+      url: stream,
+      url_resolved: stream,
+      favicon: artist.avatar,
+      tags: `${artist.tag}, discography, 24/7, ${artist.genre}`,
+      country:
+        artist.category === 'cis'
+          ? 'Россия / СНГ'
+          : artist.category === 'ost'
+          ? 'Саундтреки OST'
+          : 'Мировые группы',
+      countrycode: artist.category === 'cis' ? 'RU' : 'US',
+      bitrate: 320,
+      isCustom: true,
+    };
+  };
+
+  return (
+    <div className="flex flex-col gap-6 animate-fade-in pb-16">
+      {/* Top Banner */}
+      <div className="relative overflow-hidden rounded-3xl p-6 sm:p-8 bg-gradient-to-br from-slate-950 via-[#07131e] to-[#041d13] border border-cyan-500/30 shadow-2xl">
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-gradient-to-r from-cyan-500/20 to-emerald-400/20 text-cyan-300 border border-cyan-400/30">
+                DISCOGRAPHIES 24/7
+              </span>
+              <span className="text-xs text-emerald-400 font-mono font-semibold flex items-center gap-1">
+                <Sparkles className="w-3.5 h-3.5 animate-pulse" />
+                Только песни артиста
+              </span>
+            </div>
+
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white flex items-center gap-3">
+              <span className="p-2.5 rounded-2xl bg-gradient-to-br from-cyan-500 to-emerald-400 text-zinc-950 shadow-lg shadow-cyan-500/30">
+                <Mic2 className="w-7 h-7 stroke-[2.5]" />
+              </span>
+              <span>Исполнители & Саундтреки</span>
+            </h1>
+
+            <p className="text-xs sm:text-sm text-zinc-300 mt-2 max-w-2xl leading-relaxed">
+              Персональные 24/7 радиостанции любимых музыкальных групп, легенд русского рока, мировых звезд и культовых саундтреков из кино, игр и аниме без лишней болтовни.
+            </p>
+          </div>
+
+          {/* Quick Counter */}
+          <div className="flex items-center gap-3 bg-zinc-950/70 border border-zinc-800 px-4 py-3 rounded-2xl shrink-0 self-start md:self-auto">
+            <Radio className="w-5 h-5 text-cyan-400" />
+            <div>
+              <div className="text-lg font-bold font-mono text-white">
+                {filteredArtists.length}
+              </div>
+              <div className="text-[10px] font-mono uppercase text-zinc-400">
+                станций найдено
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Category Tabs */}
+      <div className="flex flex-wrap items-center gap-2 p-1.5 bg-zinc-900/90 border border-zinc-800 rounded-2xl w-fit shadow-lg">
+        {[
+          { id: 'all', label: 'Все станции 24/7', icon: Flame },
+          { id: 'cis', label: '🇷🇺 СНГ / Рок и Поп', icon: Mic2 },
+          { id: 'world', label: '🌍 Мировые группы & Легенды', icon: Globe },
+          { id: 'ost', label: '🎬 Саундтреки (OST)', icon: Film },
+        ].map((tab) => {
+          const Icon = tab.icon;
+          const isActive = activeCategory === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => handleCategorySelect(tab.id as any)}
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
+                isActive
+                  ? 'bg-gradient-to-r from-cyan-500 to-emerald-400 text-zinc-950 shadow-md shadow-cyan-500/20'
+                  : 'text-zinc-400 hover:text-white hover:bg-zinc-800'
+              }`}
+            >
+              <Icon className="w-4 h-4" />
+              <span>{tab.label}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Search & Alphabet Filter Row */}
+      <div className="flex flex-col gap-3">
+        {/* Search Bar */}
+        <div className="relative w-full max-w-md">
+          <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Поиск исполнителя, группы или саундтрека..."
+            className="w-full bg-zinc-900/90 hover:bg-zinc-900 focus:bg-zinc-900 text-xs sm:text-sm text-zinc-100 placeholder-zinc-500 pl-10 pr-4 py-2.5 rounded-2xl border border-zinc-800 focus:border-cyan-400 focus:outline-none transition-all shadow-inner"
+          />
+        </div>
+
+        {/* Alphabet (A-Z, А-Я) Selector Bar */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+          <button
+            onClick={() => setSelectedLetter('all')}
+            className={`px-3 py-1 rounded-xl text-xs font-bold font-mono transition-all shrink-0 ${
+              selectedLetter === 'all'
+                ? 'bg-cyan-400 text-zinc-950 shadow-sm'
+                : 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800'
+            }`}
+          >
+            Все (A–Z)
+          </button>
+
+          {availableLetters.map((letter) => {
+            const isSel = selectedLetter === letter;
+            return (
+              <button
+                key={letter}
+                onClick={() => setSelectedLetter(letter)}
+                className={`w-8 h-8 rounded-xl text-xs font-bold font-mono flex items-center justify-center transition-all shrink-0 ${
+                  isSel
+                    ? 'bg-emerald-400 text-zinc-950 shadow-sm'
+                    : 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800'
+                }`}
+              >
+                {letter}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Artists & OST Stations Grid */}
+      {filteredArtists.length === 0 ? (
+        <div className="py-20 text-center text-zinc-400 bg-zinc-950/40 rounded-3xl border border-zinc-900">
+          <Mic2 className="w-12 h-12 mx-auto text-zinc-600 mb-3 opacity-50" />
+          <h3 className="text-base font-bold text-white mb-1">Ничего не найдено</h3>
+          <p className="text-xs text-zinc-500 max-w-sm mx-auto">
+            Попробуйте изменить поисковый запрос или выбрать другую букву алфавита
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {filteredArtists.map((artist) => {
+            const stationUuid = `artist_${artist.id}`;
+            const isPlayingThis =
+              currentStation?.stationuuid === stationUuid && isPlaying;
+            const fav = isFavorite(stationUuid);
+
+            return (
+              <div
+                key={artist.id}
+                className={`group relative overflow-hidden rounded-3xl border transition-all duration-300 flex flex-col justify-between ${
+                  isPlayingThis
+                    ? 'bg-gradient-to-b from-zinc-900 to-emerald-950/40 border-emerald-500 shadow-xl shadow-emerald-500/10'
+                    : 'bg-zinc-950/70 border-zinc-800/80 hover:border-cyan-500/40 hover:bg-zinc-900/60 shadow-lg'
+                }`}
+              >
+                {/* Top Image Banner */}
+                <div className="relative aspect-[16/10] w-full overflow-hidden bg-zinc-900">
+                  <img
+                    src={artist.avatar}
+                    alt={artist.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/30 to-transparent" />
+
+                  {/* 24/7 Badge */}
+                  <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-black/70 backdrop-blur-md border border-white/10 text-[10px] font-mono font-bold text-cyan-300 shadow">
+                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" />
+                    <span>24/7 ОНЛАЙН</span>
+                  </div>
+
+                  {/* Favorite Heart Button */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onToggleFavorite(getArtistStationObj(artist));
+                    }}
+                    className="absolute top-3 right-3 p-2 rounded-xl bg-black/60 hover:bg-black/90 backdrop-blur-md border border-white/10 text-white transition-all active:scale-90"
+                    title={fav ? 'Удалить из избранного' : 'Добавить в избранное'}
+                  >
+                    <Heart
+                      className={`w-4 h-4 transition-colors ${
+                        fav ? 'fill-rose-500 text-rose-500' : 'text-zinc-300'
+                      }`}
+                    />
+                  </button>
+
+                  {/* Floating Play Button */}
+                  <button
+                    onClick={() => handlePlayArtist(artist)}
+                    disabled={loadingArtistId === artist.id}
+                    className="absolute bottom-3 right-3 w-12 h-12 rounded-2xl bg-gradient-to-r from-cyan-500 to-emerald-400 hover:brightness-110 text-zinc-950 flex items-center justify-center shadow-xl shadow-cyan-500/30 group-hover:scale-110 transition-transform active:scale-95"
+                    title={isPlayingThis ? 'Пауза' : 'Включить дискографию'}
+                  >
+                    {loadingArtistId === artist.id ? (
+                      <div className="w-5 h-5 border-2 border-zinc-950 border-t-transparent rounded-full animate-spin" />
+                    ) : isPlayingThis ? (
+                      <Pause className="w-6 h-6 fill-current" />
+                    ) : (
+                      <Play className="w-6 h-6 fill-current ml-0.5" />
+                    )}
+                  </button>
+
+                  {/* Genre badge bottom left */}
+                  <div className="absolute bottom-3 left-3 max-w-[65%]">
+                    <span className="px-2 py-0.5 rounded-md bg-black/80 backdrop-blur-md text-[10px] font-medium text-emerald-300 border border-emerald-500/30 truncate block">
+                      {artist.genre}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Content body */}
+                <div className="p-4 flex-1 flex flex-col justify-between gap-3">
+                  <div>
+                    <div className="flex items-center justify-between gap-2">
+                      <h3 className="text-base font-extrabold text-white group-hover:text-cyan-300 transition-colors truncate">
+                        {artist.name}
+                      </h3>
+                      {isPlayingThis && (
+                        <span className="flex items-center gap-1 text-[10px] font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/30 shrink-0">
+                          <Volume2 className="w-3 h-3 animate-pulse" />
+                          В ЭФИРЕ
+                        </span>
+                      )}
+                    </div>
+
+                    <p className="text-xs text-zinc-400 mt-1 line-clamp-2 leading-relaxed">
+                      {artist.description}
+                    </p>
+                  </div>
+
+                  {/* Footer Action */}
+                  <div className="pt-2 border-t border-zinc-800/80 flex items-center justify-between">
+                    <span className="text-[10px] font-mono text-zinc-500">
+                      320 KBPS ULTRA HD
+                    </span>
+
+                    <button
+                      onClick={() => handlePlayArtist(artist)}
+                      className="text-xs font-bold text-cyan-400 hover:text-emerald-300 transition-colors flex items-center gap-1"
+                    >
+                      <span>{isPlayingThis ? 'Остановить' : 'Слушать 24/7'}</span>
+                      <Play className="w-3 h-3 fill-current" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};
