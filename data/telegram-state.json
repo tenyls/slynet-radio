@@ -28,7 +28,7 @@
     "1.0.6",
     "1.0.8"
   ],
-  "askIndex": 0,
+  "askIndex": 1,
   "lastNewsSource": "NME",
   "vkError": "опубликовано без картинки (photos.getWallUploadServer 27: Group authorization failed: method is unavailable with group auth.)",
   "lastReleaseAt": 1792346865828,
