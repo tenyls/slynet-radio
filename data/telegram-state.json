@@ -5,7 +5,8 @@
     "ex-record-summer-dance",
     "b8601593-152a-429d-9cb2-5065cf7c0185",
     "ex-soma-thistle",
-    "2ce23ee2-95c5-407d-9df8-54c3cdde2825"
+    "2ce23ee2-95c5-407d-9df8-54c3cdde2825",
+    "ex-soma-deepspaceone"
   ],
   "news": [
     "https://stereogum.com/2514933/she-punk-supergroup-plays-poly-styrene-tribute-in-london/news/",
@@ -29,6 +30,6 @@
   ],
   "askIndex": 0,
   "lastNewsSource": "NME",
-  "vkError": "опубликовано без картинки",
+  "vkError": "опубликовано без картинки (photos.getWallUploadServer 27: Group authorization failed: method is unavailable with group auth.)",
   "lastReleaseAt": 1792346865828
 }
