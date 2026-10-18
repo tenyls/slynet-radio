@@ -472,7 +472,9 @@ async function buildExclusive() {
   const ok = await pool(all, 20, (s) => audioAlive(s.url));
   const alive = new Set(all.filter((_, i) => ok[i]).map((s) => s.stationuuid));
   // Запасные битрейты тоже проверяем — оставляем только рабочие
-  const alts = all.filter((s) => alive.has(s.stationuuid)).flatMap((s) => (s.alt || []).map((a) => [s, a]));
+  // Record публикует запасные потоки в своём официальном списке, а их сервер ограничивает частые подключения —
+  // им доверяем без проверки (основной поток того же сервера уже проверен)
+  const alts = all.filter((s) => alive.has(s.stationuuid) && !s.stationuuid.startsWith('ex-record-')).flatMap((s) => (s.alt || []).map((a) => [s, a]));
   // Медленнее и с повтором: серверы станций не любят много одновременных запросов
   const altOk = await pool(alts, 4, async ([, a]) => (await audioAlive(a.url)) || (await audioAlive(a.url)));
   const bad = new Set(alts.filter((_, i) => !altOk[i]).map(([, a]) => a.url));
