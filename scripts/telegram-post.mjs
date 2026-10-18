@@ -182,6 +182,7 @@ async function vkPhoto(buf) {
     return `photo${p.owner_id}_${p.id}`;
   } catch (e) {
     log('ВК: картинка не загрузилась —', e.message);
+    VK_PHOTO_ERROR = e.message;
     return '';
   }
 }
@@ -201,7 +202,7 @@ async function vkPost(html, link, photoBuf) {
     const params = { owner_id: '-' + VK_GROUP, from_group: '1', message: text.slice(0, 15000) };
     if (photo) params.attachments = photo;
     const res = await vkApi('wall.post', params);
-    VK_ERROR = photo ? '' : 'опубликовано без картинки';
+    VK_ERROR = photo ? '' : `опубликовано без картинки (${VK_PHOTO_ERROR})`;
     log('ВК: пост опубликован', res?.post_id);
   } catch (e) {
     VK_ERROR = e.message;
@@ -209,6 +210,7 @@ async function vkPost(html, link, photoBuf) {
   }
 }
 let VK_ERROR = '';
+let VK_PHOTO_ERROR = '';
 
 // ---------- фирменная картинка поста (рисуем сами, чтобы не было белых/битых картинок) ----------
 let sharp = null;
