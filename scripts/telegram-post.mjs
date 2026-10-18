@@ -72,7 +72,7 @@ async function footer() {
     `\n\n➖➖➖\n` +
     `📢 Подписывайтесь: <a href="https://t.me/${ch}">@${ch}</a>\n` +
     `🎧 Слушать: <a href="${SITE}">в браузере</a> · <a href="${SITE}#apps">Android</a> · <a href="${SITE}#apps">iPhone/iPad</a>` +
-    (BOT_USERNAME ? ` · <a href="https://t.me/${BOT_USERNAME}">в Telegram</a>` : '')
+    (BOT_USERNAME ? ` · <a href="https://t.me/${BOT_USERNAME}?startapp">в Telegram</a>` : '')
   );
 }
 const CAPTION_MAX = 1024;
