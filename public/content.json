@@ -36,7 +36,8 @@
   "hiddenCountries": {
     "radio": [],
     "tv": [
-      "RU"
+      "RU",
+      "UA"
     ],
     "webcams": []
   },
