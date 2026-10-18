@@ -1,3 +1,4 @@
+import { initAppUpdater } from './services/appUpdater';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 // Шрифты встроены в сайт (без запросов к Google — важно для GDPR)
@@ -14,3 +15,6 @@ if ('serviceWorker' in navigator && import.meta.env.PROD && location.protocol ==
     navigator.serviceWorker.register('./sw.js').catch(() => {});
   });
 }
+
+// Приложение: тихое автообновление кода с сайта
+initAppUpdater();

@@ -2,6 +2,20 @@
   "appId": "com.slynet.radio",
   "appName": "SlyNet Radio",
   "webDir": "dist",
-  "android": { "allowMixedContent": false },
-  "server": { "androidScheme": "https" }
+  "android": {
+    "allowMixedContent": false
+  },
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "CapacitorUpdater": {
+      "autoUpdate": "off",
+      "statsUrl": "",
+      "updateUrl": "",
+      "channelUrl": "",
+      "resetWhenUpdate": true,
+      "appReadyTimeout": 10000
+    }
+  }
 }

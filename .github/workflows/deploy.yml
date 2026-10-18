@@ -23,12 +23,22 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: main
+          fetch-depth: 0
+      - name: Номер сборки (последнее изменение кода, без ежедневного каталога)
+        run: echo "BUILD_ID=$(git log -1 --format=%h --abbrev=7 -- src index.html vite.config.ts package-lock.json public/sw.js public/icons public/logo.png public/manifest.webmanifest public/privacy.html)" >> $GITHUB_ENV
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
       - run: npm ci
       - run: npm run build
+      - name: Пакет обновления для приложения (приложение скачивает его само)
+        run: |
+          mkdir -p /tmp/bundle && cp -r dist/. /tmp/bundle && rm -f /tmp/bundle/catalog.json /tmp/bundle/content.json
+          (cd /tmp/bundle && zip -qr ../app-bundle.zip .)
+          mkdir -p dist/app && mv /tmp/app-bundle.zip "dist/app/bundle-$BUILD_ID.zip"
+          echo "{\"version\":\"$BUILD_ID\",\"url\":\"https://tenyls.github.io/slynet-radio/app/bundle-$BUILD_ID.zip\"}" > dist/app/version.json
+          cat dist/app/version.json
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

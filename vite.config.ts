@@ -9,7 +9,7 @@ export default defineConfig({
   base: './',
   plugins: [react(), tailwindcss()],
   // Номер сборки (коммит) — приложение сравнивает его с последним APK и предлагает обновиться
-  define: { __BUILD__: JSON.stringify((process.env.GITHUB_SHA || 'dev').slice(0, 7)) },
+  define: { __BUILD__: JSON.stringify((process.env.BUILD_ID || process.env.GITHUB_SHA || 'dev').slice(0, 7)) },
   resolve: {
     alias: { '@': path.resolve(__dirname, '.') },
   },

@@ -1,5 +1,5 @@
 """Делает один APK пригодным и для телефона, и для Android TV (иконка-баннер в меню ТВ, управление пультом)."""
-import re, shutil, pathlib
+import re, shutil, pathlib, sys
 root = pathlib.Path(__file__).resolve().parent.parent
 man = root / 'android/app/src/main/AndroidManifest.xml'
 s = man.read_text()
@@ -15,4 +15,11 @@ man.write_text(s)
 dst = root / 'android/app/src/main/res/drawable'
 dst.mkdir(parents=True, exist_ok=True)
 shutil.copy(root / 'assets/tv-banner.png', dst / 'tv_banner.png')
-print('Android TV: манифест обновлён')
+# Номер версии приложения = номер сборки (приложение сравнивает его с последним APK)
+n = int(sys.argv[1]) if len(sys.argv) > 1 and sys.argv[1].isdigit() else 1
+g = root / 'android/app/build.gradle'
+gs = g.read_text()
+gs = re.sub(r'versionCode \d+', f'versionCode {n}', gs)
+gs = re.sub(r'versionName "[^"]*"', f'versionName "1.0.{n}"', gs)
+g.write_text(gs)
+print('Android TV: манифест обновлён, версия 1.0.%d' % n)
