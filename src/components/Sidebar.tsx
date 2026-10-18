@@ -24,6 +24,7 @@ import {
   Mic2,
   Tv,
   Smartphone,
+  Globe2,
 } from 'lucide-react';
 import { useAudio } from '../context/AudioPlayerContext';
 import { SlyNetLogo } from './SlyNetLogo';
@@ -80,6 +81,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'popular' as MainTab, label: t.navPopular, icon: Flame },
     { id: 'artists' as MainTab, label: 'Группы (A–Z)', icon: Mic2, badgeText: '24/7' },
     { id: 'genres' as MainTab, label: t.navGenres, icon: LayoutGrid },
+    { id: 'globe' as MainTab, label: 'Глобус радио', icon: Globe2, badgeText: '3D' },
     { id: 'moods' as MainTab, label: t.navMoods, icon: Sparkles, badgeText: 'NEW' },
     { id: 'webcams' as MainTab, label: t.navWebcams, icon: Video, badgeText: 'LIVE' },
     { id: 'tv' as MainTab, label: 'Телеканалы мира (TV)', icon: Tv, badgeText: 'LIVE' },

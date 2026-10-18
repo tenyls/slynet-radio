@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { MainTab } from '../types/radio';
 import { useSlyNetSettings } from '../context/SlyNetSettingsContext';
 import { isSectionHidden } from '../utils/visibility';
-import { Flame, LayoutGrid, Sparkles, Search, Heart, Clock, Video, Mic2, Tv, Smartphone, MoreHorizontal, X, Crown, Info } from 'lucide-react';
+import { Flame, LayoutGrid, Sparkles, Search, Heart, Clock, Video, Mic2, Tv, Smartphone, Globe2, MoreHorizontal, X, Crown, Info } from 'lucide-react';
 
 interface BottomNavProps {
   currentTab: MainTab;
@@ -23,6 +23,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onSelectTab, f
     { id: 'favorites' as MainTab, label: 'Избранное', icon: Heart, badge: favoritesCount || undefined },
   ].filter(visible);
   const more = [
+    { id: 'globe' as MainTab, label: 'Глобус', icon: Globe2 },
     { id: 'search' as MainTab, label: 'Поиск', icon: Search },
     { id: 'moods' as MainTab, label: 'Настроение', icon: Sparkles },
     { id: 'webcams' as MainTab, label: 'Веб-камеры', icon: Video },

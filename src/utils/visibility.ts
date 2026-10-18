@@ -4,6 +4,7 @@ import { SlyNetSettings } from '../types/radio';
 export const TOGGLABLE_SECTIONS: { id: string; label: string }[] = [
   { id: 'artists', label: '🎤 Артисты и саундтреки' },
   { id: 'genres', label: '🎵 Жанры' },
+  { id: 'globe', label: '🌍 Глобус радио' },
   { id: 'moods', label: '✨ Настроение' },
   { id: 'webcams', label: '📷 Веб-камеры' },
   { id: 'tv', label: '📺 Телеканалы' },

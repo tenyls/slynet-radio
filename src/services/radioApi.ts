@@ -180,6 +180,8 @@ export interface FetchOptions {
   tag?: string;
   name?: string;
   countrycode?: string;
+  /** регион/штат (для глобуса) */
+  state?: string;
   limit?: number;
   /** clickcount (по умолчанию), clicktrend — «в тренде», random — случайные */
   order?: 'clickcount' | 'clicktrend' | 'random' | 'votes';
@@ -248,7 +250,7 @@ export function deduplicateStations(stations: Station[]): Station[] {
 }
 
 export async function fetchStations(options: FetchOptions = {}): Promise<Station[]> {
-  const { tag, name, countrycode, limit = 120, order = 'clickcount' } = options;
+  const { tag, name, countrycode, state, limit = 120, order = 'clickcount' } = options;
   const query = new URLSearchParams({
     hidebroken: 'true',
     order,
@@ -260,6 +262,10 @@ export async function fetchStations(options: FetchOptions = {}): Promise<Station
   if (countrycode && countrycode.trim()) query.set('countrycode', countrycode.trim().toUpperCase());
   if (tag && tag.trim()) query.set('tag', tag.trim().toLowerCase());
   if (name && name.trim()) query.set('name', name.trim());
+  if (state && state.trim()) {
+    query.set('state', state.trim());
+    query.set('stateExact', 'true');
+  }
   const path = `/json/stations/search?${query.toString()}`;
 
   try {

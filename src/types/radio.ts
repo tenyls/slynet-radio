@@ -49,6 +49,7 @@ export type MainTab =
   | 'history'
   | 'pro'
   | 'apps'
+  | 'globe'
   | 'info';
 
 export interface RecognizedTrack {

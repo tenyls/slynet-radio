@@ -488,6 +488,44 @@ async function buildExclusive() {
   return result;
 }
 
+// ---------- 6. Глобус: точки станций по регионам (как radio.garden) ----------
+async function buildGeo() {
+  let all = null;
+  for (const host of RB) {
+    try {
+      all = await getJson(host + '/json/stations/search?has_geo_info=true&hidebroken=true&is_https=true&order=clickcount&reverse=true&limit=40000', 120000);
+      break;
+    } catch (e) {
+      log('глобус:', host, e.message);
+    }
+  }
+  if (!all) throw new Error('Radio Browser недоступен');
+  const groups = new Map();
+  for (const s of all) {
+    if (!familySafe(s)) continue;
+    const lat = Number(s.geo_lat), lon = Number(s.geo_long);
+    if (!Number.isFinite(lat) || !Number.isFinite(lon) || (lat === 0 && lon === 0) || Math.abs(lat) > 85) continue;
+    const cc = String(s.countrycode || '').toUpperCase();
+    const state = String(s.state || '').trim();
+    // Группа: страна + регион; без региона — по клетке ~0.5°
+    const key = state ? `${cc}|${state.toLowerCase()}` : `${cc}|@${Math.round(lat * 2)}:${Math.round(lon * 2)}`;
+    let g = groups.get(key);
+    if (!g) groups.set(key, (g = { cc, state, lat: 0, lon: 0, n: 0, ids: [] }));
+    g.lat += lat;
+    g.lon += lon;
+    g.n++;
+    if (!state && g.ids.length < 15) g.ids.push(s.stationuuid);
+  }
+  const points = [...groups.values()]
+    .map((g) => [+(g.lat / g.n).toFixed(2), +(g.lon / g.n).toFixed(2), g.n, g.cc, g.state, ...(g.state ? [] : [g.ids])])
+    .sort((a, b) => b[2] - a[2])
+    .slice(0, 6000);
+  stats.geoPoints = points.length;
+  stats.geoStations = points.reduce((n, p) => n + p[2], 0);
+  log(`глобус: ${points.length} точек, ${stats.geoStations} станций`);
+  await fs.writeFile(path.join(ROOT, 'public', 'geo.json'), JSON.stringify({ generatedAt: new Date().toISOString(), points }));
+}
+
 // ---------- запуск ----------
 const prev = await fs.readFile(OUT, 'utf8').then(JSON.parse).catch(() => ({}));
 const safe = async (name, fn, fallback) => {
@@ -508,6 +546,7 @@ const catalog = {
   deadLinks: await safe('ссылки', buildDeadLinks, prev.deadLinks || []),
   exclusive: await safe('эксклюзив', buildExclusive, prev.exclusive || []),
 };
+await safe('глобус', buildGeo, null);
 catalog.stats = stats;
 
 await fs.writeFile(OUT, JSON.stringify(catalog));

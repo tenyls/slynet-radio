@@ -15,6 +15,7 @@ import { ExclusiveSection } from './components/ExclusiveSection';
 import { MyPlaylist, openPlaylist } from './components/MyPlaylist';
 import { RecordSpotlight, openRecord } from './components/RecordSpotlight';
 import { AppsView } from './components/AppsView';
+const GlobeView = React.lazy(() => import('./components/GlobeView').then((m) => ({ default: m.GlobeView })));
 import { UpdateBanner } from './components/UpdateBanner';
 import { IntroSplash } from './components/IntroSplash';
 import { useCustomStations } from './hooks/useCustomStations';
@@ -212,7 +213,8 @@ function RadioApp() {
       currentTab === 'moods' ||
       currentTab === 'history' ||
       currentTab === 'webcams' ||
-      currentTab === 'apps'
+      currentTab === 'apps' ||
+      currentTab === 'globe'
     ) {
       return;
     }
@@ -576,7 +578,7 @@ function RadioApp() {
 
         <main className="flex-1 px-4 sm:px-6 py-6 max-w-7xl w-full mx-auto">
           {/* Active Combo Filters Banner: Country + Genre (hidden on webcams, tv, info, artists) */}
-          {!(currentTab === 'webcams' || currentTab === 'tv' || currentTab === 'info' || currentTab === 'artists' || currentTab === 'apps') &&
+          {!(currentTab === 'webcams' || currentTab === 'tv' || currentTab === 'info' || currentTab === 'artists' || currentTab === 'apps' || currentTab === 'globe') &&
             (selectedCountry || (currentTab === 'genres' && activeGenreDetail)) && (
             <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-zinc-900/95 via-zinc-900/80 to-emerald-950/40 border border-cyan-500/30 shadow-lg animate-fade-in mb-6">
               <div className="flex flex-wrap items-center gap-2">
@@ -1000,6 +1002,12 @@ function RadioApp() {
 
           {/* TAB: INFO & TELEGRAM */}
           {currentTab === 'apps' && <AppsView />}
+
+          {currentTab === 'globe' && (
+            <React.Suspense fallback={<div className="py-20 text-center text-zinc-400">Загружаем глобус…</div>}>
+              <GlobeView />
+            </React.Suspense>
+          )}
 
           {currentTab === 'info' && (
             <InfoTelegramView

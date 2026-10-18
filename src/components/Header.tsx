@@ -257,7 +257,7 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Filters Group Row (Hidden on Webcams, TV, Info tabs to keep clear view) */}
-        {!(currentTab === 'webcams' || currentTab === 'tv' || currentTab === 'info' || currentTab === 'apps') && (
+        {!(currentTab === 'webcams' || currentTab === 'tv' || currentTab === 'info' || currentTab === 'apps' || currentTab === 'globe') && (
           <div className="flex items-center justify-between gap-2 overflow-x-auto pb-0.5 scrollbar-none animate-fade-in">
             <div className="flex items-center gap-2">
               {/* Country Selector with reliable modal */}
@@ -297,6 +297,18 @@ export const Header: React.FC<HeaderProps> = ({
               >
                 {viewMode === 'list' ? '☰ Список' : '▦ Плитка'}
               </button>
+
+              {/* Глобус как radio.garden */}
+              {!isSectionHidden(settings, 'globe') && (
+                <button
+                  type="button"
+                  onClick={() => onSelectTab && onSelectTab('globe')}
+                  title="Показать станции на глобусе"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border shrink-0 bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 text-emerald-100 border-emerald-500/40"
+                >
+                  🌍 <span>Глобус</span>
+                </button>
+              )}
 
               {/* Artists & Groups Selector Button */}
               {(() => {
