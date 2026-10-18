@@ -34,7 +34,7 @@ jobs:
       - run: npm run build
       - name: Пакет обновления для приложения (приложение скачивает его само)
         run: |
-          mkdir -p /tmp/bundle && cp -r dist/. /tmp/bundle && rm -f /tmp/bundle/catalog.json /tmp/bundle/content.json
+          mkdir -p /tmp/bundle && cp -r dist/. /tmp/bundle && rm -rf /tmp/bundle/catalog.json /tmp/bundle/content.json /tmp/bundle/s /tmp/bundle/rss.xml
           (cd /tmp/bundle && zip -qr ../app-bundle.zip .)
           mkdir -p dist/app && mv /tmp/app-bundle.zip "dist/app/bundle-$BUILD_ID.zip"
           BUILT_AT=$(git log -1 --format=%cI -- src index.html vite.config.ts package-lock.json public/sw.js public/icons public/logo.png public/manifest.webmanifest public/privacy.html)

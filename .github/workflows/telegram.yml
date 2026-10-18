@@ -17,11 +17,13 @@ on:
       mode:
         description: 'Что опубликовать'
         type: choice
-        options: [auto, day, station, webcam, news, release, ask, promo, setup]
+        options: [auto, day, station, webcam, news, release, ask, promo, setup, vkflush]
         default: auto
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 concurrency:
   group: telegram
@@ -51,9 +53,50 @@ jobs:
           node scripts/telegram-post.mjs "${MODE:-auto}"
       - name: Запомнить опубликованное
         run: |
-          if [ -z "$(git status --porcelain data public/rss.xml)" ]; then exit 0; fi
+          if [ -z "$(git status --porcelain data public/rss.xml public/s)" ]; then exit 0; fi
           git config user.name "slynet-telegram-bot"
           git config user.email "slynet-telegram-bot@users.noreply.github.com"
-          git add data public/rss.xml
+          git add data public/rss.xml public/s
           git commit -m "Телеграм: отметка опубликованного"
+          for i in 1 2 3; do git pull --rebase -q origin main && git push && break; sleep 5; done
+      - name: Есть ли очередь ВК
+        id: q
+        run: |
+          git pull -q --rebase origin main || true
+          if [ -s data/vk-queue.json ] && [ "$(tr -d ' \n' < data/vk-queue.json)" != "[]" ]; then echo "has=1" >> "$GITHUB_OUTPUT"; fi
+    outputs:
+      vkqueue: ${{ steps.q.outputs.has }}
+
+  # Страницы-превью для ВК появляются на сайте только после публикации — публикуем сайт
+  site:
+    needs: post
+    if: needs.post.outputs.vkqueue == '1'
+    uses: ./.github/workflows/deploy.yml
+
+  # ...и только потом отправляем пост в ВК со ссылкой на превью (ВК покажет картинку крупно)
+  vk:
+    needs: [post, site]
+    if: always() && needs.post.outputs.vkqueue == '1'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Публикация в ВК
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHANNEL: ${{ secrets.TELEGRAM_CHANNEL }}
+          VK_TOKEN: ${{ secrets.VK_TOKEN }}
+          VK_GROUP_ID: ${{ secrets.VK_GROUP_ID }}
+        run: node scripts/telegram-post.mjs vkflush
+      - name: Запомнить опубликованное
+        run: |
+          if [ -z "$(git status --porcelain data public/s)" ]; then exit 0; fi
+          git config user.name "slynet-telegram-bot"
+          git config user.email "slynet-telegram-bot@users.noreply.github.com"
+          git add -A data public/s
+          git commit -m "ВК: очередь опубликована"
           for i in 1 2 3; do git pull --rebase -q origin main && git push && break; sleep 5; done

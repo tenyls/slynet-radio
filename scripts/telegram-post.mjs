@@ -220,6 +220,12 @@ async function vkPost(html, link, photoBuf) {
       `📢 Подписывайтесь: Telegram https://t.me/${ch} · ВКонтакте https://vk.com/clubslynet`;
     let buf = photoBuf;
     if (!buf) buf = await fs.readFile(path.join(ROOT, 'public', 'telegram-card.png')).catch(() => null);
+    if (!VK_BRIDGE_KEY && VK_TOKEN && sharp && buf) {
+      // Без ключа администратора: картинка — через страницу-превью на нашем сайте (ВК сам покажет её крупно).
+      // Страница появится после публикации сайта, поэтому пост уходит в очередь (режим vkflush, следующий шаг workflow).
+      await vkQueueAdd(text, html, link, buf);
+      return;
+    }
     const admin = await vkAdminToken();
     if (!admin && !VK_PHOTO_ERROR) VK_PHOTO_ERROR = 'не задан VK_BRIDGE_KEY';
     const photo = await vkPhoto(buf, admin);
@@ -245,6 +251,95 @@ async function vkPost(html, link, photoBuf) {
 }
 let VK_ERROR = '';
 let VK_PHOTO_ERROR = '';
+
+// ---------- ВК: картинка через страницу-превью (ключа сообщества достаточно) ----------
+const SHARE_DIR = path.join(ROOT, 'public', 's');
+const VK_QUEUE = path.join(ROOT, 'data', 'vk-queue.json');
+const readQueue = async () => JSON.parse(await fs.readFile(VK_QUEUE, 'utf8').catch(() => '[]'));
+
+async function vkQueueAdd(message, html, link, buf) {
+  const id = Date.now().toString(36);
+  await fs.mkdir(SHARE_DIR, { recursive: true });
+  // ВК показывает крупное превью ссылки в пропорции ~2.24:1 — обрезаем карточку по центру
+  const wide = await sharp(buf).resize(1280, 572, { fit: 'cover', position: 'centre' }).jpeg({ quality: 86, mozjpeg: true }).toBuffer();
+  await fs.writeFile(path.join(SHARE_DIR, id + '.jpg'), wide);
+  const plain = htmlToPlain(html).trim();
+  const title = plain.split('\n')[0].replace(/^[^\p{L}\p{N}]+/u, '').slice(0, 90) || 'SlyNet Radio';
+  const desc = plain.split('\n').slice(1).join(' ').replace(/\s+/g, ' ').trim().slice(0, 180) || 'Радио со всего мира — бесплатно';
+  const target = link && link.startsWith(SITE) ? link : SITE;
+  const x = (t) => String(t).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  await fs.writeFile(
+    path.join(SHARE_DIR, id + '.html'),
+    `<!doctype html><html lang="ru"><head><meta charset="utf-8"><title>${x(title)}</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta property="og:type" content="website"><meta property="og:site_name" content="SlyNet Radio">
+<meta property="og:title" content="${x(title)}"><meta property="og:description" content="${x(desc)}">
+<meta property="og:image" content="${SITE}s/${id}.jpg"><meta property="og:image:width" content="1280"><meta property="og:image:height" content="572">
+<meta property="og:url" content="${SITE}s/${id}.html"><meta name="robots" content="noindex">
+</head><body style="background:#09090b;color:#fff;font-family:system-ui;text-align:center;padding:40px">
+<img src="${id}.jpg" alt="" style="max-width:100%;border-radius:16px"><p><a style="color:#34d399" href="${x(target)}">Открыть SlyNet Radio →</a></p>
+<script>location.replace(${JSON.stringify(target)})</script></body></html>\n`
+  );
+  const q = await readQueue();
+  q.push({ id, message, at: Date.now() });
+  await fs.writeFile(VK_QUEUE, JSON.stringify(q, null, 1));
+  log('ВК: пост в очереди, страница-превью', id);
+}
+
+/** Публикуем очередь ВК, когда страницы-превью уже доступны на сайте */
+async function vkFlush(state) {
+  const q = await readQueue();
+  if (!q.length) return log('ВК: очередь пуста');
+  if (!VK_TOKEN || !VK_GROUP) return log('ВК: нет VK_TOKEN / VK_GROUP_ID');
+  const left = [];
+  const deadline = Date.now() + 8 * 60000;
+  for (const item of q) {
+    const page = `${SITE}s/${item.id}.html`;
+    let live = false;
+    while (Date.now() < deadline) {
+      const r = await fetchT(`${SITE}s/${item.id}.jpg`, { method: 'HEAD' }, 15000).catch(() => null);
+      if (r?.ok) {
+        live = true;
+        break;
+      }
+      await sleep(20000);
+    }
+    const params = { owner_id: '-' + VK_GROUP, from_group: '1', message: item.message.slice(0, 15000) };
+    if (live) params.attachments = page;
+    else if (Date.now() - item.at < 3 * 3600000) {
+      left.push(item); // сайт ещё не обновился — попробуем в следующий раз
+      continue;
+    }
+    try {
+      const res = await vkApi('wall.post', params);
+      VK_ERROR = live ? '' : 'опубликовано без картинки: страница-превью не появилась за 3 часа';
+      log('ВК: пост опубликован', res?.post_id, live ? 'с картинкой' : 'без картинки');
+    } catch (e) {
+      if (!params.attachments) {
+        VK_ERROR = e.message;
+        log('ВК не принял пост:', e.message);
+        continue;
+      }
+      // ВК не смог разобрать превью — публикуем текстом, чтобы пост не пропал
+      log('ВК: превью не подошло —', e.message);
+      delete params.attachments;
+      try {
+        await vkApi('wall.post', params);
+        VK_ERROR = 'опубликовано без картинки: ' + e.message;
+      } catch (e2) {
+        VK_ERROR = e2.message;
+      }
+    }
+  }
+  await fs.writeFile(VK_QUEUE, JSON.stringify(left, null, 1));
+  // убираем старые страницы-превью (оставляем последние 40)
+  const files = (await fs.readdir(SHARE_DIR).catch(() => [])).filter((f) => f.endsWith('.html')).sort();
+  for (const f of files.slice(0, Math.max(0, files.length - 40))) {
+    await fs.rm(path.join(SHARE_DIR, f), { force: true });
+    await fs.rm(path.join(SHARE_DIR, f.replace('.html', '.jpg')), { force: true });
+  }
+  state.vkError = VK_ERROR || undefined;
+}
 
 // ---------- фирменная картинка поста (рисуем сами, чтобы не было белых/битых картинок) ----------
 let sharp = null;
@@ -725,6 +820,12 @@ function autoMode() {
 }
 
 const mode = (process.argv[2] || 'auto') === 'auto' ? autoMode() : process.argv[2];
+if (mode === 'vkflush') {
+  const st = await loadState();
+  await vkFlush(st);
+  await saveState(st);
+  process.exit(0);
+}
 if (!TOKEN || !CHANNEL) {
   log('Секреты TELEGRAM_BOT_TOKEN / TELEGRAM_CHANNEL не заданы — пропускаю.');
   process.exit(0);
