@@ -51,6 +51,12 @@ export const GlobeView: React.FC = () => {
     import('globe.gl').then(({ default: Globe }) => {
       if (disposed || !box.current) return;
       const el = box.current;
+      const choose = (d: Point) => {
+        setSel(d);
+        g.pointOfView({ lat: d[0], lng: d[1], altitude: Math.min(g.pointOfView().altitude || 2, 1.1) }, 900);
+        g.controls().autoRotate = false;
+        setRotate(false);
+      };
       const g = new (Globe as any)(el, { animateIn: true })
         .globeImageUrl('./globe/earth-night.jpg')
         .backgroundColor('rgba(0,0,0,0)')
@@ -70,11 +76,23 @@ export const GlobeView: React.FC = () => {
               d[4] || countryName(d[3])
             }<br><span style="color:#6ee7b7">${d[2]} станц.</span></div>`
         )
-        .onPointClick((d: Point) => {
-          setSel(d);
-          g.pointOfView({ lat: d[0], lng: d[1], altitude: 0.9 }, 900);
-          g.controls().autoRotate = false;
-          setRotate(false);
+        .onPointClick((d: Point) => choose(d))
+        // Точки мелкие — нажатие рядом выбирает ближайшую (в пределах ~4° при текущем масштабе)
+        .onGlobeClick(({ lat, lng }: { lat: number; lng: number }) => {
+          const alt = g.pointOfView().altitude || 2;
+          const maxDeg = Math.max(0.6, Math.min(6, alt * 2.2));
+          let best: Point | null = null;
+          let bestD = Infinity;
+          for (const p of points) {
+            const dLat = p[0] - lat;
+            const dLon = (((p[1] - lng + 540) % 360) - 180) * Math.cos((lat * Math.PI) / 180);
+            const dd = Math.hypot(dLat, dLon);
+            if (dd < bestD) {
+              bestD = dd;
+              best = p;
+            }
+          }
+          if (best && bestD <= maxDeg) choose(best);
         })
         .width(el.clientWidth)
         .height(el.clientHeight);
