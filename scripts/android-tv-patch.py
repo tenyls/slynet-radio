@@ -21,5 +21,19 @@ g = root / 'android/app/build.gradle'
 gs = g.read_text()
 gs = re.sub(r'versionCode \d+', f'versionCode {n}', gs)
 gs = re.sub(r'versionName "[^"]*"', f'versionName "1.0.{n}"', gs)
+# Постоянный ключ подписи (из секретов GitHub) → обновления ставятся поверх
+import os
+if os.environ.get('SLYNET_KEYSTORE') and 'signingConfigs' not in gs:
+    gs = gs.replace('android {', '''android {
+    signingConfigs {
+        release {
+            storeFile file(System.getenv("SLYNET_KEYSTORE"))
+            storePassword System.getenv("SLYNET_KEYSTORE_PASSWORD")
+            keyAlias System.getenv("SLYNET_KEY_ALIAS")
+            keyPassword System.getenv("SLYNET_KEYSTORE_PASSWORD")
+        }
+    }''', 1)
+    gs = re.sub(r'(buildTypes\s*\{\s*release\s*\{)', r'\1\n            signingConfig signingConfigs.release', gs, count=1)
+    print('Подпись: постоянный ключ SlyNet')
 g.write_text(gs)
 print('Android TV: манифест обновлён, версия 1.0.%d' % n)
