@@ -275,7 +275,7 @@ async function vkQueueAdd(message, html, link, buf) {
 <meta property="og:type" content="website"><meta property="og:site_name" content="SlyNet Radio">
 <meta property="og:title" content="${x(title)}"><meta property="og:description" content="${x(desc)}">
 <meta property="og:image" content="${SITE}s/${id}.jpg"><meta property="og:image:width" content="1280"><meta property="og:image:height" content="572">
-<meta property="og:url" content="${SITE}s/${id}.html"><meta name="robots" content="noindex">
+<meta property="og:url" content="${SITE}s/${id}.html">
 </head><body style="background:#09090b;color:#fff;font-family:system-ui;text-align:center;padding:40px">
 <img src="${id}.jpg" alt="" style="max-width:100%;border-radius:16px"><p><a style="color:#34d399" href="${x(target)}">Открыть SlyNet Radio →</a></p>
 <script>location.replace(${JSON.stringify(target)})</script></body></html>\n`
@@ -284,6 +284,18 @@ async function vkQueueAdd(message, html, link, buf) {
   q.push({ id, message, at: Date.now() });
   await fs.writeFile(VK_QUEUE, JSON.stringify(q, null, 1));
   log('ВК: пост в очереди, страница-превью', id);
+}
+
+/** Картинка через загрузку «для сообщений» — этот метод ключу сообщества разрешён */
+async function vkMsgPhoto(buf) {
+  const srv = await vkApi('photos.getMessagesUploadServer', { peer_id: '0' });
+  const fd = new FormData();
+  fd.append('photo', new Blob([buf], { type: 'image/jpeg' }), 'slynet.jpg');
+  const up = await (await fetchT(srv.upload_url, { method: 'POST', body: fd }, 30000)).json();
+  if (!up.photo || up.photo === '[]') throw new Error('сервер загрузки ВК не принял файл');
+  const saved = await vkApi('photos.saveMessagesPhoto', { photo: up.photo, server: String(up.server), hash: up.hash });
+  const p = saved[0];
+  return `photo${p.owner_id}_${p.id}${p.access_key ? '_' + p.access_key : ''}`;
 }
 
 /** Публикуем очередь ВК, когда страницы-превью уже доступны на сайте */
@@ -305,6 +317,22 @@ async function vkFlush(state) {
       await sleep(20000);
     }
     const params = { owner_id: '-' + VK_GROUP, from_group: '1', message: item.message.slice(0, 15000) };
+    // 1) настоящая картинка поста (загрузка «для сообщений»)
+    const img = await fs.readFile(path.join(SHARE_DIR, item.id + '.jpg')).catch(() => null);
+    if (img) {
+      try {
+        const photo = await vkMsgPhoto(img);
+        const res = await vkApi('wall.post', { ...params, attachments: photo });
+        VK_ERROR = '';
+        state.vkVia = 'photo';
+        log('ВК: пост с картинкой опубликован', res?.post_id);
+        continue;
+      } catch (e) {
+        log('ВК: картинка-вложение не прошла —', e.message);
+        state.vkPhotoTry = e.message;
+      }
+    }
+    // 2) превью ссылки на нашу страницу
     if (live) params.attachments = page;
     else if (Date.now() - item.at < 3 * 3600000) {
       left.push(item); // сайт ещё не обновился — попробуем в следующий раз
@@ -313,6 +341,7 @@ async function vkFlush(state) {
     try {
       const res = await vkApi('wall.post', params);
       VK_ERROR = live ? '' : 'опубликовано без картинки: страница-превью не появилась за 3 часа';
+      if (live) state.vkVia = 'link';
       log('ВК: пост опубликован', res?.post_id, live ? 'с картинкой' : 'без картинки');
     } catch (e) {
       if (!params.attachments) {
