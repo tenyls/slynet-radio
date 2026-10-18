@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
-import { Play, Pause, Shuffle, TrendingUp, MapPin, Loader2 } from 'lucide-react';
+import { Play, Pause, Shuffle, TrendingUp, MapPin, Loader2, Flame, ListMusic } from 'lucide-react';
+import { openPlaylist } from './MyPlaylist';
+import { openRecord } from './RecordSpotlight';
+import { useFavorites } from '../hooks/useFavorites';
 import { Station } from '../types/radio';
 import { SlyNetLogo } from './SlyNetLogo';
 import { getCountryFlag, COUNTRIES } from '../constants/countries';
@@ -35,6 +38,7 @@ export const MobileHome: React.FC<Props> = ({
   onMyCountry,
 }) => {
   const [busy, setBusy] = useState<'random' | 'trend' | null>(null);
+  const { favoritesCount } = useFavorites();
   const playing = !!currentStation && isPlaying;
   const countryName = COUNTRIES.find((c) => c.code === userCountry)?.name;
 
@@ -99,6 +103,30 @@ export const MobileHome: React.FC<Props> = ({
         <button onClick={onMyCountry} className="flex flex-col items-center gap-1.5 py-3.5 rounded-2xl bg-zinc-900 border border-zinc-800 active:scale-95">
           <MapPin className="w-6 h-6 text-cyan-400" />
           <span className="text-xs font-semibold text-zinc-200 truncate max-w-full px-1">Моя страна</span>
+        </button>
+      </div>
+
+      {/* Эксклюзив и свой плейлист — крупно */}
+      <div className="grid grid-cols-2 gap-2 w-full mt-2">
+        <button
+          onClick={openRecord}
+          className="relative overflow-hidden flex items-center gap-2.5 p-3 rounded-2xl text-left bg-gradient-to-br from-orange-500 to-rose-600 active:scale-95 shadow-lg shadow-orange-500/20"
+        >
+          <Flame className="w-7 h-7 text-white shrink-0" />
+          <span className="min-w-0">
+            <span className="block text-sm font-extrabold text-white leading-tight">Radio Record</span>
+            <span className="block text-[10px] font-bold text-orange-100 uppercase tracking-wide">Эксклюзив SlyNet</span>
+          </span>
+        </button>
+        <button
+          onClick={openPlaylist}
+          className="relative flex items-center gap-2.5 p-3 rounded-2xl text-left bg-gradient-to-br from-emerald-500 to-cyan-600 active:scale-95 shadow-lg shadow-emerald-500/20"
+        >
+          <ListMusic className="w-7 h-7 text-zinc-950 shrink-0" />
+          <span className="min-w-0">
+            <span className="block text-sm font-extrabold text-zinc-950 leading-tight">Мой плейлист</span>
+            <span className="block text-[10px] font-bold text-zinc-900/80 uppercase tracking-wide">{favoritesCount ? `${favoritesCount} станций` : 'Собрать свой'}</span>
+          </span>
         </button>
       </div>
 

@@ -7,6 +7,54 @@ const APK_PHONE = `${REPO}/releases/download/android-latest/SlyNetRadio.apk`;
 const APK_TV = `${REPO}/releases/download/android-latest/SlyNetRadio-TV.apk`;
 const SITE = 'https://tenyls.github.io/slynet-radio/';
 
+interface Versions {
+  apk?: string;
+  apkDate?: string;
+  apkSize?: number;
+  web?: string;
+  webDate?: string;
+}
+
+const fmtDate = (iso?: string) => {
+  if (!iso) return '';
+  try {
+    return new Date(iso).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+  } catch {
+    return '';
+  }
+};
+
+/** Последние версии: APK (GitHub Releases) и веб-версия (она же — обновление для приложений и iPhone) */
+function useVersions(): Versions {
+  const [v, setV] = useState<Versions>({});
+  useEffect(() => {
+    fetch('https://api.github.com/repos/tenyls/slynet-radio/releases/tags/android-latest', { cache: 'no-cache' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((rel) => {
+        if (!rel) return;
+        const apk = String(rel.body || '').match(/native:\s*([\d.]+)/)?.[1];
+        const size = rel.assets?.find((a: any) => a.name === 'SlyNetRadio.apk')?.size;
+        setV((p) => ({ ...p, apk, apkDate: rel.published_at, apkSize: size }));
+      })
+      .catch(() => {});
+    fetch(`./app/version.json?t=${Date.now()}`, { cache: 'no-store' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => j && setV((p) => ({ ...p, web: j.version, webDate: j.builtAt })))
+      .catch(() => {});
+  }, []);
+  return v;
+}
+
+const VersionLine: React.FC<{ label: string; value?: string; date?: string; extra?: string }> = ({ label, value, date, extra }) => (
+  <div className="flex items-center justify-between gap-3 px-3 py-2 rounded-xl bg-black/30 border border-white/5 text-xs">
+    <span className="text-zinc-400">{label}</span>
+    <span className="text-right">
+      <b className="text-white font-mono">{value || '…'}</b>
+      {(date || extra) && <span className="block text-[10px] text-zinc-500">{[date && fmtDate(date), extra].filter(Boolean).join(' · ')}</span>}
+    </span>
+  </div>
+);
+
 const Soon: React.FC<{ store: string }> = ({ store }) => (
   <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold bg-amber-500/15 text-amber-200 border border-amber-500/30">
     <Clock className="w-3.5 h-3.5" /> Скоро в {store}
@@ -26,6 +74,7 @@ const Step: React.FC<{ n: number; icon: React.ReactNode; children: React.ReactNo
 /** «Mobile Apps»: Android (телефон и ТВ), iPhone / iPad */
 export const AppsView: React.FC = () => {
   const [qr, setQr] = useState('');
+  const ver = useVersions();
   useEffect(() => {
     import('qrcode').then((QR) => QR.toDataURL(SITE, { margin: 1, width: 220, color: { dark: '#09090b', light: '#ffffff' } }).then(setQr)).catch(() => {});
   }, []);
@@ -73,6 +122,11 @@ export const AppsView: React.FC = () => {
           >
             <Download className="w-5 h-5" /> Скачать APK для Android
           </a>
+          <div className="space-y-1.5">
+            <VersionLine label="Последняя версия APK" value={ver.apk ? `v${ver.apk}` : undefined} date={ver.apkDate} extra={ver.apkSize ? `${(ver.apkSize / 1048576).toFixed(1)} МБ` : ''} />
+            <VersionLine label="Google Play" value="скоро" extra="будет та же версия" />
+            <VersionLine label="Обновление содержимого" value={ver.web} date={ver.webDate} extra="приходит в приложение само" />
+          </div>
           <ol className="space-y-2 text-xs text-zinc-400 list-decimal pl-5">
             <li>Скачайте файл и откройте его.</li>
             <li>Разрешите установку из браузера, если телефон спросит.</li>
@@ -100,6 +154,7 @@ export const AppsView: React.FC = () => {
           >
             <Download className="w-5 h-5" /> Скачать APK для Android TV
           </a>
+          <VersionLine label="Последняя версия APK" value={ver.apk ? `v${ver.apk}` : undefined} date={ver.apkDate} />
           <ol className="space-y-2 text-xs text-zinc-400 list-decimal pl-5">
             <li>Установите на телевизор приложение-загрузчик (например, «Downloader») из Google Play.</li>
             <li>Откройте в нём ссылку на APK из этой кнопки и установите.</li>
@@ -124,6 +179,10 @@ export const AppsView: React.FC = () => {
             </div>
           </div>
           <Soon store="App Store" />
+        </div>
+        <div className="grid sm:grid-cols-2 gap-1.5 mb-5">
+          <VersionLine label="Версия для iPhone / iPad (через Safari)" value={ver.web} date={ver.webDate} extra="обновляется сама" />
+          <VersionLine label="App Store" value="скоро" />
         </div>
         <ol className="grid sm:grid-cols-2 gap-4">
           <Step n={1} icon={<Compass className="w-4 h-4" />}>

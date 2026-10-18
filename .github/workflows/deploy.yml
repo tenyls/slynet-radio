@@ -37,7 +37,8 @@ jobs:
           mkdir -p /tmp/bundle && cp -r dist/. /tmp/bundle && rm -f /tmp/bundle/catalog.json /tmp/bundle/content.json
           (cd /tmp/bundle && zip -qr ../app-bundle.zip .)
           mkdir -p dist/app && mv /tmp/app-bundle.zip "dist/app/bundle-$BUILD_ID.zip"
-          echo "{\"version\":\"$BUILD_ID\",\"url\":\"https://tenyls.github.io/slynet-radio/app/bundle-$BUILD_ID.zip\"}" > dist/app/version.json
+          BUILT_AT=$(git log -1 --format=%cI -- src index.html vite.config.ts package-lock.json public/sw.js public/icons public/logo.png public/manifest.webmanifest public/privacy.html)
+          echo "{\"version\":\"$BUILD_ID\",\"builtAt\":\"$BUILT_AT\",\"url\":\"https://tenyls.github.io/slynet-radio/app/bundle-$BUILD_ID.zip\"}" > dist/app/version.json
           cat dist/app/version.json
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

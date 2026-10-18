@@ -1,3 +1,4 @@
+import { FEATURES } from '../utils/platform';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Tv, Play, ExternalLink, Search, Youtube, Globe, AlertTriangle, Loader2, X } from 'lucide-react';
 import { loadCatalog, CatalogTvChannel } from '../services/catalogService';
@@ -82,7 +83,7 @@ type Playable = CatalogTvChannel & { custom?: boolean };
 export const LiveTVView: React.FC = () => {
   const { isPlaying, togglePlayPause } = useAudio();
   const { settings } = useSlyNetSettings();
-  const [tab, setTab] = useState<'watch' | 'links'>('watch');
+  const [tab, setTab] = useState<'watch' | 'links'>(FEATURES.tvStreams ? 'watch' : 'links');
   const [channels, setChannels] = useState<Playable[] | null>(null);
   const [category, setCategory] = useState('all');
   const [country, setCountry] = useState('');
@@ -115,7 +116,7 @@ export const LiveTVView: React.FC = () => {
         const hidden = hiddenCountrySet(settings, 'tv');
         if (mine && !hidden.has(mine) && all.some((ch) => ch.country === mine)) setCountry(mine);
       });
-      if (!c.tv.length && !custom.length) setTab('links');
+      if (!FEATURES.tvStreams || (!c.tv.length && !custom.length)) setTab('links');
     });
   }, [settings.customTvChannels]);
 
@@ -252,9 +253,9 @@ export const LiveTVView: React.FC = () => {
 
       {/* Вкладки */}
       <div className="inline-flex p-1 rounded-2xl bg-zinc-900 border border-zinc-800 self-start">
-        <button onClick={() => setTab('watch')} className={`px-4 py-2 rounded-xl text-xs font-bold ${tab === 'watch' ? 'bg-emerald-500 text-zinc-950' : 'text-zinc-400'}`}>
+        {FEATURES.tvStreams && <button onClick={() => setTab('watch')} className={`px-4 py-2 rounded-xl text-xs font-bold ${tab === 'watch' ? 'bg-emerald-500 text-zinc-950' : 'text-zinc-400'}`}>
           Смотреть здесь {channels ? `(${list.length})` : ''}
-        </button>
+        </button>}
         <button onClick={() => setTab('links')} className={`px-4 py-2 rounded-xl text-xs font-bold ${tab === 'links' ? 'bg-emerald-500 text-zinc-950' : 'text-zinc-400'}`}>
           Официальные эфиры ({OFFICIAL_LINKS.length})
         </button>

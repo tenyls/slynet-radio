@@ -17,7 +17,7 @@ export const ExclusiveSection: React.FC = () => {
 
   useEffect(() => {
     loadCatalog().then((c) => {
-      const g = c.exclusive || [];
+      const g = (c.exclusive || []).filter((x) => x.id !== 'record'); // у Record своя витрина
       setGroups(g);
       if (g.length) setActive(g[0].id);
     });

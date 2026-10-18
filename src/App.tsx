@@ -11,6 +11,8 @@ import { isSectionHidden, hiddenCountrySet } from './utils/visibility';
 import { ContinueListening } from './components/ContinueListening';
 import { ListFilters } from './components/ListFilters';
 import { ExclusiveSection } from './components/ExclusiveSection';
+import { MyPlaylist, openPlaylist } from './components/MyPlaylist';
+import { RecordSpotlight, openRecord } from './components/RecordSpotlight';
 import { AppsView } from './components/AppsView';
 import { UpdateBanner } from './components/UpdateBanner';
 import { IntroSplash } from './components/IntroSplash';
@@ -68,6 +70,7 @@ import {
   ShieldCheck,
   Car,
   X,
+  ListMusic,
 } from 'lucide-react';
 
 function RadioApp() {
@@ -688,6 +691,14 @@ function RadioApp() {
                     </button>
 
                     <button
+                      onClick={openPlaylist}
+                      className="px-5 py-3 rounded-2xl bg-gradient-to-r from-emerald-500/25 to-lime-400/20 hover:from-emerald-500/35 text-white font-bold text-xs border border-emerald-400/50 flex items-center justify-center gap-2 transition-colors"
+                    >
+                      <ListMusic className="w-4 h-4 text-emerald-300" />
+                      <span>Мой плейлист{favoritesCount ? ` · ${favoritesCount}` : ''}</span>
+                    </button>
+
+                    <button
                       onClick={() => {
                         setCurrentTab('genres');
                         setActiveGenreDetail(null);
@@ -709,7 +720,11 @@ function RadioApp() {
                 </div>
               </div>
 
-              {/* Под баннером: эксклюзив, затем «Продолжить слушать» */}
+              {/* Под баннером: мой плейлист, Radio Record, эксклюзив, затем «Продолжить слушать» */}
+              <MyPlaylist onGoFavorites={() => setCurrentTab('favorites')} />
+
+              <RecordSpotlight />
+
               <ExclusiveSection />
 
               <ContinueListening />
