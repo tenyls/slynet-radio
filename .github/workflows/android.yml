@@ -1,8 +1,25 @@
 name: Android APK
-# Сборка тестового APK для Android. Запуск: Actions → «Android APK» → Run workflow.
+# Сборка APK для Android (телефон + Android TV).
+# Собирается сам после каждого изменения кода сайта, или вручную: Actions → «Android APK» → Run workflow.
 # Готовый файл появляется в Releases → «android-latest».
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'index.html'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'vite.config.ts'
+      - 'capacitor.config.json'
+      - 'assets/**'
+      - 'scripts/android-tv-patch.py'
+      - '.github/workflows/android.yml'
+
+concurrency:
+  group: android-apk
+  cancel-in-progress: true
 
 permissions:
   contents: write
@@ -44,4 +61,4 @@ jobs:
           gh release delete android-latest -y --cleanup-tag || true
           gh release create android-latest SlyNetRadio.apk SlyNetRadio-TV.apk --prerelease \
             --title "SlyNet Radio для Android (тестовая сборка)" \
-            --notes "Тестовая сборка из ветки main. SlyNetRadio.apk — для телефонов и планшетов, SlyNetRadio-TV.apk — для Android TV (это одно и то же приложение, оно работает и там, и там)."
+            --notes "build: ${GITHUB_SHA::7} — тестовая сборка из ветки main. SlyNetRadio.apk — для телефонов и планшетов, SlyNetRadio-TV.apk — для Android TV (это одно и то же приложение, оно работает и там, и там)."

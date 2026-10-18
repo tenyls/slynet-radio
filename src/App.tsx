@@ -12,6 +12,7 @@ import { ContinueListening } from './components/ContinueListening';
 import { ListFilters } from './components/ListFilters';
 import { ExclusiveSection } from './components/ExclusiveSection';
 import { AppsView } from './components/AppsView';
+import { UpdateBanner } from './components/UpdateBanner';
 import { useCustomStations } from './hooks/useCustomStations';
 import { fetchStations, fetchGenreStations, fetchCatalogStats, fetchStationsByUuids } from './services/radioApi';
 import { MobileHome } from './components/MobileHome';
@@ -546,6 +547,8 @@ function RadioApp() {
         )}
 
         {/* Dynamic Page Views */}
+        <UpdateBanner />
+
         <main className="flex-1 px-4 sm:px-6 py-6 max-w-7xl w-full mx-auto">
           {/* Active Combo Filters Banner: Country + Genre (hidden on webcams, tv, info, artists) */}
           {!(currentTab === 'webcams' || currentTab === 'tv' || currentTab === 'info' || currentTab === 'artists' || currentTab === 'apps') &&
