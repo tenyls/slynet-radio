@@ -70,7 +70,7 @@ async function footer() {
   const ch = CHANNEL.startsWith('@') ? CHANNEL.slice(1) : 'SlyNetRadio';
   return (
     `\n\n➖➖➖\n` +
-    `📢 Подписывайтесь: <a href="https://t.me/${ch}">@${ch}</a>\n` +
+    `📢 Подписывайтесь: <a href="https://t.me/${ch}">Telegram @${ch}</a> · <a href="https://vk.com/clubslynet">ВКонтакте</a>\n` +
     `🎧 Слушать: <a href="${SITE}">в браузере</a> · <a href="${SITE}#apps">Android</a> · <a href="${SITE}#apps">iPhone/iPad</a>` +
     (BOT_USERNAME ? ` · <a href="https://t.me/${BOT_USERNAME}?startapp">в Telegram</a>` : '')
   );
@@ -161,34 +161,51 @@ async function addToFeed(html, link) {
   }
 }
 
-async function vkPost(html, link) {
+async function vkApi(method, params) {
+  const body = new URLSearchParams({ ...params, access_token: VK_TOKEN, v: '5.199' });
+  const r = await fetchT(`https://api.vk.com/method/${method}`, { method: 'POST', body }, 20000);
+  const j = await r.json();
+  if (j.error) throw new Error(`${method} ${j.error.error_code}: ${j.error.error_msg}`);
+  return j.response;
+}
+
+/** Загружаем картинку на стену группы (если ВК разрешит ключом сообщества) */
+async function vkPhoto(buf) {
+  if (!buf) return '';
+  try {
+    const srv = await vkApi('photos.getWallUploadServer', { group_id: VK_GROUP });
+    const fd = new FormData();
+    fd.append('photo', new Blob([buf], { type: 'image/png' }), 'slynet.png');
+    const up = await (await fetchT(srv.upload_url, { method: 'POST', body: fd }, 30000)).json();
+    const saved = await vkApi('photos.saveWallPhoto', { group_id: VK_GROUP, photo: up.photo, server: String(up.server), hash: up.hash });
+    const p = saved[0];
+    return `photo${p.owner_id}_${p.id}`;
+  } catch (e) {
+    log('ВК: картинка не загрузилась —', e.message);
+    return '';
+  }
+}
+
+async function vkPost(html, link, photoBuf) {
   await addToFeed(html, link);
   if (!VK_TOKEN || !VK_GROUP) return;
   try {
     const ch = CHANNEL.startsWith('@') ? CHANNEL.slice(1) : 'SlyNetRadio';
     const text =
       htmlToPlain(html) +
-      `\n\n➖➖➖\n🎧 Слушать: ${SITE}\n📱 Приложения для Android и iPhone: ${SITE}#apps\n📢 Telegram: https://t.me/${ch}`;
-    const body = new URLSearchParams({
-      owner_id: '-' + VK_GROUP,
-      from_group: '1',
-      message: text.slice(0, 15000),
-      attachments: link || SITE,
-      access_token: VK_TOKEN,
-      v: '5.199',
-    });
-    const r = await fetchT('https://api.vk.com/method/wall.post', { method: 'POST', body }, 20000);
-    const j = await r.json();
-    if (j.error) {
-      VK_ERROR = `${j.error.error_code}: ${j.error.error_msg}`;
-      log('ВК не принял пост:', VK_ERROR);
-    } else {
-      VK_ERROR = '';
-      log('ВК: пост опубликован', j.response?.post_id);
-    }
+      `\n\n➖➖➖\n🎧 Слушать: ${link && link.startsWith(SITE) ? link : SITE}\n📱 Приложения для Android и iPhone: ${SITE}#apps\n` +
+      `📢 Подписывайтесь: Telegram https://t.me/${ch} · ВКонтакте https://vk.com/clubslynet`;
+    let buf = photoBuf;
+    if (!buf) buf = await fs.readFile(path.join(ROOT, 'public', 'telegram-card.png')).catch(() => null);
+    const photo = await vkPhoto(buf);
+    const params = { owner_id: '-' + VK_GROUP, from_group: '1', message: text.slice(0, 15000) };
+    if (photo) params.attachments = photo;
+    const res = await vkApi('wall.post', params);
+    VK_ERROR = photo ? '' : 'опубликовано без картинки';
+    log('ВК: пост опубликован', res?.post_id);
   } catch (e) {
     VK_ERROR = e.message;
-    log('ВК недоступен:', e.message);
+    log('ВК не принял пост:', e.message);
   }
 }
 let VK_ERROR = '';
@@ -373,7 +390,7 @@ async function postStation(state, isDay = false) {
     (await makeCard({ label: isDay ? 'СТАНЦИЯ ДНЯ' : 'ИНТЕРЕСНАЯ СТАНЦИЯ', title: st.name, subtitle: [country, st.bitrate ? `${st.bitrate} kbps` : '', st.group ? 'Эксклюзив SlyNet' : ''].filter(Boolean).join(' · '), logoUrl: st.favicon })) ||
     BANNER;
   await postPhotoOrText({ photo, caption: await withFooter(caption), buttons: listenButton(`${SITE}#station=${st.stationuuid}`) });
-  await vkPost(caption, `${SITE}#station=${st.stationuuid}`);
+  await vkPost(caption, `${SITE}#station=${st.stationuuid}`, Buffer.isBuffer(photo) ? photo : null);
   state.stations.push(st.stationuuid);
   log('опубликована станция дня:', st.name);
 }
@@ -480,7 +497,6 @@ async function postNews(state) {
 // ---------- 3. Обновление сайта/приложения ----------
 async function postRelease(state) {
   // Не чаще раза в сутки: все непубликованные версии собираем в один пост
-  if (state.lastReleaseAt && Date.now() - state.lastReleaseAt < 20 * 3600000) return log('пост об обновлении уже был сегодня — копим изменения');
   const releases = JSON.parse(await fs.readFile(path.join(ROOT, 'public', 'releases.json'), 'utf8').catch(() => '[]'));
   const fresh = releases.filter((r) => !state.releases.includes(r.version));
   if (!fresh.length) return log('новых релизов для публикации нет');
