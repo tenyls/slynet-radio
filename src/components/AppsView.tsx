@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Smartphone, Tv, Apple, Download, Share, PlusSquare, Compass, Check, Clock } from 'lucide-react';
 import { isNativeApp } from '../utils/platform';
-import { nativeVersion } from '../services/appUpdater';
+import { nativeVersion, lastUpdateStatus } from '../services/appUpdater';
 
 const REPO = 'https://github.com/tenyls/slynet-radio';
 const APK_PHONE = `${REPO}/releases/download/android-latest/SlyNetRadio.apk`;
@@ -59,6 +59,7 @@ const VersionLine: React.FC<{ label: string; value?: string; date?: string; extr
 /** В приложении: что установлено сейчас (для проверки автообновления) */
 const InstalledInfo: React.FC = () => {
   const [native, setNative] = useState('');
+  const status = lastUpdateStatus();
   useEffect(() => {
     nativeVersion().then(setNative);
   }, []);
@@ -68,6 +69,7 @@ const InstalledInfo: React.FC = () => {
       <div>
         Приложение <b className="font-mono text-white">v{native || '…'}</b> · содержимое <b className="font-mono text-white">{__BUILD__}</b>
       </div>
+      {status && <div className="text-zinc-400">Последняя проверка: {status.text}</div>}
       <div className="text-zinc-500">Если содержимое на сайте новее — оно скачается само и включится при следующем запуске.</div>
     </div>
   );

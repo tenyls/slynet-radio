@@ -1,11 +1,25 @@
 /**
  * Автообновление приложения (Android/iOS): при запуске проверяем app/version.json на сайте.
- * Если код сайта новее — тихо скачиваем пакет и применяем при следующем запуске (или уходе в фон).
+ * Если код сайта новее — тихо скачиваем пакет (с проверкой SHA-256) и применяем при следующем запуске.
  * Серверы Capgo не используются: пакеты лежат на нашем GitHub Pages.
  */
 import { isNativeApp } from '../utils/platform';
 
 const VERSION_URL = 'https://tenyls.github.io/slynet-radio/app/version.json';
+const STATUS_KEY = 'slynet_update_status';
+
+function saveStatus(text: string) {
+  try {
+    localStorage.setItem(STATUS_KEY, JSON.stringify({ text, at: Date.now() }));
+  } catch {}
+}
+export function lastUpdateStatus(): { text: string; at: number } | null {
+  try {
+    return JSON.parse(localStorage.getItem(STATUS_KEY) || 'null');
+  } catch {
+    return null;
+  }
+}
 
 export async function initAppUpdater() {
   if (!isNativeApp) return;
@@ -15,15 +29,21 @@ export async function initAppUpdater() {
     await CapacitorUpdater.notifyAppReady();
 
     const remote = await fetch(`${VERSION_URL}?t=${Date.now()}`, { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null));
-    if (!remote?.version || !remote?.url || remote.version === __BUILD__) return;
+    if (!remote?.version || !remote?.url) return saveStatus('Не удалось узнать версию на сайте');
+    if (remote.version === __BUILD__) return saveStatus(`Актуально (${__BUILD__})`);
 
     // Уже скачан раньше? Тогда просто назначаем его следующим
     const { bundles } = await CapacitorUpdater.list();
     let bundle = bundles.find((b) => b.version === remote.version && b.status !== 'error');
-    if (!bundle) bundle = await CapacitorUpdater.download({ url: remote.url, version: remote.version });
+    if (!bundle) {
+      saveStatus(`Скачиваем ${remote.version}…`);
+      bundle = await CapacitorUpdater.download({ url: remote.url, version: remote.version, checksum: remote.checksum || '' });
+    }
     await CapacitorUpdater.next({ id: bundle.id });
+    saveStatus(`Скачано ${remote.version} — включится при следующем запуске`);
     window.dispatchEvent(new CustomEvent('slynet_update_ready'));
-  } catch (e) {
+  } catch (e: any) {
+    saveStatus(`Ошибка: ${e?.message || e}`);
     console.warn('Автообновление не удалось', e);
   }
 }
