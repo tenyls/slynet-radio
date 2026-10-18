@@ -59,6 +59,33 @@ async function tg(method, body) {
 }
 const listenButton = (url, text = '▶️ Слушать в SlyNet Radio') => ({ inline_keyboard: [[{ text, url }]] });
 
+// Подпись под каждым постом: канал, сайт, приложения, бот (ссылки спрятаны под названия)
+let BOT_USERNAME = '';
+async function footer() {
+  if (!BOT_USERNAME) {
+    try {
+      BOT_USERNAME = (await tg('getMe', {})).username || '';
+    } catch {}
+  }
+  const ch = CHANNEL.startsWith('@') ? CHANNEL.slice(1) : 'SlyNetRadio';
+  return (
+    `\n\n➖➖➖\n` +
+    `📢 Подписывайтесь: <a href="https://t.me/${ch}">@${ch}</a>\n` +
+    `🎧 Слушать: <a href="${SITE}">в браузере</a> · <a href="${SITE}#apps">Android</a> · <a href="${SITE}#apps">iPhone/iPad</a>` +
+    (BOT_USERNAME ? ` · <a href="https://t.me/${BOT_USERNAME}">в Telegram</a>` : '')
+  );
+}
+const CAPTION_MAX = 1024;
+/** Текст + подпись, с обрезкой основной части, чтобы влезть в лимит Telegram */
+async function withFooter(text, limit = CAPTION_MAX) {
+  const f = await footer();
+  const room = limit - f.length - 5;
+  // обрезаем только по тексту без HTML-тегов внутри (тексты у нас простые: <b>, <a>)
+  let t = text;
+  if (t.length > room) t = t.slice(0, room).replace(/<[^>]*$/, '').replace(/\s+\S*$/, '') + '…';
+  return t + f;
+}
+
 async function postPhotoOrText({ photo, caption, buttons, preview = false }) {
   if (photo) {
     try {
@@ -167,7 +194,7 @@ async function postStation(state, isDay = false) {
     `${country ? `🌍 ${esc(country)}` : ''}${st.bitrate ? ` · 🎧 ${st.bitrate} kbps` : ''}${st.group ? ' · ⭐ Эксклюзив SlyNet' : ''}\n\n` +
     `${esc(body)}`;
   const photo = /^https:\/\/.+\.(png|jpe?g|webp)(\?|$)/i.test(st.favicon || '') ? st.favicon : BANNER;
-  await postPhotoOrText({ photo, caption, buttons: listenButton(`${SITE}#station=${st.stationuuid}`) });
+  await postPhotoOrText({ photo, caption: await withFooter(caption), buttons: listenButton(`${SITE}#station=${st.stationuuid}`) });
   state.stations.push(st.stationuuid);
   log('опубликована станция дня:', st.name);
 }
@@ -218,25 +245,47 @@ async function postNews(state) {
   const fresh = all
     .filter((i) => !posted.has(i.link) && Date.now() - i.date.getTime() < 2 * 86400000)
     .sort((a, b) => b.date - a.date);
-  if (!fresh.length) return log('свежих новостей нет');
-  // Берём одну из самых свежих, чередуя источники
-  const lastSource = state.lastNewsSource;
-  const item = fresh.find((i) => i.source !== lastSource) || fresh[0];
-  const text = await ai(
-    STYLE,
-    `Перескажи музыкальную новость своими словами по-русски. Формат строго такой:\nЗАГОЛОВОК: <короткий заголовок по-русски>\nТЕКСТ: <2–3 предложения пересказа>\n` +
-      `Опирайся только на заголовок и анонс ниже, ничего не добавляй от себя.\n\nЗаголовок: ${item.title}\nАнонс: ${item.desc}`
-  );
-  let title = item.title;
-  let body = item.desc.slice(0, 280);
-  if (text) {
-    title = (text.match(/ЗАГОЛОВОК:\s*(.+)/) || [])[1]?.trim() || title;
-    body = (text.match(/ТЕКСТ:\s*([\s\S]+)/) || [])[1]?.trim() || body;
+  if (!fresh.length) {
+    log('свежих новостей нет — вместо неё интересная станция');
+    return postStation(state);
   }
-  const caption =
-    `🎵 <b>${esc(title)}</b>\n\n${esc(body)}\n\n` +
-    `🔗 Источник: <a href="${esc(item.link)}">${esc(item.source)}</a>\n` +
-    `📻 Слушайте музыку со всего мира — <a href="${SITE}">SlyNet Radio</a>`;
+  // Пробуем самые свежие (чередуя источники): нейросеть пишет по-русски и отбрасывает не-музыкальное
+  const lastSource = state.lastNewsSource;
+  const ordered = [...fresh.filter((i) => i.source !== lastSource), ...fresh.filter((i) => i.source === lastSource)].slice(0, 6);
+  let item = null;
+  let title = '';
+  let body = '';
+  for (const cand of ordered) {
+    const text = await ai(
+      STYLE,
+      `Ниже анонс новости. Если она НЕ про музыку (исполнители, группы, альбомы, песни, концерты, радио, музыкальная индустрия, шоу-бизнес вокруг музыки), ответь одним словом: НЕ_МУЗЫКА.\n` +
+        `Иначе перескажи её своими словами ПО-РУССКИ (имена и названия можно оставить в оригинале). Формат строго:\nЗАГОЛОВОК: <короткий заголовок по-русски>\nТЕКСТ: <2–3 предложения пересказа по-русски>\n` +
+        `Опирайся только на заголовок и анонс, ничего не добавляй от себя.\n\nЗаголовок: ${cand.title}\nАнонс: ${cand.desc}`
+    );
+    if (!text) {
+      state.news.push(cand.link); // не смогли перевести — не публикуем на английском
+      continue;
+    }
+    if (/НЕ_МУЗЫКА/.test(text)) {
+      state.news.push(cand.link);
+      continue;
+    }
+    title = (text.match(/ЗАГОЛОВОК:\s*(.+)/) || [])[1]?.trim() || '';
+    body = (text.match(/ТЕКСТ:\s*([\s\S]+)/) || [])[1]?.trim() || '';
+    if (title && body && /[а-яё]/i.test(body)) {
+      item = cand;
+      break;
+    }
+    state.news.push(cand.link);
+  }
+  if (!item) {
+    log('подходящей новости на русском нет — вместо неё интересная станция');
+    return postStation(state);
+  }
+  const caption = await withFooter(
+    `🎵 <b>${esc(title)}</b>\n\n${esc(body)}\n\n🔗 Источник: <a href="${esc(item.link)}">${esc(item.source)}</a>`,
+    4000
+  );
   await tg('sendMessage', {
     chat_id: CHANNEL,
     text: caption,
@@ -261,7 +310,7 @@ async function postRelease(state) {
     list('Исправлено', r.fixed, '🛠') +
     list('Убрано', r.removed, '🗑') +
     `\nСайт обновится сам, приложение — при следующем запуске.`;
-  await postPhotoOrText({ photo: BANNER, caption: caption.slice(0, 1020), buttons: listenButton(SITE, '🚀 Открыть SlyNet Radio') });
+  await postPhotoOrText({ photo: BANNER, caption: await withFooter(caption), buttons: listenButton(SITE, '🚀 Открыть SlyNet Radio') });
   state.releases.push(r.version);
   log('опубликован релиз', r.version);
 }
@@ -275,7 +324,7 @@ const ASKS = [
 ];
 async function postAsk(state) {
   const i = (state.askIndex || 0) % ASKS.length;
-  await postPhotoOrText({ photo: null, caption: ASKS[i], buttons: listenButton(SITE, '✍️ Открыть сайт') });
+  await postPhotoOrText({ photo: null, caption: await withFooter(ASKS[i], 4000), buttons: listenButton(SITE, '✍️ Открыть сайт') });
   state.askIndex = i + 1;
   log('опубликован вопрос подписчикам');
 }
@@ -288,7 +337,7 @@ const PROMOS = [
 ];
 async function postPromo(state) {
   const i = (state.promoIndex || 0) % PROMOS.length;
-  await postPhotoOrText({ photo: BANNER, caption: PROMOS[i], buttons: { inline_keyboard: [[{ text: '📱 Скачать / установить', url: SITE + '#apps' }], [{ text: '▶️ Слушать сейчас', url: SITE }]] } });
+  await postPhotoOrText({ photo: BANNER, caption: await withFooter(PROMOS[i]), buttons: { inline_keyboard: [[{ text: '📱 Скачать / установить', url: SITE + '#apps' }], [{ text: '▶️ Слушать сейчас', url: SITE }]] } });
   state.promoIndex = i + 1;
   log('опубликовано напоминание о приложениях');
 }
