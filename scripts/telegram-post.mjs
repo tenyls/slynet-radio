@@ -228,6 +228,14 @@ async function vkPost(html, link, photoBuf) {
         const res = await vkApi('wall.post', { owner_id: '-' + VK_GROUP, from_group: '1', message: text.slice(0, 15000), attachments: photo });
         VK_ERROR = '';
         log('ВК: пост с картинкой опубликован', res?.post_id);
+        // проверяем, что ВК действительно показал картинку (во время сбоев он её молча теряет)
+        try {
+          const [w] = await vkApi('wall.getById', { posts: `-${VK_GROUP}_${res?.post_id}` });
+          VK_PHOTO_SHOWN = (w?.attachments || []).some((a) => a.type === 'photo');
+          if (!VK_PHOTO_SHOWN) VK_ERROR = 'ВК принял пост, но картинку не показал';
+        } catch (e) {
+          VK_PHOTO_SHOWN = 'не проверено: ' + e.message;
+        }
         return;
       } catch (e) {
         log('ВК: картинка сразу не прошла —', e.message, '— ставлю в очередь с превью');
@@ -261,6 +269,7 @@ async function vkPost(html, link, photoBuf) {
   }
 }
 let VK_ERROR = '';
+let VK_PHOTO_SHOWN;
 let VK_PHOTO_ERROR = '';
 
 // ---------- ВК: картинка через страницу-превью (ключа сообщества достаточно) ----------
@@ -884,5 +893,6 @@ try {
 } finally {
   state.aiError = AI_ERROR || undefined;
   state.vkError = VK_ERROR || undefined;
+  state.vkPhotoShown = VK_PHOTO_SHOWN;
   await saveState(state);
 }
