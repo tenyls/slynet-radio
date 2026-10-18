@@ -32,9 +32,7 @@
     "homepage": "https://plus.rm.fm/"
   },
   "apiUrl": "https://slynet-api.tenylse.workers.dev",
-  "hiddenSections": [
-    "webcams"
-  ],
+  "hiddenSections": [],
   "hiddenCountries": {
     "radio": [],
     "tv": [
