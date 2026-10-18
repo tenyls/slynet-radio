@@ -3,6 +3,10 @@ import re, shutil, pathlib, sys
 root = pathlib.Path(__file__).resolve().parent.parent
 man = root / 'android/app/src/main/AndroidManifest.xml'
 s = man.read_text()
+# Фоновое воспроизведение (Android 14+ требует отдельное разрешение для медиа-сервиса)
+for perm in ['android.permission.FOREGROUND_SERVICE', 'android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK', 'android.permission.WAKE_LOCK', 'android.permission.POST_NOTIFICATIONS']:
+    if perm not in s:
+        s = s.replace('<application', f'<uses-permission android:name="{perm}" />\n    <application', 1)
 if 'android.software.leanback' not in s:
     s = s.replace('<application', '<uses-feature android:name="android.software.leanback" android:required="false" />\n'
                   '    <uses-feature android:name="android.hardware.touchscreen" android:required="false" />\n\n    <application', 1)

@@ -1,3 +1,4 @@
+import { isNativeApp } from '../utils/platform';
 import { pickStream, lowerStream, getQualityMode, networkTier, QUALITY_EVENT } from '../services/streamQuality';
 import React, { createContext, useContext, useState, useRef, useEffect, useCallback } from 'react';
 import { Station, EqualizerBand, RecordedTrack, PlayedTrackHistory, RadioAlarm, RecognizedTrack } from '../types/radio';
@@ -1054,58 +1055,63 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   }, []);
 
-  // Sync MediaSession for iOS, Android, macOS, Windows lockscreen
+  // Карточка «Сейчас играет» на экране блокировки, в шторке, на часах и в машине.
+  // В приложении Android — через нативный модуль (он же держит звук при выключенном экране),
+  // в браузере/на iPhone — через стандартный Media Session.
+  const controlsRef = useRef({ playNext, playPrevious });
+  controlsRef.current = { playNext, playPrevious };
   useEffect(() => {
-    if (!('mediaSession' in navigator)) return;
+    if (!currentStation) return;
+    const tags = currentStation.tags ? currentStation.tags.split(',').slice(0, 2).join(', ') : 'Радио';
+    const hasTrack = !!currentTrackTitle && currentTrackTitle !== currentStation.name;
+    const meta = {
+      title: hasTrack ? currentTrackTitle : currentStation.name,
+      artist: hasTrack ? currentStation.name : `${currentStation.country || 'Радио'} · ${tags}`,
+      album: 'SlyNet Radio',
+      artwork: [
+        currentStation.favicon && /^https:\/\//.test(currentStation.favicon)
+          ? { src: currentStation.favicon, sizes: '512x512', type: 'image/png' }
+          : { src: 'https://tenyls.github.io/slynet-radio/icons/icon-512.png', sizes: '512x512', type: 'image/png' },
+      ],
+    };
+    const state = isPlaying ? 'playing' : 'paused';
+    const play = () => {
+      audioRef.current?.play().catch(() => {});
+      setIsPlaying(true);
+    };
+    const pause = () => {
+      audioRef.current?.pause();
+      setIsPlaying(false);
+    };
 
-    if (currentStation) {
-      const tags = currentStation.tags ? currentStation.tags.split(',').slice(0, 3).join(', ') : 'Радио';
-      const artwork = [];
-
-      if (currentStation.favicon && currentStation.favicon.startsWith('http')) {
-        artwork.push(
-          { src: currentStation.favicon, sizes: '96x96', type: 'image/png' },
-          { src: currentStation.favicon, sizes: '128x128', type: 'image/png' },
-          { src: currentStation.favicon, sizes: '256x256', type: 'image/png' },
-          { src: currentStation.favicon, sizes: '512x512', type: 'image/png' }
-        );
-      }
-
-      navigator.mediaSession.metadata = new MediaMetadata({
-        title: currentStation.name,
-        artist: `${currentStation.country || 'World'} · ${tags}`,
-        album: 'SlyNet Radio — Global Hub',
-        artwork: artwork.length > 0 ? artwork : undefined,
-      });
-
-      navigator.mediaSession.playbackState = isPlaying ? 'playing' : 'paused';
-
-      try {
-        navigator.mediaSession.setActionHandler('play', () => {
-          if (audioRef.current) {
-            audioRef.current.play();
-            setIsPlaying(true);
-          }
-        });
-        navigator.mediaSession.setActionHandler('pause', () => {
-          if (audioRef.current) {
-            audioRef.current.pause();
-            setIsPlaying(false);
-          }
-        });
-        navigator.mediaSession.setActionHandler('previoustrack', () => playPrevious());
-        navigator.mediaSession.setActionHandler('nexttrack', () => playNext());
-        navigator.mediaSession.setActionHandler('stop', () => {
-          if (audioRef.current) {
-            audioRef.current.pause();
-            setIsPlaying(false);
-          }
-        });
-      } catch (e) {
-        console.warn('MediaSession handler error:', e);
-      }
+    if (isNativeApp) {
+      import('@capgo/capacitor-media-session')
+        .then(async ({ MediaSession }) => {
+          await MediaSession.setMetadata(meta);
+          await MediaSession.setPlaybackState({ playbackState: state });
+          await MediaSession.setActionHandler({ action: 'play' }, play);
+          await MediaSession.setActionHandler({ action: 'pause' }, pause);
+          await MediaSession.setActionHandler({ action: 'stop' }, pause);
+          await MediaSession.setActionHandler({ action: 'nexttrack' }, () => controlsRef.current.playNext());
+          await MediaSession.setActionHandler({ action: 'previoustrack' }, () => controlsRef.current.playPrevious());
+        })
+        .catch((e) => console.warn('Нативная карточка плеера недоступна', e));
+      return;
     }
-  }, [currentStation, isPlaying, playNext, playPrevious]);
+
+    if (!('mediaSession' in navigator)) return;
+    try {
+      navigator.mediaSession.metadata = new MediaMetadata(meta);
+      navigator.mediaSession.playbackState = state;
+      navigator.mediaSession.setActionHandler('play', play);
+      navigator.mediaSession.setActionHandler('pause', pause);
+      navigator.mediaSession.setActionHandler('stop', pause);
+      navigator.mediaSession.setActionHandler('previoustrack', () => controlsRef.current.playPrevious());
+      navigator.mediaSession.setActionHandler('nexttrack', () => controlsRef.current.playNext());
+    } catch (e) {
+      console.warn('MediaSession handler error:', e);
+    }
+  }, [currentStation, isPlaying, currentTrackTitle]);
 
   const clearError = useCallback(() => setError(null), []);
 
