@@ -847,6 +847,104 @@ async function postPromo(state) {
   log('опубликовано напоминание о приложениях');
 }
 
+// ---------- 4в. Возможности сайта: «а вы знаете?» (каждые 3–4 часа) и большой рекламный пост (раз в день) ----------
+// ВАЖНО: телевидение в рекламе не упоминаем никогда. Только то, что реально есть на сайте и в приложении.
+const PROMO_DIR = path.join(ROOT, 'public', 'promo');
+const FEATS = [
+  { id: 'globe', name: 'Глобус радио', poster: 'globe', link: '#globe', btn: '🌍 Открыть глобус', facts: 'Раздел «Глобус радио»: вращаешь 3D-Землю, нажимаешь на любую точку — и слушаешь радио этого места. Тысячи станций по всему миру, зелёные точки — города с эфиром.' },
+  { id: 'webcams', name: 'Веб-камеры мира', poster: 'webcams', link: '#webcams', btn: '📷 Смотреть камеры', facts: 'Раздел «Веб-камеры»: живые камеры городов, гор и пляжей мира. Выбор по стране и городу списком. Можно включить радио и смотреть камеру одновременно.' },
+  { id: 'record', name: 'Radio Record — эксклюзив', poster: 'record', link: '', btn: '🔥 Слушать Radio Record', facts: '117 официальных каналов Radio Record собраны в одном месте: танцевальная музыка, хиты, клубные сеты. Качество само подстраивается под интернет.' },
+  { id: 'exclusive', name: 'Эксклюзив SlyNet', poster: 'all', link: '', btn: '⭐ Слушать эксклюзив', facts: 'Подборка «Эксклюзив SlyNet»: Radio Paradise, FIP (Радио Франции), KEXP, NTS, Nightride и другие известные станции мира — официальные потоки в высоком качестве.' },
+  { id: 'genres', name: 'Жанры и настроения', poster: 'all', link: '', btn: '🎵 Выбрать жанр', facts: 'Десятки жанров (рок, джаз, электроника, диско, транс, кантри, фолк, K-pop, детское, новогоднее и др.) и подборки под настроение. Станции без тегов находятся по названию.' },
+  { id: 'playlist', name: 'Мой плейлист', poster: 'all', link: '', btn: '🎧 Собрать плейлист', facts: 'Нажимаешь ♥ у любимых станций — и они собираются в «Мой плейлист» на главной. Можно войти и синхронизировать избранное между телефоном и компьютером.' },
+  { id: 'search', name: 'Поиск и фильтры', poster: 'all', link: '', btn: '🔍 Найти станцию', facts: 'Поиск по названию станции и фильтры рядом со списком: страна, жанр, название. Вид — плиткой или списком.' },
+  { id: 'country', name: 'Радио вашей страны', poster: 'radiocam', link: '', btn: '📻 Моя страна', facts: 'Кнопка «Моя страна» сама определяет, где вы, и показывает местные станции. Более 50 000 радиостанций из почти всех стран мира.' },
+  { id: 'android', name: 'Приложение для Android', poster: 'all', link: '#apps', btn: '🤖 Скачать для Android', facts: 'Приложение для Android (APK с нашего сайта, раздел «Mobile Apps»): радио играет при выключенном экране, управление с экрана блокировки, обновления приходят сами. Есть версия для Android TV. В Google Play — скоро.' },
+  { id: 'iphone', name: 'SlyNet на iPhone и iPad', poster: 'all', link: '#apps', btn: '🍏 Как установить на iPhone', facts: 'На iPhone и iPad: открыть сайт в Safari → «Поделиться» → «На экран „Домой“» — и SlyNet Radio работает как приложение. В App Store — скоро.' },
+  { id: 'telegram', name: 'Радио прямо в Telegram', poster: 'all', link: 'tg', btn: '💬 Открыть в Telegram', facts: 'Наш бот открывает SlyNet Radio прямо внутри Telegram — кнопка «🎧 Слушать» в чате с ботом. Ничего устанавливать не нужно.' },
+  { id: 'tools', name: 'Таймер сна, будильник и эквалайзер', poster: 'all', link: '', btn: '⏰ Попробовать', facts: 'В плеере есть таймер сна (радио само выключится), будильник с любимой станцией, эквалайзер и режим «За рулём» с крупными кнопками.' },
+  { id: 'quality', name: 'Слабый интернет — не проблема', poster: 'record', link: '', btn: '📶 Слушать', facts: 'Качество звука подстраивается под интернет: на слабой связи станция переключается на лёгкий поток и не прерывается. Можно выбрать режим «экономия трафика».' },
+  { id: 'free', name: 'Бесплатно и легально', poster: 'radiocam', link: '', btn: '▶️ Слушать бесплатно', facts: 'Всё бесплатно, без рекламы от нас и без регистрации. Только официальные открытые потоки радиостанций.' },
+  { id: 'history', name: 'Продолжить слушать', poster: 'all', link: '', btn: '🕘 Открыть', facts: 'На главной есть «Продолжить слушать» — последние станции в один клик, и раздел «История».' },
+];
+const STYLES = [
+  'Начни с «А вы знаете, что…» и удиви одним фактом.',
+  'Формат «Совет дня»: один полезный приём и как им воспользоваться за 10 секунд.',
+  'Формат «Мало кто знает»: раскрой скрытую возможность.',
+  'Начни с вопроса к читателю (например, «Хотите…?» / «Бывало, что…?») и дай ответ.',
+  'Формат «3 причины попробовать» — короткий список из трёх пунктов.',
+  'Формат «Попробуйте прямо сейчас»: пошагово 2–3 шага.',
+  'Формат мини-истории: ситуация из жизни (утро, дорога, вечер, работа) и как тут помогает SlyNet Radio.',
+  'Формат «Лайфхак для меломана».',
+];
+const CTAS = [
+  'Подпишитесь на канал, чтобы не пропустить новые фишки.',
+  'Поделитесь постом с другом, который любит музыку.',
+  'Установите приложение — так ещё удобнее.',
+  'Сохраните пост, чтобы не потерять.',
+  'Расскажите в комментариях, что слушаете вы.',
+];
+const NO_TV = /телевид|телеканал|\bТВ\b|\bTV\b|iptv|сериал|фильм/i;
+const cleanHtml = (t) => String(t).replace(/<(?!\/?(b|i)>)[^>]*>/g, '').replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').trim();
+const featLink = (f) => (f.link === 'tg' ? (BOT_USERNAME ? `https://t.me/${BOT_USERNAME}?startapp` : SITE) : SITE + (f.link || ''));
+const promoImg = async (name) => fs.readFile(path.join(PROMO_DIR, name + '.jpg')).catch(() => null);
+
+async function postFeature(state) {
+  await footer(); // узнаём имя бота для ссылок
+  const recent = state.featRecent || [];
+  const pool = FEATS.filter((f) => !recent.includes(f.id));
+  const f = (pool.length ? pool : FEATS)[Math.floor(Math.random() * (pool.length || FEATS.length))];
+  const si = (state.featStyle || 0) % STYLES.length;
+  const cta = CTAS[(state.featCta || 0) % CTAS.length];
+  let text = await ai(
+    'Ты ведёшь Telegram-канал SlyNet Radio (бесплатное легальное радио со всего мира: сайт, Android, iPhone, Telegram). ' +
+      'Пиши по-русски, живо и дружелюбно, как будто общаешься с подписчиками, 350–650 символов, 2–4 уместных эмодзи. ' +
+      'Первая строка — цепляющий заголовок в <b>…</b>. Разметка: только <b> и <i>, без Markdown, без ссылок и хэштегов. ' +
+      'Пиши ТОЛЬКО о том, что дано в фактах, ничего не выдумывай. Никогда не упоминай телевидение, ТВ, телеканалы, фильмы и сериалы. ' +
+      'В конце — один призыв к действию.',
+    `Возможность: ${f.name}.\nФакты: ${f.facts}\nПодача: ${STYLES[si]}\nПризыв в конце: ${cta}`,
+    500
+  );
+  if (text) text = cleanHtml(text);
+  if (!text || text.length < 120 || NO_TV.test(text)) {
+    text = `<b>${['А вы знаете? 🤔', 'Совет дня 💡', 'Мало кто знает 👀', 'Попробуйте сегодня ✨'][si % 4]} ${f.name}</b>\n\n${f.facts}\n\n${cta}`;
+  }
+  const link = featLink(f);
+  const img = await promoImg(f.poster);
+  await postPhotoOrText({
+    photo: img || BANNER,
+    caption: await withFooter(text),
+    buttons: { inline_keyboard: [[{ text: f.btn, url: link }], [{ text: '📱 Приложения', url: SITE + '#apps' }]] },
+    silent: true,
+  });
+  await vkPost(text, link.startsWith(SITE) ? link : SITE, img);
+  state.featRecent = [...recent, f.id].slice(-Math.min(8, FEATS.length - 1));
+  state.featStyle = si + 1;
+  state.featCta = (state.featCta || 0) + 1;
+  log('опубликована возможность сайта:', f.name);
+}
+
+const SHOWCASES = [
+  `🎧 <b>SlyNet Radio — весь мир музыки в одном месте</b>\n\nБесплатно, без регистрации, только официальные потоки:\n\n📻 <b>50 000+ радиостанций</b> со всего мира\n🌍 <b>Глобус радио</b> — крутите Землю и слушайте любой уголок мира\n🔥 <b>Radio Record</b> — 117 официальных каналов\n⭐ <b>Эксклюзив</b> — Radio Paradise, FIP, KEXP, NTS и другие\n🎵 <b>Жанры и настроения</b> — от джаза до транса\n📷 <b>Веб-камеры мира</b> в прямом эфире\n🎧 <b>Мой плейлист</b> из избранного\n⏰ Таймер сна, будильник, эквалайзер\n📱 Android, iPhone, iPad и прямо в Telegram\n\n👇 Перешлите друзьям — пусть тоже слушают бесплатно!`,
+  `🌍 <b>Радио со всего мира — в кармане</b>\n\nЧто умеет SlyNet Radio:\n\n• 50 000+ станций: ваша страна в один клик\n• 3D-глобус: нажали на город — играет его радио\n• Radio Record: 117 каналов танцевальной музыки\n• Эксклюзивные станции мира в высоком качестве\n• Веб-камеры городов, гор и пляжей\n• Плейлист из любимых станций, история, поиск\n• Таймер сна и будильник с любимой станцией\n• Играет при выключенном экране (Android)\n\n💚 Бесплатно, легально, без регистрации.\n📤 Поделитесь постом — это лучшая поддержка проекта!`,
+  `📻 <b>Одно приложение — тысячи эфиров</b>\n\nSlyNet Radio — это:\n\n✅ 50 000+ легальных радиостанций\n✅ Глобус радио и веб-камеры мира\n✅ Radio Record и эксклюзивы SlyNet\n✅ Жанры, настроения, умный поиск\n✅ Мой плейлист и «Продолжить слушать»\n✅ Таймер сна, будильник, эквалайзер, режим «За рулём»\n✅ Сайт, Android, iPhone/iPad и Telegram\n\nВсё бесплатно и без регистрации.\n🔁 Отправьте этот пост другу или в свой канал!`,
+];
+async function postShowcase(state) {
+  await footer();
+  const i = (state.showIndex || 0) % SHOWCASES.length;
+  const text = SHOWCASES[i];
+  const img = await promoImg(['all', 'radiocam', 'all'][i] || 'all');
+  const share = `https://t.me/share/url?url=${encodeURIComponent(SITE)}&text=${encodeURIComponent('SlyNet Radio — 50 000+ радиостанций со всего мира бесплатно 🎧')}`;
+  await postPhotoOrText({
+    photo: img || BANNER,
+    caption: await withFooter(text),
+    buttons: { inline_keyboard: [[{ text: '▶️ Слушать бесплатно', url: SITE }], [{ text: '📱 Приложения', url: SITE + '#apps' }, { text: '📤 Поделиться', url: share }]] },
+  });
+  await vkPost(text, SITE, img);
+  state.showIndex = i + 1;
+  log('опубликован большой рекламный пост');
+}
+
 // ---------- 5. Настройка бота (кнопка «Слушать» в чате с ботом — мини-приложение) ----------
 async function setup() {
   await tg('setChatMenuButton', { menu_button: { type: 'web_app', text: '🎧 Слушать', web_app: { url: SITE } } });
@@ -861,7 +959,8 @@ async function setup() {
 function autoMode() {
   const cron = process.env.SCHEDULE || '';
   if (cron.startsWith('50 18')) return 'ask';
-  if (cron.startsWith('50 15')) return 'promo';
+  if (cron.startsWith('45 16')) return 'showcase';
+  if (cron.startsWith('50 ')) return 'feature';
   if (cron.startsWith('20 ')) return 'news';
   if (cron.startsWith('35 ')) return 'webcam';
   if (cron.startsWith('5 5 ')) return 'day';
@@ -884,6 +983,8 @@ try {
   if (mode === 'day') await postStation(state, true);
   else if (mode === 'station') await postStation(state);
   else if (mode === 'promo') await postPromo(state);
+  else if (mode === 'feature') await postFeature(state);
+  else if (mode === 'showcase') await postShowcase(state);
   else if (mode === 'webcam') await postWebcam(state);
   else if (mode === 'news') await postNews(state);
   else if (mode === 'release') await postRelease(state);

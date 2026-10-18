@@ -10,14 +10,15 @@ on:
     - cron: '5 6-21 * * *'    # каждый час :05 — интересная станция (тихо)
     - cron: '35 5-21 * * *'   # каждый час :35 — веб-камера «Взгляд на мир» (тихо)
     - cron: '20 8,12,16 * * *' # 10:20, 14:20, 18:20 — новости музыки
-    - cron: '50 15 * * 2,5'   # вт и пт 17:50 — напоминание о приложениях
+    - cron: '50 7,11,15,19 * * *' # 09:50, 13:50, 17:50, 21:50 — «а вы знаете?»: возможности сайта (тихо)
+    - cron: '45 16 * * *'     # 18:45 — большой рекламный пост со всеми возможностями (со звуком)
     - cron: '50 18 * * 0'     # вс 20:50 — вопрос подписчикам
   workflow_dispatch:
     inputs:
       mode:
         description: 'Что опубликовать'
         type: choice
-        options: [auto, day, station, webcam, news, release, ask, promo, setup, vkflush]
+        options: [auto, day, station, webcam, news, release, ask, promo, feature, showcase, setup, vkflush]
         default: auto
 
 permissions:
