@@ -2,8 +2,8 @@
  * Автопостинг в Телеграм-канал SlyNet Radio.
  *   node scripts/telegram-post.mjs <mode>
  *   mode: auto | day | station | news | release | ask | promo | setup
- * Тексты пишет нейросеть (GitHub Models, бесплатно для GitHub Actions); если она недоступна — шаблоны.
- * Нужны секреты: TELEGRAM_BOT_TOKEN, TELEGRAM_CHANNEL (@имя_канала).
+ * Тексты пишет нейросеть Google Gemini (бесплатный ключ); если она недоступна — шаблоны.
+ * Нужны секреты: TELEGRAM_BOT_TOKEN, TELEGRAM_CHANNEL (@имя_канала), GEMINI_API_KEY.
  */
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -103,45 +103,48 @@ async function postPhotoOrText({ photo, caption, buttons, preview = false }) {
   });
 }
 
-// ---------- нейросеть (GitHub Models) ----------
+// ---------- нейросеть (Google Gemini) ----------
 let AI_ERROR = '';
-async function ai(system, user, maxTokens = 450) {
-  const key = process.env.GITHUB_TOKEN;
-  if (!key) return null;
-  try {
-    const r = await fetchT(
-      'https://models.github.ai/inference/chat/completions',
-      {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', Accept: 'application/vnd.github+json' },
-        body: JSON.stringify({
-          model: 'openai/gpt-4o-mini',
-          temperature: 0.8,
-          max_tokens: maxTokens,
-          messages: [
-            { role: 'system', content: system },
-            { role: 'user', content: user },
-          ],
-        }),
-      },
-      40000
-    );
-    const raw = await r.text();
-    let j = null;
-    try {
-      j = JSON.parse(raw);
-    } catch {}
-    const text = j?.choices?.[0]?.message?.content?.trim();
-    if (!text) {
-      AI_ERROR = `HTTP ${r.status}: ${raw.slice(0, 300)}`;
-      log('нейросеть не ответила:', AI_ERROR);
-    } else AI_ERROR = '';
-    return text || null;
-  } catch (e) {
-    AI_ERROR = 'исключение: ' + e.message;
-    log('нейросеть недоступна:', e.message);
+async function ai(system, user, maxTokens = 700) {
+  // Google Gemini (бесплатный ключ из Google AI Studio → секрет GEMINI_API_KEY)
+  const key = process.env.GEMINI_API_KEY;
+  if (!key) {
+    AI_ERROR = 'нет секрета GEMINI_API_KEY';
     return null;
   }
+  for (const model of ['gemini-flash-latest', 'gemini-2.5-flash']) {
+    try {
+      const r = await fetchT(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
+          body: JSON.stringify({
+            systemInstruction: { parts: [{ text: system }] },
+            contents: [{ role: 'user', parts: [{ text: user }] }],
+            generationConfig: { temperature: 0.8, maxOutputTokens: maxTokens + 1500 },
+          }),
+        },
+        60000
+      );
+      const raw = await r.text();
+      let j = null;
+      try {
+        j = JSON.parse(raw);
+      } catch {}
+      const text = (j?.candidates?.[0]?.content?.parts || []).map((p) => p.text || '').join('').trim();
+      if (text) {
+        AI_ERROR = '';
+        return text;
+      }
+      AI_ERROR = `${model} HTTP ${r.status}: ${raw.slice(0, 300)}`;
+      log('нейросеть не ответила:', AI_ERROR);
+    } catch (e) {
+      AI_ERROR = `${model}: ${e.message}`;
+      log('нейросеть недоступна:', AI_ERROR);
+    }
+  }
+  return null;
 }
 const STYLE =
   'Ты ведёшь Телеграм-канал SlyNet Radio — бесплатного сайта и приложения с радиостанциями со всего мира. ' +

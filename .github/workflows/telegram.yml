@@ -28,7 +28,6 @@ on:
 
 permissions:
   contents: write
-  models: read
 
 concurrency:
   group: telegram
@@ -46,7 +45,7 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHANNEL: ${{ secrets.TELEGRAM_CHANNEL }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           SCHEDULE: ${{ github.event.schedule }}
         run: |
           MODE="${{ github.event.inputs.mode }}"
