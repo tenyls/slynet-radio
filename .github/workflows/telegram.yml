@@ -1,0 +1,56 @@
+# Автопостинг в Телеграм-канал SlyNet Radio:
+#  • станция дня (утром и днём), • новости музыки (в обед и вечером), • вопрос подписчикам (воскресенье)
+#  • пост об обновлении — сам, когда меняется public/releases.json
+name: Телеграм-канал
+
+on:
+  schedule:
+    - cron: '10 6 * * *'   # ~08:10 по Берлину — станция дня
+    - cron: '10 10 * * *'  # ~12:10 — новость
+    - cron: '10 14 * * *'  # ~16:10 — станция дня
+    - cron: '10 17 * * *'  # ~19:10 — новость
+    - cron: '40 18 * * 0'  # воскресенье ~20:40 — вопрос подписчикам
+  push:
+    branches: [main]
+    paths: ['public/releases.json']
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Что опубликовать'
+        type: choice
+        options: [auto, station, news, release, ask, setup]
+        default: auto
+
+permissions:
+  contents: write
+  models: read
+
+concurrency:
+  group: telegram
+  cancel-in-progress: false
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Публикация
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHANNEL: ${{ secrets.TELEGRAM_CHANNEL }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          MODE="${{ github.event.inputs.mode }}"
+          if [ "${{ github.event_name }}" = "push" ]; then MODE=release; fi
+          node scripts/telegram-post.mjs "${MODE:-auto}"
+      - name: Запомнить опубликованное
+        run: |
+          if git diff --quiet -- data/telegram-state.json; then exit 0; fi
+          git config user.name "slynet-telegram-bot"
+          git config user.email "slynet-telegram-bot@users.noreply.github.com"
+          git add data/telegram-state.json
+          git commit -m "Телеграм: отметка опубликованного"
+          for i in 1 2 3; do git pull --rebase -q origin main && git push && break; sleep 5; done

@@ -10,6 +10,7 @@ import { useSlyNetSettings, SlyNetSettingsProvider } from './context/SlyNetSetti
 import { isSectionHidden, hiddenCountrySet } from './utils/visibility';
 import { ContinueListening } from './components/ContinueListening';
 import { ListFilters } from './components/ListFilters';
+import { loadCatalog } from './services/catalogService';
 import { ExclusiveSection } from './components/ExclusiveSection';
 import { MyPlaylist, openPlaylist } from './components/MyPlaylist';
 import { RecordSpotlight, openRecord } from './components/RecordSpotlight';
@@ -166,10 +167,21 @@ function RadioApp() {
   // Ссылка «поделиться станцией»: #station=<uuid>
   const [sharedStation, setSharedStation] = useState<Station | null>(null);
   useEffect(() => {
-    const m = /#station=([0-9a-f-]{36})/i.exec(window.location.hash);
+    const m = /#station=([0-9a-z-]{8,80})/i.exec(window.location.hash);
     if (!m) return;
     history.replaceState(null, '', window.location.pathname + window.location.search);
-    fetchStationsByUuids([m[1]]).then((l) => l[0] && setSharedStation(l[0])).catch(() => {});
+    const id = m[1];
+    // Эксклюзив (Record, SomaFM…) ищем в нашем каталоге, остальные — в Radio Browser
+    if (id.startsWith('ex-')) {
+      loadCatalog()
+        .then((c) => {
+          const st = (c.exclusive || []).flatMap((g) => g.stations).find((x) => x.stationuuid === id);
+          if (st) setSharedStation(st);
+        })
+        .catch(() => {});
+    } else {
+      fetchStationsByUuids([id]).then((l) => l[0] && setSharedStation(l[0])).catch(() => {});
+    }
   }, []);
 
   // Размер каталога для главной + перенос избранного по ссылке/QR (#fav=...)
