@@ -44,5 +44,9 @@
   ],
   "camIndex": 5,
   "vkVia": "photo",
-  "vkPhotoShown": "не проверено: wall.getById 27: Group authorization failed: method is unavailable with group auth."
+  "featRecent": [
+    "exclusive"
+  ],
+  "featStyle": 1,
+  "featCta": 1
 }
