@@ -24,9 +24,11 @@
     "https://www.nme.com/news/music/smashing-pumpkins-billy-corgan-blink-182-travis-barker-most-influential-drummer-3973446?utm_source=rss&utm_medium=rss&utm_campaign=smashing-pumpkins-billy-corgan-blink-182-travis-barker-most-influential-drummer"
   ],
   "releases": [
-    "1.0.6"
+    "1.0.6",
+    "1.0.8"
   ],
   "askIndex": 0,
   "lastNewsSource": "NME",
-  "vkError": "100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "vkError": "опубликовано без картинки",
+  "lastReleaseAt": 1792346865828
 }
