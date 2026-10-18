@@ -131,7 +131,38 @@ const htmlToPlain = (h) =>
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
     .replace(/&amp;/g, '&');
+// RSS-лента сайта: ВКонтакте («Импорт в сообщество») и другие сервисы забирают посты отсюда
+const RSS_FILE = path.join(ROOT, 'public', 'rss.xml');
+const RSS_ITEMS = path.join(ROOT, 'data', 'rss-items.json');
+async function addToFeed(html, link) {
+  try {
+    const items = JSON.parse(await fs.readFile(RSS_ITEMS, 'utf8').catch(() => '[]'));
+    const plain = htmlToPlain(html).trim();
+    const title = plain.split('\n')[0].replace(/^[^\p{L}\p{N}]+/u, '').slice(0, 120) || 'SlyNet Radio';
+    const ch = CHANNEL.startsWith('@') ? CHANNEL.slice(1) : 'SlyNetRadio';
+    const text = plain + `\n\n🎧 Слушать: ${SITE}\n📱 Приложения: ${SITE}#apps\n📢 Telegram: https://t.me/${ch}`;
+    items.unshift({ title, link: link || SITE, text, date: new Date().toUTCString(), id: `slynet-${Date.now()}` });
+    const keep = items.slice(0, 40);
+    await fs.writeFile(RSS_ITEMS, JSON.stringify(keep, null, 1));
+    const x = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const xml =
+      `<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0"><channel>\n` +
+      `<title>SlyNet Radio</title><link>${SITE}</link><description>Радио со всего мира: станции дня, новости музыки и обновления SlyNet Radio</description><language>ru</language>\n` +
+      keep
+        .map(
+          (i) =>
+            `<item><title>${x(i.title)}</title><link>${x(i.link)}</link><guid isPermaLink="false">${i.id}</guid><pubDate>${i.date}</pubDate><description>${x(i.text)}</description></item>`
+        )
+        .join('\n') +
+      `\n</channel></rss>\n`;
+    await fs.writeFile(RSS_FILE, xml);
+  } catch (e) {
+    log('RSS не обновилась:', e.message);
+  }
+}
+
 async function vkPost(html, link) {
+  await addToFeed(html, link);
   if (!VK_TOKEN || !VK_GROUP) return;
   try {
     const ch = CHANNEL.startsWith('@') ? CHANNEL.slice(1) : 'SlyNetRadio';
