@@ -38,5 +38,6 @@
     "1793917390",
     "1793912494"
   ],
-  "camIndex": 3
+  "camIndex": 3,
+  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
 }
