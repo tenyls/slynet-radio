@@ -4,7 +4,8 @@
     "a781a6da-a41f-498d-92f5-aede46952d54",
     "ex-record-summer-dance",
     "b8601593-152a-429d-9cb2-5065cf7c0185",
-    "ex-soma-thistle"
+    "ex-soma-thistle",
+    "2ce23ee2-95c5-407d-9df8-54c3cdde2825"
   ],
   "news": [
     "https://stereogum.com/2514933/she-punk-supergroup-plays-poly-styrene-tribute-in-london/news/",
@@ -26,5 +27,6 @@
     "1.0.6"
   ],
   "askIndex": 0,
-  "lastNewsSource": "NME"
+  "lastNewsSource": "NME",
+  "vkError": "100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
 }
