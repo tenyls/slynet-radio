@@ -1,6 +1,6 @@
 # Автопостинг в Телеграм-канал SlyNet Radio:
 #  • станция дня (утром и днём), • новости музыки (в обед и вечером), • вопрос подписчикам (воскресенье)
-#  • пост об обновлении — сам, когда меняется public/releases.json
+#  • пост об обновлении — запускается вручную (mode=release), не чаще раза в сутки
 name: Телеграм-канал
 
 on:
@@ -15,9 +15,6 @@ on:
     - cron: '10 16 * * *'    # 18:10 — новость
     - cron: '10 18 * * *'    # 20:10 — интересная станция
     - cron: '40 18 * * 0'    # вс 20:40 — вопрос подписчикам
-  push:
-    branches: [main]
-    paths: ['public/releases.json']
   workflow_dispatch:
     inputs:
       mode:
@@ -47,11 +44,12 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHANNEL: ${{ secrets.TELEGRAM_CHANNEL }}
+          VK_TOKEN: ${{ secrets.VK_TOKEN }}
+          VK_GROUP_ID: ${{ secrets.VK_GROUP_ID }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           SCHEDULE: ${{ github.event.schedule }}
         run: |
           MODE="${{ github.event.inputs.mode }}"
-          if [ "${{ github.event_name }}" = "push" ]; then MODE=release; fi
           node scripts/telegram-post.mjs "${MODE:-auto}"
       - name: Запомнить опубликованное
         run: |

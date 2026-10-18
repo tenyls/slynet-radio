@@ -121,6 +121,47 @@ async function postPhotoOrText({ photo, caption, buttons, preview = false }) {
   });
 }
 
+// ---------- ВКонтакте: тот же пост на стену группы (если заданы VK_TOKEN и VK_GROUP_ID) ----------
+const VK_TOKEN = process.env.VK_TOKEN;
+const VK_GROUP = String(process.env.VK_GROUP_ID || '').replace(/^-?(club|public)?/, '');
+const htmlToPlain = (h) =>
+  String(h)
+    .replace(/<a href="([^"]+)">([^<]+)<\/a>/g, '$2 ($1)')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&');
+async function vkPost(html, link) {
+  if (!VK_TOKEN || !VK_GROUP) return;
+  try {
+    const ch = CHANNEL.startsWith('@') ? CHANNEL.slice(1) : 'SlyNetRadio';
+    const text =
+      htmlToPlain(html) +
+      `\n\n➖➖➖\n🎧 Слушать: ${SITE}\n📱 Приложения для Android и iPhone: ${SITE}#apps\n📢 Telegram: https://t.me/${ch}`;
+    const body = new URLSearchParams({
+      owner_id: '-' + VK_GROUP,
+      from_group: '1',
+      message: text.slice(0, 15000),
+      attachments: link || SITE,
+      access_token: VK_TOKEN,
+      v: '5.199',
+    });
+    const r = await fetchT('https://api.vk.com/method/wall.post', { method: 'POST', body }, 20000);
+    const j = await r.json();
+    if (j.error) {
+      VK_ERROR = `${j.error.error_code}: ${j.error.error_msg}`;
+      log('ВК не принял пост:', VK_ERROR);
+    } else {
+      VK_ERROR = '';
+      log('ВК: пост опубликован', j.response?.post_id);
+    }
+  } catch (e) {
+    VK_ERROR = e.message;
+    log('ВК недоступен:', e.message);
+  }
+}
+let VK_ERROR = '';
+
 // ---------- фирменная картинка поста (рисуем сами, чтобы не было белых/битых картинок) ----------
 let sharp = null;
 try {
@@ -301,6 +342,7 @@ async function postStation(state, isDay = false) {
     (await makeCard({ label: isDay ? 'СТАНЦИЯ ДНЯ' : 'ИНТЕРЕСНАЯ СТАНЦИЯ', title: st.name, subtitle: [country, st.bitrate ? `${st.bitrate} kbps` : '', st.group ? 'Эксклюзив SlyNet' : ''].filter(Boolean).join(' · '), logoUrl: st.favicon })) ||
     BANNER;
   await postPhotoOrText({ photo, caption: await withFooter(caption), buttons: listenButton(`${SITE}#station=${st.stationuuid}`) });
+  await vkPost(caption, `${SITE}#station=${st.stationuuid}`);
   state.stations.push(st.stationuuid);
   log('опубликована станция дня:', st.name);
 }
@@ -398,6 +440,7 @@ async function postNews(state) {
     parse_mode: 'HTML',
     link_preview_options: { url: item.link, prefer_large_media: true },
   });
+  await vkPost(`🎵 <b>${esc(title)}</b>\n\n${esc(body)}\n\nИсточник: ${item.source} — ${item.link}`, item.link);
   state.news.push(item.link);
   state.lastNewsSource = item.source;
   log('опубликована новость:', item.source, item.title);
@@ -405,19 +448,25 @@ async function postNews(state) {
 
 // ---------- 3. Обновление сайта/приложения ----------
 async function postRelease(state) {
+  // Не чаще раза в сутки: все непубликованные версии собираем в один пост
+  if (state.lastReleaseAt && Date.now() - state.lastReleaseAt < 20 * 3600000) return log('пост об обновлении уже был сегодня — копим изменения');
   const releases = JSON.parse(await fs.readFile(path.join(ROOT, 'public', 'releases.json'), 'utf8').catch(() => '[]'));
-  const r = releases[0];
-  if (!r || state.releases.includes(r.version)) return log('новых релизов для публикации нет');
+  const fresh = releases.filter((r) => !state.releases.includes(r.version));
+  if (!fresh.length) return log('новых релизов для публикации нет');
+  const merged = (k) => [...new Set(fresh.flatMap((r) => r[k] || []))];
+  const r = fresh[0];
   const list = (title, arr, icon) => (arr?.length ? `\n<b>${title}</b>\n${arr.map((x) => `${icon} ${esc(x)}`).join('\n')}\n` : '');
   const caption =
     `🚀 <b>SlyNet Radio обновлён до версии ${esc(r.version)}</b>\n${r.title ? `${esc(r.title)}\n` : ''}` +
-    list('Что нового', r.added, '✨') +
-    list('Улучшено', r.improved, '⚡') +
-    list('Исправлено', r.fixed, '🛠') +
-    list('Убрано', r.removed, '🗑') +
+    list('Что нового', merged('added'), '✨') +
+    list('Улучшено', merged('improved'), '⚡') +
+    list('Исправлено', merged('fixed'), '🛠') +
+    list('Убрано', merged('removed'), '🗑') +
     `\nСайт обновится сам, приложение — при следующем запуске.`;
   await postPhotoOrText({ photo: BANNER, caption: await withFooter(caption), buttons: listenButton(SITE, '🚀 Открыть SlyNet Radio') });
-  state.releases.push(r.version);
+  await vkPost(caption, SITE);
+  state.releases.push(...fresh.map((x) => x.version));
+  state.lastReleaseAt = Date.now();
   log('опубликован релиз', r.version);
 }
 
@@ -431,6 +480,7 @@ const ASKS = [
 async function postAsk(state) {
   const i = (state.askIndex || 0) % ASKS.length;
   await postPhotoOrText({ photo: null, caption: await withFooter(ASKS[i], 4000), buttons: listenButton(SITE, '✍️ Открыть сайт') });
+  await vkPost(ASKS[i], SITE);
   state.askIndex = i + 1;
   log('опубликован вопрос подписчикам');
 }
@@ -444,6 +494,7 @@ const PROMOS = [
 async function postPromo(state) {
   const i = (state.promoIndex || 0) % PROMOS.length;
   await postPhotoOrText({ photo: BANNER, caption: await withFooter(PROMOS[i]), buttons: { inline_keyboard: [[{ text: '📱 Скачать / установить', url: SITE + '#apps' }], [{ text: '▶️ Слушать сейчас', url: SITE }]] } });
+  await vkPost(PROMOS[i], SITE + '#apps');
   state.promoIndex = i + 1;
   log('опубликовано напоминание о приложениях');
 }
@@ -486,5 +537,6 @@ try {
   else log('неизвестный режим', mode);
 } finally {
   state.aiError = AI_ERROR || undefined;
+  state.vkError = VK_ERROR || undefined;
   await saveState(state);
 }
