@@ -15,6 +15,7 @@ export interface Station {
   bitrate?: number;
   clickcount?: number;
   isCustom?: boolean; // Added manually via SlyNet Admin
+  alt?: { bitrate: number; url: string; codec?: string }[]; // тот же эфир в другом качестве (для слабой сети)
 }
 
 export interface GenreCategory {

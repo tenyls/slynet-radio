@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Smartphone, Tv, Apple, Download, Share, PlusSquare, Compass, Check, Clock } from 'lucide-react';
 import { isNativeApp } from '../utils/platform';
+import { nativeVersion } from '../services/appUpdater';
 
 const REPO = 'https://github.com/tenyls/slynet-radio';
 const APK_PHONE = `${REPO}/releases/download/android-latest/SlyNetRadio.apk`;
@@ -54,6 +55,23 @@ const VersionLine: React.FC<{ label: string; value?: string; date?: string; extr
     </span>
   </div>
 );
+
+/** В приложении: что установлено сейчас (для проверки автообновления) */
+const InstalledInfo: React.FC = () => {
+  const [native, setNative] = useState('');
+  useEffect(() => {
+    nativeVersion().then(setNative);
+  }, []);
+  return (
+    <div className="p-4 rounded-2xl bg-zinc-900/80 border border-emerald-500/30 text-center text-xs text-zinc-300 space-y-1">
+      <div className="text-sm font-bold text-white">У вас установлено 💚</div>
+      <div>
+        Приложение <b className="font-mono text-white">v{native || '…'}</b> · содержимое <b className="font-mono text-white">{__BUILD__}</b>
+      </div>
+      <div className="text-zinc-500">Если содержимое на сайте новее — оно скачается само и включится при следующем запуске.</div>
+    </div>
+  );
+};
 
 const Soon: React.FC<{ store: string }> = ({ store }) => (
   <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold bg-amber-500/15 text-amber-200 border border-amber-500/30">
@@ -200,7 +218,7 @@ export const AppsView: React.FC = () => {
         </ol>
       </section>
 
-      {isNativeApp && <p className="text-xs text-zinc-500 text-center">Вы уже пользуетесь приложением SlyNet Radio 💚</p>}
+      {isNativeApp && <InstalledInfo />}
     </div>
   );
 };

@@ -1,3 +1,4 @@
+import { pickStream, lowerStream, getQualityMode, networkTier, QUALITY_EVENT } from '../services/streamQuality';
 import React, { createContext, useContext, useState, useRef, useEffect, useCallback } from 'react';
 import { Station, EqualizerBand, RecordedTrack, PlayedTrackHistory, RadioAlarm, RecognizedTrack } from '../types/radio';
 import { registerStationClick } from '../services/radioApi';
@@ -194,6 +195,10 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   // Refs for audio and Web Audio API
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  // Адаптивное качество: текущий адрес потока и «заикания» за последние 30 секунд
+  const streamUrlRef = useRef<string>('');
+  const stallsRef = useRef<number[]>([]);
+  const startedRef = useRef(false);
   const previousVolumeRef = useRef<number>(0.85);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const sourceNodeRef = useRef<MediaElementAudioSourceNode | null>(null);
@@ -229,8 +234,28 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       }
     };
 
-    const handleWaiting = () => setIsLoading(true);
+    // Слабая сеть: 2 «заикания» за 30 секунд → переходим на поток полегче того же эфира
+    const handleWaiting = () => {
+      setIsLoading(true);
+      if (!startedRef.current || getQualityMode() === 'high') return;
+      const now = Date.now();
+      stallsRef.current = [...stallsRef.current.filter((t) => now - t < 30000), now];
+      const st = currentStationRef.current;
+      if (stallsRef.current.length >= 2 && st && st.alt?.length) {
+        const lower = lowerStream(st, streamUrlRef.current);
+        if (lower) {
+          stallsRef.current = [];
+          streamUrlRef.current = lower.url;
+          audio.src = lower.url;
+          audio.play().catch(() => {});
+          const upd = { ...st, bitrate: lower.bitrate };
+          currentStationRef.current = upd;
+          setCurrentStation(upd);
+        }
+      }
+    };
     const handlePlaying = () => {
+      startedRef.current = true;
       clearConnectTimeout();
       setIsLoading(false);
       setIsPlaying(true);
@@ -446,7 +471,12 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         playlistRef.current = [station];
       }
 
-      const streamUrl = station.url_resolved || station.url;
+      // Поток под качество сети (если у станции есть несколько битрейтов)
+      const picked = pickStream(station);
+      const streamUrl = picked.url;
+      streamUrlRef.current = streamUrl;
+      stallsRef.current = [];
+      startedRef.current = false;
       if (!streamUrl) {
         quarantineStation(station.stationuuid, station.name, '', 'Отсутствует адрес потока');
         setError('У станции отсутствует рабочий адрес потока');
@@ -454,8 +484,9 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         return;
       }
 
-      setCurrentStation(station);
-      currentStationRef.current = station;
+      const shown = picked.bitrate && picked.bitrate !== station.bitrate ? { ...station, bitrate: picked.bitrate } : station;
+      setCurrentStation(shown);
+      currentStationRef.current = shown;
       setCurrentTrackTitle('');
 
       // Clear existing connection timeout
@@ -540,6 +571,34 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     },
     [currentStation, togglePlayPause, volume, isMuted, playlist]
   );
+
+  // Сеть стала хуже/лучше или пользователь сменил качество → подбираем поток заново
+  useEffect(() => {
+    const reselect = (e?: Event) => {
+      const st = currentStationRef.current;
+      const audio = audioRef.current;
+      if (!st || !st.alt?.length || !audio || audio.paused) return;
+      const want = pickStream(st, networkTier());
+      if (want.url === streamUrlRef.current) return;
+      // Сеть улучшилась — не прерываем эфир, лучшее качество включится со следующей станцией
+      const userChoice = e?.type === QUALITY_EVENT;
+      if (!userChoice && want.bitrate > (st.bitrate || 0)) return;
+      streamUrlRef.current = want.url;
+      stallsRef.current = [];
+      audio.src = want.url;
+      audio.play().catch(() => {});
+      const upd = { ...st, bitrate: want.bitrate };
+      currentStationRef.current = upd;
+      setCurrentStation(upd);
+    };
+    const conn = (navigator as any).connection;
+    conn?.addEventListener?.('change', reselect);
+    window.addEventListener(QUALITY_EVENT, reselect);
+    return () => {
+      conn?.removeEventListener?.('change', reselect);
+      window.removeEventListener(QUALITY_EVENT, reselect);
+    };
+  }, []);
 
   // Play next in playlist
   const playNext = useCallback(() => {

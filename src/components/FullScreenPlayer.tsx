@@ -1,3 +1,4 @@
+import { QualityChip } from './QualityChip';
 import { StationLogo } from './StationLogo';
 import { FEATURES } from '../utils/platform';
 import React, { useState, useEffect, useMemo } from 'react';
@@ -352,6 +353,7 @@ export const FullScreenPlayer: React.FC<FullScreenPlayerProps> = ({ isFavorite, 
               <h2 className="text-lg font-extrabold tracking-tight text-white truncate">{currentStation.name}</h2>
               <p className="text-[11px] text-zinc-400 truncate">
                 {[currentStation.country, currentStation.bitrate ? `${currentStation.bitrate} kbps` : '', currentStation.codec].filter(Boolean).join(' · ')}
+                <QualityChip hasVariants={!!currentStation.alt?.length} />
               </p>
             </div>
             <button

@@ -386,6 +386,7 @@ const exStation = (src, id, name, url, extra = {}) => ({
   codec: extra.codec || 'MP3',
   bitrate: extra.bitrate || 128,
   clickcount: 0,
+  ...(extra.alt ? { alt: extra.alt } : {}),
 });
 
 const STATIC_GROUPS = [
@@ -396,7 +397,8 @@ const STATIC_GROUPS = [
       ['mellow', 'Radio Paradise — Mellow Mix', 'https://stream.radioparadise.com/mellow-320', 'chillout,mellow', 320, 'AAC'],
       ['rock', 'Radio Paradise — Rock Mix', 'https://stream.radioparadise.com/rock-320', 'rock', 320, 'AAC'],
       ['global', 'Radio Paradise — Global Mix', 'https://stream.radioparadise.com/global-320', 'world,eclectic', 320, 'AAC'],
-    ].map(([id, n, u, t, b, c]) => exStation('rp', id, n, u, { tags: t, bitrate: b, codec: c, homepage: 'https://radioparadise.com', country: 'The United States Of America', countrycode: 'US' })),
+    ].map(([id, n, u, t, b, c]) => exStation('rp', id, n, u, { tags: t, bitrate: b, codec: c, homepage: 'https://radioparadise.com', country: 'The United States Of America', countrycode: 'US',
+      alt: [128, 64].map((br) => ({ bitrate: br, codec: 'AAC', url: u.replace(/320$/, String(br)) })) })),
   },
   {
     id: 'fip', name: 'FIP (Radio France)', note: 'Государственное радио Франции · без рекламы',
@@ -404,7 +406,8 @@ const STATIC_GROUPS = [
       ['fip', 'FIP', 'fip'], ['rock', 'FIP Rock', 'fiprock'], ['jazz', 'FIP Jazz', 'fipjazz'], ['groove', 'FIP Groove', 'fipgroove'],
       ['world', 'FIP Monde', 'fipworld'], ['new', 'FIP Nouveautés', 'fipnouveautes'], ['reggae', 'FIP Reggae', 'fipreggae'],
       ['electro', 'FIP Electro', 'fipelectro'], ['metal', 'FIP Metal', 'fipmetal'], ['hiphop', 'FIP Hip-Hop', 'fiphiphop'], ['pop', 'FIP Pop', 'fippop'],
-    ].map(([id, n, k]) => exStation('fip', id, n, `https://icecast.radiofrance.fr/${k}-hifi.aac`, { tags: 'eclectic,' + id, bitrate: 192, codec: 'AAC', homepage: 'https://www.radiofrance.fr/fip', country: 'France', countrycode: 'FR' })),
+    ].map(([id, n, k]) => exStation('fip', id, n, `https://icecast.radiofrance.fr/${k}-hifi.aac`, { tags: 'eclectic,' + id, bitrate: 192, codec: 'AAC', homepage: 'https://www.radiofrance.fr/fip', country: 'France', countrycode: 'FR',
+      alt: [{ bitrate: 128, codec: 'MP3', url: `https://icecast.radiofrance.fr/${k}-midfi.mp3` }, { bitrate: 32, codec: 'MP3', url: `https://icecast.radiofrance.fr/${k}-lofi.mp3` }] })),
   },
   {
     id: 'swiss', name: 'Radio Swiss (SRG SSR)', note: 'Общественное радио Швейцарии · без рекламы и болтовни',
@@ -429,6 +432,7 @@ async function somaGroup() {
   const j = await getJson('https://api.somafm.com/channels.json');
   const stations = (j.channels || []).map((c) =>
     exStation('soma', c.id, `SomaFM — ${c.title}`, `https://ice1.somafm.com/${c.id}-128-mp3`, {
+      alt: [{ bitrate: 64, codec: 'AAC', url: `https://ice1.somafm.com/${c.id}-64-aac` }, { bitrate: 32, codec: 'AAC', url: `https://ice1.somafm.com/${c.id}-32-aac` }],
       tags: c.genre || '', favicon: c.largeimage || c.image || '', homepage: `https://somafm.com/${c.id}/`, country: 'The United States Of America', countrycode: 'US',
     })
   );
@@ -445,6 +449,7 @@ async function recordGroup() {
       return exStation('record', c.prefix || c.id, `Record — ${c.title}`, url, {
         tags: ['dance', ...(c.genre || []).map((g) => g.name)].join(',').toLowerCase(),
         favicon: c.icon_fill_colored || c.icon_fill_white || '', homepage: 'https://www.radiorecord.ru', bitrate: c.stream_320 ? 320 : 128,
+        alt: [[128, c.stream_128], [64, c.stream_64]].filter(([, u]) => u && u !== url && String(u).startsWith('https://')).map(([b, u]) => ({ bitrate: b, codec: b === 64 ? 'AAC' : 'MP3', url: u })),
         country: 'Russia', countrycode: 'RU',
       });
     })
@@ -465,6 +470,12 @@ async function buildExclusive() {
   log(`эксклюзив: проверяем ${all.length} потоков…`);
   const ok = await pool(all, 20, (s) => audioAlive(s.url));
   const alive = new Set(all.filter((_, i) => ok[i]).map((s) => s.stationuuid));
+  // Запасные битрейты тоже проверяем — оставляем только рабочие
+  const alts = all.filter((s) => alive.has(s.stationuuid)).flatMap((s) => (s.alt || []).map((a) => [s, a]));
+  const altOk = await pool(alts, 20, ([, a]) => audioAlive(a.url));
+  const bad = new Set(alts.filter((_, i) => !altOk[i]).map(([, a]) => a.url));
+  for (const s of all) if (s.alt) s.alt = s.alt.filter((a) => !bad.has(a.url));
+  stats.exclusiveAlt = alts.length - bad.size;
   const result = groups
     .map((g) => ({ ...g, stations: g.stations.filter((s) => alive.has(s.stationuuid)) }))
     .filter((g) => g.stations.length);

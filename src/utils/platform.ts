@@ -5,14 +5,22 @@
 export const isNativeApp: boolean =
   typeof window !== 'undefined' && !!(window as any).Capacitor?.isNativePlatform?.();
 
+/**
+ * Сборка для Google Play / App Store помечается строкой «SlyNet-Store» в User-Agent
+ * (capacitor.config → appendUserAgent). APK с нашего сайта — без пометки.
+ */
+export const isStoreBuild: boolean =
+  isNativeApp && typeof navigator !== 'undefined' && /SlyNet-Store/.test(navigator.userAgent || '');
+
 export const FEATURES = {
   /** Запись эфира в файл: Apple 5.2.3 / Google Play запрещают сохранять чужие трансляции */
   recorder: !isNativeApp,
   /**
    * Прямые ТВ-трансляции: Google Play и App Store массово удаляют IPTV-приложения,
-   * поэтому в приложениях показываем только ссылки на официальные сайты/YouTube каналов.
+   * поэтому в версиях из магазинов — только ссылки на официальные сайты/YouTube каналов.
+   * На сайте и в APK с нашего сайта трансляции есть.
    */
-  tvStreams: !isNativeApp,
+  tvStreams: !isStoreBuild,
 };
 
 /** Откуда брать свежие content.json / catalog.json: в приложении — с сайта (чтобы обновлялись без новой версии приложения) */
