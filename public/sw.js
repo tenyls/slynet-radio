@@ -1,6 +1,6 @@
 // SlyNet Radio — service worker: быстрый запуск и работа оболочки без сети.
 // Радиопотоки, каталог станций и внешние сервисы НЕ кэшируются.
-const CACHE = 'slynet-shell-v2';
+const CACHE = 'slynet-shell-v3';
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(['./', 'index.html', 'logo.png', 'manifest.webmanifest'])));
@@ -28,7 +28,7 @@ self.addEventListener('fetch', (e) => {
   const networkFirst = req.mode === 'navigate' || !url.pathname.includes('/assets/');
   if (networkFirst) {
     e.respondWith(
-      fetch(req)
+      fetch(req, { cache: 'no-cache' })
         .then((res) => {
           const copy = res.clone();
           caches.open(CACHE).then((c) => c.put(req, copy));
