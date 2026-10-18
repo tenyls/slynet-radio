@@ -7,12 +7,7 @@
     {
       "id": "1",
       "title": "Telegram Канал",
-      "url": "https://t.me/slynet_radio"
-    },
-    {
-      "id": "2",
-      "title": "Чат / Поддержка",
-      "url": "https://t.me/slynet_support"
+      "url": "https://t.me/SlyNetRadio"
     }
   ],
   "customWebcams": [],
@@ -31,6 +26,7 @@
     "codec": "MP3",
     "homepage": "https://plus.rm.fm/"
   },
+  "contactEmail": "",
   "apiUrl": "https://slynet-api.tenylse.workers.dev",
   "hiddenSections": [],
   "hiddenCountries": {
@@ -43,7 +39,9 @@
   },
   "defaultViewMode": "grid",
   "adminLock": "pbkdf2:26975460842329934732:rwvJZr+spyXO/RLrjLDKK6x47awxVfIEYPworX7lVcE=",
+  "legalContact": "",
   "heroTitle": "SlyNet Radio",
-  "versionChangelog": "",
+  "heroSubtitle": "Радио со всего мира",
+  "versionChangelog": "Версия 0.8.6: Умный фильтр RDS и Shazam (сохранение только реальных проверенных песен с исполнителем), каталог «Исполнители & Группы (A–Z)» и «Саундтреки OST 24/7», точный выбор стран без сбоев (до 200 станций на страну, кнопка Закрыть и Esc), быстрая регистрация без Email (Логин + Пароль + QR-код), строгий PIN админки, 50+ проверенных веб-камер мира без черных окон.",
   "dmcaPolicy": "SlyNet Radio — программный интернет-тюнер и каталог публичных радиопотоков и открытых веб-камер. Приложение не хранит, не ретранслирует и не изменяет аудио- и видеоматериалы: все потоки воспроизводятся напрямую с серверов вещателей, каталог станций — открытая база Radio Browser.\n\nВаши настройки (избранное, тема, язык) хранятся только на вашем устройстве.\n\nЕсли вы правообладатель или представитель вещателя и хотите изменить или удалить поток, напишите нам через официальный Telegram-канал."
 }
