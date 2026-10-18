@@ -55,15 +55,19 @@ export const MobileHome: React.FC<Props> = ({
         <button
           onClick={currentStation ? onTogglePlay : onPlayMain}
           aria-label={playing ? 'Пауза' : 'Слушать'}
-          className="relative w-40 h-40 rounded-full bg-gradient-to-br from-cyan-400 via-emerald-500 to-lime-400 text-zinc-950 flex items-center justify-center shadow-[0_0_60px_rgba(16,185,129,0.45)] active:scale-95 transition-transform"
+          className="relative w-44 h-44 rounded-full active:scale-95 transition-transform"
         >
-          {isLoading ? (
-            <Loader2 className="w-16 h-16 animate-spin" />
-          ) : playing ? (
-            <Pause className="w-16 h-16 fill-zinc-950" />
-          ) : (
-            <Play className="w-16 h-16 fill-zinc-950 ml-2" />
-          )}
+          {/* Логотип SlyNet: крутится, пока играет радио */}
+          <SlyNetLogo size="2xl" isSpinning={playing} className="!w-44 !h-44 shadow-[0_0_60px_rgba(16,185,129,0.45)]" />
+          <span className="absolute -bottom-1 -right-1 w-16 h-16 rounded-full bg-gradient-to-br from-cyan-400 via-emerald-500 to-lime-400 text-zinc-950 flex items-center justify-center border-4 border-zinc-950 shadow-lg">
+            {isLoading ? (
+              <Loader2 className="w-7 h-7 animate-spin" />
+            ) : playing ? (
+              <Pause className="w-7 h-7 fill-zinc-950" />
+            ) : (
+              <Play className="w-7 h-7 fill-zinc-950 ml-1" />
+            )}
+          </span>
         </button>
       </div>
 

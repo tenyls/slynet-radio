@@ -116,7 +116,7 @@ export const SlyNetLogo: React.FC<SlyNetLogoProps> = ({
 
   // Spin ONLY when isPlaying is true (e.g. inside audio player during playback)
   const animationClasses = isPlaying
-    ? 'animate-[spin_18s_linear_infinite] shadow-[0_0_25px_rgba(6,182,212,0.85),0_0_40px_rgba(16,185,129,0.65)] border-cyan-400'
+    ? 'animate-[spin_10s_linear_infinite] shadow-[0_0_25px_rgba(6,182,212,0.85),0_0_40px_rgba(16,185,129,0.65)] border-cyan-400'
     : 'shadow-[0_0_15px_rgba(16,185,129,0.3)] border-emerald-500/40';
 
   return (
