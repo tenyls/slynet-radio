@@ -1,7 +1,7 @@
 /**
  * Автопостинг в Телеграм-канал SlyNet Radio.
  *   node scripts/telegram-post.mjs <mode>
- *   mode: auto | station | news | release | ask | setup
+ *   mode: auto | day | station | news | release | ask | promo | setup
  * Тексты пишет нейросеть (GitHub Models, бесплатно для GitHub Actions); если она недоступна — шаблоны.
  * Нужны секреты: TELEGRAM_BOT_TOKEN, TELEGRAM_CHANNEL (@имя_канала).
  */
@@ -144,7 +144,7 @@ async function pickStation(state) {
   return null;
 }
 
-async function postStation(state) {
+async function postStation(state, isDay = false) {
   const st = await pickStation(state);
   if (!st) return log('станция не найдена');
   const country = st.countrycode ? COUNTRY_RU.of(st.countrycode.toUpperCase()) : st.country || '';
@@ -160,10 +160,10 @@ async function postStation(state) {
     .filter(Boolean)
     .join('\n');
   const body =
-    (await ai(STYLE, `Напиши пост «Станция дня» (3–4 предложения): чем она может понравиться и под какое настроение подходит.\nФакты:\n${facts}`)) ||
+    (await ai(STYLE, `Напиши пост «${isDay ? 'Станция дня' : 'Интересная станция'}» (3–4 предложения): чем она может понравиться и под какое настроение подходит. ${isDay ? 'Это утренний пост — можно пожелать хорошего дня.' : ''}\nФакты:\n${facts}`)) ||
     `${st.name} — ${country ? `радио из страны ${country}` : 'радио со всего мира'}${tags ? `, в эфире: ${tags}` : ''}. Включайте и слушайте бесплатно, без рекламы и регистрации.`;
   const caption =
-    `📻 <b>Станция дня: ${esc(st.name)}</b>\n` +
+    `${isDay ? '🌅 <b>Станция дня' : '📻 <b>Интересная станция'}: ${esc(st.name)}</b>\n` +
     `${country ? `🌍 ${esc(country)}` : ''}${st.bitrate ? ` · 🎧 ${st.bitrate} kbps` : ''}${st.group ? ' · ⭐ Эксклюзив SlyNet' : ''}\n\n` +
     `${esc(body)}`;
   const photo = /^https:\/\/.+\.(png|jpe?g|webp)(\?|$)/i.test(st.favicon || '') ? st.favicon : BANNER;
@@ -280,6 +280,19 @@ async function postAsk(state) {
   log('опубликован вопрос подписчикам');
 }
 
+// ---------- 4б. Напоминание о приложениях ----------
+const PROMOS = [
+  '📱 <b>SlyNet Radio всегда под рукой</b>\n\n🤖 <b>Android:</b> скачайте приложение (APK) на сайте — раздел «Mobile Apps». Музыка играет даже при выключенном экране, обновления приходят сами.\n🍏 <b>iPhone и iPad:</b> откройте сайт в Safari → «Поделиться» → «На экран „Домой“» — и радио станет полноценным приложением.\n\n⏳ В Google Play и App Store — скоро. Как только выйдем, объявим здесь!',
+  '🎧 <b>Слушаете радио в браузере?</b>\n\nПоставьте SlyNet Radio как приложение — так удобнее:\n• Android — APK с нашего сайта (раздел «Mobile Apps»)\n• iPhone — Safari → «Поделиться» → «На экран „Домой“»\n\nСкоро — в Google Play и App Store. Следите за новостями канала!',
+  '⭐ <b>Знаете ли вы?</b>\n\nВ SlyNet Radio можно собрать <b>свой плейлист</b> — просто нажимайте ♥ у любимых станций. А Radio Record — 117 официальных каналов — уже в разделе «Эксклюзив».\n\n📱 Приложение для Android — на сайте, для iPhone — через «На экран „Домой“». Google Play и App Store — скоро!',
+];
+async function postPromo(state) {
+  const i = (state.promoIndex || 0) % PROMOS.length;
+  await postPhotoOrText({ photo: BANNER, caption: PROMOS[i], buttons: { inline_keyboard: [[{ text: '📱 Скачать / установить', url: SITE + '#apps' }], [{ text: '▶️ Слушать сейчас', url: SITE }]] } });
+  state.promoIndex = i + 1;
+  log('опубликовано напоминание о приложениях');
+}
+
 // ---------- 5. Настройка бота (кнопка «Слушать» в чате с ботом — мини-приложение) ----------
 async function setup() {
   await tg('setChatMenuButton', { menu_button: { type: 'web_app', text: '🎧 Слушать', web_app: { url: SITE } } });
@@ -290,11 +303,15 @@ async function setup() {
 }
 
 // ---------- запуск ----------
+// Расписание приходит из GitHub (строка cron), по ней понимаем, что публиковать
 function autoMode() {
-  const d = new Date();
-  const h = d.getUTCHours();
-  if (d.getUTCDay() === 0 && h >= 18) return 'ask';
-  return h < 8 || (h >= 13 && h < 16) ? 'station' : 'news';
+  const cron = process.env.SCHEDULE || '';
+  if (cron.startsWith('40 18')) return 'ask';
+  if (cron.startsWith('10 15')) return 'promo';
+  const h = Number(cron.split(' ')[1] ?? new Date().getUTCHours());
+  if (h === 6) return 'day';
+  if ([10, 14, 18].includes(h)) return 'station';
+  return 'news';
 }
 
 const mode = (process.argv[2] || 'auto') === 'auto' ? autoMode() : process.argv[2];
@@ -304,7 +321,9 @@ if (!TOKEN || !CHANNEL) {
 }
 const state = await loadState();
 try {
-  if (mode === 'station') await postStation(state);
+  if (mode === 'day') await postStation(state, true);
+  else if (mode === 'station') await postStation(state);
+  else if (mode === 'promo') await postPromo(state);
   else if (mode === 'news') await postNews(state);
   else if (mode === 'release') await postRelease(state);
   else if (mode === 'ask') await postAsk(state);

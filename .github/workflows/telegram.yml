@@ -5,11 +5,16 @@ name: Телеграм-канал
 
 on:
   schedule:
-    - cron: '10 6 * * *'   # ~08:10 по Берлину — станция дня
-    - cron: '10 10 * * *'  # ~12:10 — новость
-    - cron: '10 14 * * *'  # ~16:10 — станция дня
-    - cron: '10 17 * * *'  # ~19:10 — новость
-    - cron: '40 18 * * 0'  # воскресенье ~20:40 — вопрос подписчикам
+    # Время UTC; по Берлину летом +2 ч, зимой +1 ч
+    - cron: '10 6 * * *'     # 08:10 — станция дня
+    - cron: '10 8 * * *'     # 10:10 — новость музыки
+    - cron: '10 10 * * *'    # 12:10 — интересная станция
+    - cron: '10 12 * * *'    # 14:10 — новость
+    - cron: '10 14 * * *'    # 16:10 — интересная станция
+    - cron: '10 15 * * 2,5'  # вт и пт 17:10 — напоминание о приложениях
+    - cron: '10 16 * * *'    # 18:10 — новость
+    - cron: '10 18 * * *'    # 20:10 — интересная станция
+    - cron: '40 18 * * 0'    # вс 20:40 — вопрос подписчикам
   push:
     branches: [main]
     paths: ['public/releases.json']
@@ -18,7 +23,7 @@ on:
       mode:
         description: 'Что опубликовать'
         type: choice
-        options: [auto, station, news, release, ask, setup]
+        options: [auto, day, station, news, release, ask, promo, setup]
         default: auto
 
 permissions:
@@ -42,6 +47,7 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHANNEL: ${{ secrets.TELEGRAM_CHANNEL }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SCHEDULE: ${{ github.event.schedule }}
         run: |
           MODE="${{ github.event.inputs.mode }}"
           if [ "${{ github.event_name }}" = "push" ]; then MODE=release; fi

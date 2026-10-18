@@ -164,6 +164,14 @@ function RadioApp() {
     return () => window.removeEventListener('hashchange', onHash);
   }, []);
 
+  // Прямые ссылки на разделы: #apps (из Телеграм-канала «Скачать приложение»)
+  useEffect(() => {
+    if (window.location.hash === '#apps') {
+      setCurrentTab('apps');
+      history.replaceState(null, '', window.location.pathname + window.location.search);
+    }
+  }, []);
+
   // Ссылка «поделиться станцией»: #station=<uuid>
   const [sharedStation, setSharedStation] = useState<Station | null>(null);
   useEffect(() => {
