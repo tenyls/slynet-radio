@@ -104,6 +104,7 @@ async function postPhotoOrText({ photo, caption, buttons, preview = false }) {
 }
 
 // ---------- нейросеть (GitHub Models) ----------
+let AI_ERROR = '';
 async function ai(system, user, maxTokens = 450) {
   const key = process.env.GITHUB_TOKEN;
   if (!key) return null;
@@ -125,11 +126,19 @@ async function ai(system, user, maxTokens = 450) {
       },
       40000
     );
-    const j = await r.json();
+    const raw = await r.text();
+    let j = null;
+    try {
+      j = JSON.parse(raw);
+    } catch {}
     const text = j?.choices?.[0]?.message?.content?.trim();
-    if (!text) log('нейросеть не ответила:', JSON.stringify(j).slice(0, 200));
+    if (!text) {
+      AI_ERROR = `HTTP ${r.status}: ${raw.slice(0, 300)}`;
+      log('нейросеть не ответила:', AI_ERROR);
+    } else AI_ERROR = '';
     return text || null;
   } catch (e) {
+    AI_ERROR = 'исключение: ' + e.message;
     log('нейросеть недоступна:', e.message);
     return null;
   }
@@ -379,5 +388,6 @@ try {
   else if (mode === 'setup') await setup();
   else log('неизвестный режим', mode);
 } finally {
+  state.aiError = AI_ERROR || undefined;
   await saveState(state);
 }
