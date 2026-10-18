@@ -1,3 +1,4 @@
+import { WindyCams } from './WindyCams';
 import React, { useState, useEffect, useRef } from 'react';
 import { WebcamCity, CityWeather } from '../types/radio';
 import { WEBCAMS_DATA } from '../constants/webcams';
@@ -132,6 +133,9 @@ export const WebcamsView: React.FC<WebcamsViewProps> = ({ onOpenAdmin }) => {
 
   return (
     <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-6 pb-28 max-w-7xl mx-auto w-full">
+      {/* Тысячи камер Windy (если на сервере задан ключ) */}
+      <WindyCams />
+
       {/* Hero Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>

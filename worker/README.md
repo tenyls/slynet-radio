@@ -36,3 +36,11 @@ Variable name: `DB`, KV namespace: `slynet-db` → **Add binding** / **Deploy**.
 github.com → аватар → **Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token**:
 Name `slynet-publish`, Expiration 1 год, Repository access → **Only select repositories** → `slynet-radio`,
 Permissions → Repository permissions → **Contents: Read and write** → Generate → скопируйте и вставьте как Secret `GITHUB_TOKEN`.
+
+## Веб-камеры Windy (необязательно)
+
+1. Зарегистрируйтесь на https://api.windy.com → **Keys** → создайте ключ для **Webcams API** (Free).
+2. Cloudflare → Workers & Pages → slynet-api → Settings → Variables and Secrets → Add →
+   Type **Secret**, имя `WINDY_API_KEY`, значение — ваш ключ → Deploy.
+3. Обновите код воркера из `worker/index.js` (Edit code → вставить → Deploy).
+Проверка: https://slynet-api.tenylse.workers.dev/health → `"windy": true`.

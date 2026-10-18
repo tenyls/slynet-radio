@@ -8,6 +8,7 @@
  *   POST /admin/login         вход в админку по паролю → токен на 7 дней
  *   GET  /admin/messages      сообщения поддержки (только админ)
  *   DELETE /admin/messages/:id
+ *   GET  /webcams             веб-камеры Windy (ключ WINDY_API_KEY хранится только здесь)
  *   POST /admin/publish       опубликовать content.json в GitHub одной кнопкой (если задан GITHUB_TOKEN)
  *   POST /sync/register       регистрация (логин + пароль) для синхронизации избранного
  *   POST /sync/login          вход
@@ -46,8 +47,9 @@ export default {
     const url = new URL(request.url);
     const p = url.pathname.replace(/\/+$/, '') || '/';
     try {
-      if (p === '/' || p === '/health') return json({ ok: true, service: 'slynet-api', kv: !!env.DB, publish: !!env.GITHUB_TOKEN, telegram: !!env.TELEGRAM_BOT_TOKEN });
+      if (p === '/' || p === '/health') return json({ ok: true, service: 'slynet-api', kv: !!env.DB, publish: !!env.GITHUB_TOKEN, telegram: !!env.TELEGRAM_BOT_TOKEN, windy: !!env.WINDY_API_KEY });
       if (p === '/meta') return await handleMeta(url, json, ctx);
+      if (p === '/webcams') return await handleWebcams(url, env, json, ctx);
       if (p === '/geo') return json({ country: request.cf?.country || '', city: request.cf?.city || '' }, 200, { 'Cache-Control': 'no-store' });
 
       if (!env.DB) return json({ error: 'KV не подключено (привязка DB)' }, 500);
@@ -173,6 +175,57 @@ async function handlePublish(request, env, json) {
 }
 
 // ---------- RDS ----------
+
+// ---------- Веб-камеры Windy (официальный API, бесплатный ключ) ----------
+// Ключ хранится только на сервере. Ссылки на картинки Windy живут 10 минут, поэтому кэшируем на 5.
+async function handleWebcams(url, env, json, ctx) {
+  if (!env.WINDY_API_KEY) return json({ error: 'WINDY_API_KEY не задан', webcams: [] }, 501);
+  const country = (url.searchParams.get('country') || '').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 2);
+  const category = (url.searchParams.get('category') || '').replace(/[^a-z.]/g, '').slice(0, 20);
+  const nearby = (url.searchParams.get('nearby') || '').replace(/[^0-9.,-]/g, '').slice(0, 40);
+  const offset = Math.min(Math.max(parseInt(url.searchParams.get('offset') || '0', 10) || 0, 0), 950);
+  const lang = (url.searchParams.get('lang') || 'ru').replace(/[^a-z]/g, '').slice(0, 2) || 'ru';
+
+  const q = new URLSearchParams({ limit: '50', offset: String(offset), include: 'images,location,player,urls,categories', sortKey: 'popularity', lang });
+  if (country) q.set('countries', country);
+  if (category) q.set('categories', category);
+  if (nearby) q.set('nearby', nearby);
+  const apiUrl = `https://api.windy.com/webcams/api/v3/webcams?${q}`;
+
+  const cache = caches.default;
+  const cacheKey = new Request('https://slynet-cache.local/webcams?' + q.toString());
+  const hit = await cache.match(cacheKey);
+  if (hit) return json(await hit.json());
+
+  const r = await fetch(apiUrl, { headers: { 'x-windy-api-key': env.WINDY_API_KEY } });
+  if (!r.ok) return json({ error: `Windy ответил ${r.status}`, webcams: [] }, 502);
+  const data = await r.json();
+  const out = {
+    total: data.total || 0,
+    offset,
+    webcams: (data.webcams || [])
+      .filter((w) => w.status === 'active' || !w.status)
+      .map((w) => ({
+        id: String(w.webcamId),
+        title: w.title || '',
+        city: w.location?.city || '',
+        region: w.location?.region || '',
+        country: w.location?.country || '',
+        countryCode: (w.location?.country_code || '').toUpperCase(),
+        lat: w.location?.latitude ?? null,
+        lon: w.location?.longitude ?? null,
+        image: w.images?.current?.preview || w.images?.current?.thumbnail || w.images?.current?.icon || '',
+        player: w.player?.live || w.player?.day || '',
+        live: !!w.player?.live,
+        page: w.urls?.detail || `https://www.windy.com/webcams/${w.webcamId}`,
+        categories: (w.categories || []).map((c) => c.id || c),
+        views: w.viewCount || 0,
+      })),
+  };
+  ctx.waitUntil(cache.put(cacheKey, new Response(JSON.stringify(out), { headers: { 'Cache-Control': 'max-age=300' } })));
+  return json(out);
+}
+
 async function handleMeta(url, json, ctx) {
   let target;
   try {
