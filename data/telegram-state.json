@@ -31,5 +31,9 @@
   "askIndex": 0,
   "lastNewsSource": "NME",
   "vkError": "опубликовано без картинки (photos.getWallUploadServer 27: Group authorization failed: method is unavailable with group auth.)",
-  "lastReleaseAt": 1792346865828
+  "lastReleaseAt": 1792346865828,
+  "cams": [
+    "1573776572"
+  ],
+  "camIndex": 1
 }
