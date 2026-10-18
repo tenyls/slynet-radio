@@ -448,8 +448,9 @@ async function recordGroup() {
       if (!url || !String(url).startsWith('https://')) return null;
       return exStation('record', c.prefix || c.id, `Record — ${c.title}`, url, {
         tags: ['dance', ...(c.genre || []).map((g) => g.name)].join(',').toLowerCase(),
-        favicon: c.icon_fill_colored || c.icon_fill_white || '', homepage: 'https://www.radiorecord.ru', bitrate: c.stream_320 ? 320 : 128,
-        alt: [[128, c.stream_128], [64, c.stream_64]].filter(([, u]) => u && u !== url && String(u).startsWith('https://')).map(([b, u]) => ({ bitrate: b, codec: b === 64 ? 'AAC' : 'MP3', url: u })),
+        // Реальные битрейты Record: поля stream_320/128/64 — это AAC+ 96/64/32 kbps
+        favicon: c.icon_fill_colored || c.icon_fill_white || '', homepage: 'https://www.radiorecord.ru', bitrate: c.stream_320 ? 96 : 64, codec: 'AAC+',
+        alt: [[64, c.stream_128], [32, c.stream_64]].filter(([, u]) => u && u !== url && String(u).startsWith('https://')).map(([b, u]) => ({ bitrate: b, codec: 'AAC+', url: u })),
         country: 'Russia', countrycode: 'RU',
       });
     })
@@ -472,7 +473,8 @@ async function buildExclusive() {
   const alive = new Set(all.filter((_, i) => ok[i]).map((s) => s.stationuuid));
   // Запасные битрейты тоже проверяем — оставляем только рабочие
   const alts = all.filter((s) => alive.has(s.stationuuid)).flatMap((s) => (s.alt || []).map((a) => [s, a]));
-  const altOk = await pool(alts, 20, ([, a]) => audioAlive(a.url));
+  // Медленнее и с повтором: серверы станций не любят много одновременных запросов
+  const altOk = await pool(alts, 4, async ([, a]) => (await audioAlive(a.url)) || (await audioAlive(a.url)));
   const bad = new Set(alts.filter((_, i) => !altOk[i]).map(([, a]) => a.url));
   for (const s of all) if (s.alt) s.alt = s.alt.filter((a) => !bad.has(a.url));
   stats.exclusiveAlt = alts.length - bad.size;
