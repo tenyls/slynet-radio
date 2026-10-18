@@ -47,13 +47,20 @@ export default {
     const url = new URL(request.url);
     const p = url.pathname.replace(/\/+$/, '') || '/';
     try {
-      if (p === '/' || p === '/health') return json({ ok: true, service: 'slynet-api', kv: !!env.DB, publish: !!env.GITHUB_TOKEN, telegram: !!env.TELEGRAM_BOT_TOKEN, windy: !!env.WINDY_API_KEY });
+      if (p === '/' || p === '/health') return json({ ok: true, service: 'slynet-api', kv: !!env.DB, publish: !!env.GITHUB_TOKEN, telegram: !!env.TELEGRAM_BOT_TOKEN, windy: !!env.WINDY_API_KEY, vk: !!env.VK_CLIENT_ID });
       if (p === '/meta') return await handleMeta(url, json, ctx);
       if (p === '/webcams') return await handleWebcams(url, env, json, ctx);
       if (p === '/geo') return json({ country: request.cf?.country || '', city: request.cf?.city || '' }, 200, { 'Cache-Control': 'no-store' });
 
       if (!env.DB) return json({ error: 'KV не подключено (привязка DB)' }, 500);
       const ip = request.headers.get('CF-Connecting-IP') || '0';
+
+      if (p === '/vk/callback') return await vkCallback(url, env);
+      if (p === '/vk/token' && request.method === 'POST') {
+        if (!env.VK_BRIDGE_KEY || !(await safeEqual(request.headers.get('X-Bridge-Key') || '', env.VK_BRIDGE_KEY))) return json({ error: 'нет доступа' }, 401);
+        if (!(await rateLimit(env, `rl:vktok:${ip}`, 60, 3600))) return json({ error: 'слишком часто' }, 429);
+        return json(await vkAccessToken(env));
+      }
 
       if (p === '/support' && request.method === 'POST') return await handleSupport(request, env, ip, json, ctx);
 
@@ -78,6 +85,11 @@ export default {
           return json({ ok: true });
         }
         if (p === '/admin/publish' && request.method === 'POST') return await handlePublish(request, env, json);
+        if (p === '/admin/vk/start' && request.method === 'POST') return json(await vkStart(url, env));
+        if (p === '/admin/vk/status') {
+          const a = await env.DB.get('vk:auth', 'json');
+          return json({ configured: !!env.VK_CLIENT_ID, bridge: !!env.VK_BRIDGE_KEY, connected: !!a?.refresh_token, user_id: a?.user_id, scope: a?.scope, at: a?.at, error: a?.error });
+        }
       }
 
       if (p === '/sync/register' && request.method === 'POST') {
@@ -172,6 +184,90 @@ async function handlePublish(request, env, json) {
   });
   if (!res.ok) return json({ error: `GitHub ответил ${res.status}` }, 502);
   return json({ ok: true });
+}
+
+// ---------- ВКонтакте: вход администратора через VK ID (OAuth 2.1 + PKCE) ----------
+// Ключи ВК хранятся только здесь, в KV. Бот получает свежий ключ доступа через /vk/token (по секрету VK_BRIDGE_KEY).
+// VK меняет refresh-ключ при каждом обновлении — поэтому он живёт на сервере, а не в секретах GitHub.
+const VK_ID = (env) => 'https://' + (env.VK_ID_HOST || 'id.vk.ru');
+const vkRedirect = (url) => `${url.origin}/vk/callback`;
+
+async function vkStart(url, env) {
+  if (!env.VK_CLIENT_ID) return { error: 'На сервере не задан VK_CLIENT_ID' };
+  const state = randomHex(16);
+  const verifier = randomHex(32);
+  const challenge = b64url(new Uint8Array(await crypto.subtle.digest('SHA-256', enc.encode(verifier))));
+  await env.DB.put('vk:pkce:' + state, verifier, { expirationTtl: 900 });
+  const q = new URLSearchParams({
+    response_type: 'code',
+    client_id: env.VK_CLIENT_ID,
+    redirect_uri: vkRedirect(url),
+    state,
+    code_challenge: challenge,
+    code_challenge_method: 'S256',
+    scope: env.VK_SCOPE || 'wall photos groups',
+  });
+  return { url: `${VK_ID(env)}/authorize?${q}` };
+}
+
+async function vkTokenRequest(env, params) {
+  const body = new URLSearchParams({ client_id: env.VK_CLIENT_ID, ...params });
+  if (env.VK_SERVICE_TOKEN) body.set('service_token', env.VK_SERVICE_TOKEN);
+  const r = await fetch(`${VK_ID(env)}/oauth2/auth`, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body });
+  const d = await r.json().catch(() => ({}));
+  if (!d.access_token) throw new Error(d.error_description || d.error || `VK ID ответил ${r.status}`);
+  return d;
+}
+
+async function vkSave(env, d, device_id, prev = {}) {
+  const a = {
+    access_token: d.access_token,
+    refresh_token: d.refresh_token || prev.refresh_token,
+    expires_at: now() + (Number(d.expires_in) || 3600),
+    device_id,
+    user_id: d.user_id || prev.user_id,
+    scope: d.scope || prev.scope,
+    at: now(),
+  };
+  await env.DB.put('vk:auth', JSON.stringify(a));
+  return a;
+}
+
+async function vkCallback(url, env) {
+  const page = (title, text, ok) =>
+    new Response(
+      `<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>${title}</title><body style="font-family:system-ui;background:#09090b;color:#fff;display:grid;place-items:center;min-height:90vh;text-align:center;padding:20px"><div><div style="font-size:64px">${ok ? '✅' : '⚠️'}</div><h2>${title}</h2><p style="color:#a1a1aa;max-width:480px">${text}</p></div>`,
+      { status: ok ? 200 : 400, headers: { 'Content-Type': 'text/html; charset=utf-8' } }
+    );
+  const esc = (t) => String(t).replace(/[<>&"]/g, '');
+  const state = url.searchParams.get('state') || '';
+  const code = url.searchParams.get('code');
+  const device_id = url.searchParams.get('device_id');
+  if (url.searchParams.get('error')) return page('ВК не подключён', esc(url.searchParams.get('error_description') || url.searchParams.get('error')), false);
+  const verifier = state && (await env.DB.get('vk:pkce:' + state));
+  if (!verifier || !code || !device_id) return page('Ссылка устарела', 'Нажмите «Подключить ВКонтакте» в админке ещё раз.', false);
+  await env.DB.delete('vk:pkce:' + state);
+  try {
+    const d = await vkTokenRequest(env, { grant_type: 'authorization_code', code, code_verifier: verifier, device_id, redirect_uri: vkRedirect(url), state });
+    const a = await vkSave(env, d, device_id);
+    return page('ВКонтакте подключён', `Теперь бот сможет публиковать посты с картинками. Права: ${esc(a.scope || '—')}. Эту вкладку можно закрыть.`, true);
+  } catch (e) {
+    return page('Не получилось', esc(e.message), false);
+  }
+}
+
+async function vkAccessToken(env) {
+  const a = await env.DB.get('vk:auth', 'json');
+  if (!a?.refresh_token) return { error: 'ВК не подключён: админка → Сервер → «Подключить ВКонтакте»' };
+  if (a.expires_at - 300 > now()) return { access_token: a.access_token, expires_at: a.expires_at, user_id: a.user_id, scope: a.scope };
+  try {
+    const d = await vkTokenRequest(env, { grant_type: 'refresh_token', refresh_token: a.refresh_token, device_id: a.device_id, state: randomHex(16) });
+    const n = await vkSave(env, d, a.device_id, a);
+    return { access_token: n.access_token, expires_at: n.expires_at, user_id: n.user_id, scope: n.scope };
+  } catch (e) {
+    await env.DB.put('vk:auth', JSON.stringify({ ...a, error: e.message, errorAt: now() }));
+    return { error: 'Не удалось обновить ключ ВК: ' + e.message + '. Подключите ВК в админке заново.' };
+  }
 }
 
 // ---------- RDS ----------

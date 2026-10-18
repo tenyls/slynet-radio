@@ -44,3 +44,28 @@ Permissions → Repository permissions → **Contents: Read and write** → Gene
    Type **Secret**, имя `WINDY_API_KEY`, значение — ваш ключ → Deploy.
 3. Обновите код воркера из `worker/index.js` (Edit code → вставить → Deploy).
 Проверка: https://slynet-api.tenylse.workers.dev/health → `"windy": true`.
+
+## ВКонтакте: посты с картинками (вход администратора через VK ID)
+
+Ключ сообщества ВК не умеет загружать картинки, поэтому бот берёт ключ администратора. Вы входите через VK ID один раз,
+ключи хранятся только в KV этого сервера и обновляются сами (ВК меняет ключ при каждом обновлении).
+
+**1. Приложение VK ID.** https://id.vk.ru/about/business/go → войти → «Мои приложения» → «Добавить приложение»:
+название `SlyNet Radio`, платформа **Web**, иконка — логотип.
+- Базовый домен: `slynet-api.tenylse.workers.dev`
+- Доверенный Redirect URL: `https://slynet-api.tenylse.workers.dev/vk/callback`
+- В разделе доступов включите **«Стена»**, **«Фотографии»**, **«Сообщества»**, если они есть. Если ВК просит подтвердить
+  профиль бизнеса (для нерезидентов РФ — анкета на ручную проверку, ответ на почту), пройдите её.
+- Скопируйте **ID приложения** (это не секрет).
+
+**2. Cloudflare → Worker slynet-api → Settings → Variables and Secrets:**
+| Тип | Имя | Значение |
+|---|---|---|
+| Text | `VK_CLIENT_ID` | ID приложения VK ID |
+| Secret | `VK_BRIDGE_KEY` | 40+ случайных символов (генератор паролей) |
+→ Deploy. Код воркера (`worker/index.js`) тоже вставьте заново → Deploy.
+
+**3. GitHub → Settings → Secrets and variables → Actions → New repository secret:** `VK_BRIDGE_KEY` — **тот же** набор символов.
+
+**4.** Сайт → `#admin` → «🛰 Сервер» → **«Подключить ВКонтакте»** → войдите в ВК → разрешите доступ → «ВКонтакте подключён».
+Раз в ~полгода (или если в статусе появится ошибка) нажмите кнопку снова.

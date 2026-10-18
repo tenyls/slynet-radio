@@ -163,23 +163,43 @@ async function addToFeed(html, link) {
   }
 }
 
-async function vkApi(method, params) {
-  const body = new URLSearchParams({ ...params, access_token: VK_TOKEN, v: '5.199' });
+async function vkApi(method, params, token = VK_TOKEN) {
+  const body = new URLSearchParams({ ...params, access_token: token, v: '5.199' });
   const r = await fetchT(`https://api.vk.com/method/${method}`, { method: 'POST', body }, 20000);
   const j = await r.json();
   if (j.error) throw new Error(`${method} ${j.error.error_code}: ${j.error.error_msg}`);
   return j.response;
 }
 
-/** Загружаем картинку на стену группы (если ВК разрешит ключом сообщества) */
-async function vkPhoto(buf) {
-  if (!buf) return '';
+/** Ключ администратора: сервер slynet-api хранит его и сам обновляет (вход через VK ID в админке → «Сервер»). */
+const VK_BRIDGE_KEY = process.env.VK_BRIDGE_KEY;
+const VK_BRIDGE_URL = (process.env.VK_BRIDGE_URL || 'https://slynet-api.tenylse.workers.dev').replace(/\/+$/, '');
+let vkUserToken;
+async function vkAdminToken() {
+  if (vkUserToken !== undefined) return vkUserToken;
+  vkUserToken = '';
+  if (!VK_BRIDGE_KEY) return '';
   try {
-    const srv = await vkApi('photos.getWallUploadServer', { group_id: VK_GROUP });
+    const r = await fetchT(`${VK_BRIDGE_URL}/vk/token`, { method: 'POST', headers: { 'X-Bridge-Key': VK_BRIDGE_KEY } }, 20000);
+    const j = await r.json();
+    if (j.access_token) vkUserToken = j.access_token;
+    else VK_PHOTO_ERROR = j.error || `сервер ответил ${r.status}`;
+  } catch (e) {
+    VK_PHOTO_ERROR = 'сервер ключей недоступен: ' + e.message;
+  }
+  return vkUserToken;
+}
+
+/** Загружаем картинку на стену группы — только ключом администратора (ключ сообщества ВК так не умеет) */
+async function vkPhoto(buf, token) {
+  if (!buf || !token) return '';
+  try {
+    const srv = await vkApi('photos.getWallUploadServer', { group_id: VK_GROUP }, token);
     const fd = new FormData();
     fd.append('photo', new Blob([buf], { type: 'image/png' }), 'slynet.png');
     const up = await (await fetchT(srv.upload_url, { method: 'POST', body: fd }, 30000)).json();
-    const saved = await vkApi('photos.saveWallPhoto', { group_id: VK_GROUP, photo: up.photo, server: String(up.server), hash: up.hash });
+    if (!up.photo || up.photo === '[]') throw new Error('сервер загрузки ВК не принял файл');
+    const saved = await vkApi('photos.saveWallPhoto', { group_id: VK_GROUP, photo: up.photo, server: String(up.server), hash: up.hash }, token);
     const p = saved[0];
     return `photo${p.owner_id}_${p.id}`;
   } catch (e) {
@@ -191,7 +211,7 @@ async function vkPhoto(buf) {
 
 async function vkPost(html, link, photoBuf) {
   await addToFeed(html, link);
-  if (!VK_TOKEN || !VK_GROUP) return;
+  if ((!VK_TOKEN && !VK_BRIDGE_KEY) || !VK_GROUP) return;
   try {
     const ch = CHANNEL.startsWith('@') ? CHANNEL.slice(1) : 'SlyNetRadio';
     const text =
@@ -200,11 +220,23 @@ async function vkPost(html, link, photoBuf) {
       `📢 Подписывайтесь: Telegram https://t.me/${ch} · ВКонтакте https://vk.com/clubslynet`;
     let buf = photoBuf;
     if (!buf) buf = await fs.readFile(path.join(ROOT, 'public', 'telegram-card.png')).catch(() => null);
-    const photo = await vkPhoto(buf);
+    const admin = await vkAdminToken();
+    if (!admin && !VK_PHOTO_ERROR) VK_PHOTO_ERROR = 'не задан VK_BRIDGE_KEY';
+    const photo = await vkPhoto(buf, admin);
     const params = { owner_id: '-' + VK_GROUP, from_group: '1', message: text.slice(0, 15000) };
     if (photo) params.attachments = photo;
-    const res = await vkApi('wall.post', params);
-    VK_ERROR = photo ? '' : `опубликовано без картинки (${VK_PHOTO_ERROR})`;
+    let res;
+    try {
+      // пост от имени группы: ключом администратора (с картинкой), иначе — ключом сообщества (текст)
+      res = await vkApi('wall.post', params, photo ? admin : VK_TOKEN || admin);
+    } catch (e) {
+      if (!photo || !VK_TOKEN) throw e;
+      log('ВК: ключ администратора не смог опубликовать —', e.message);
+      VK_PHOTO_ERROR = e.message;
+      delete params.attachments;
+      res = await vkApi('wall.post', params, VK_TOKEN);
+    }
+    VK_ERROR = params.attachments ? '' : `опубликовано без картинки (${VK_PHOTO_ERROR})`;
     log('ВК: пост опубликован', res?.post_id);
   } catch (e) {
     VK_ERROR = e.message;
