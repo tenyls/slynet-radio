@@ -1,7 +1,8 @@
 {
   "stations": [
     "ex-record-groovetribal",
-    "a781a6da-a41f-498d-92f5-aede46952d54"
+    "a781a6da-a41f-498d-92f5-aede46952d54",
+    "ex-record-summer-dance"
   ],
   "news": [
     "https://stereogum.com/2514933/she-punk-supergroup-plays-poly-styrene-tribute-in-london/news/",
@@ -10,11 +11,18 @@
     "https://www.billboard.com/music/music-news/taylor-swift-fate-of-ophelia-live-debut-academy-museum-gala-1236362416/",
     "https://pitchfork.com/story/john-wilson-is-making-a-harry-styles-tour-documentary/",
     "https://www.rollingstone.com/music/music-news/charli-xcx-chappell-roan-boom-clap-los-angeles-1235644412/",
-    "https://www.intermedia.ru/news/407502"
+    "https://www.intermedia.ru/news/407502",
+    "https://www.rollingstone.com/music/music-news/harry-styles-john-wilson-documentary-msg-residency-1235644404/",
+    "https://www.intermedia.ru/news/407494",
+    "https://www.nme.com/news/music/watch-michael-stipe-join-members-the-national-rem-ebow-the-letter-3973454?utm_source=rss&utm_medium=rss&utm_campaign=watch-michael-stipe-join-members-the-national-rem-ebow-the-letter",
+    "https://www.billboard.com/culture/product-recommendations/nfl-london-2026-texans-jaguars-watch-live-online-free-1236359693/",
+    "https://www.nme.com/news/music/u2-skip-chile-latin-american-tour-negotiations-reportedly-fall-through-3973450?utm_source=rss&utm_medium=rss&utm_campaign=u2-skip-chile-latin-american-tour-negotiations-reportedly-fall-through",
+    "https://www.intermedia.ru/news/407499"
   ],
   "releases": [
     "1.0.6"
   ],
   "askIndex": 0,
-  "lastNewsSource": "Stereogum"
+  "lastNewsSource": "Stereogum",
+  "aiError": "HTTP 200: OK\r\n"
 }
