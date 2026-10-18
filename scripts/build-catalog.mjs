@@ -87,7 +87,8 @@ const nameMatches = (name, v) => ` ${norm(name)} `.includes(` ${norm(v)} `);
 /** Поток жив: сервер отвечает и отдаёт аудио/плейлист */
 async function audioAlive(url) {
   try {
-    const r = await fetchWithTimeout(url, { headers: { 'Icy-MetaData': '0' } }, 9000);
+    // Проверяем так же, как поток откроет наш сайт (с адресом сайта): станции, запрещающие чужие сайты, отсеются
+    const r = await fetchWithTimeout(url, { headers: { 'Icy-MetaData': '0', Referer: 'https://tenyls.github.io/', Origin: 'https://tenyls.github.io' } }, 9000);
     const type = (r.headers.get('content-type') || '').toLowerCase();
     try {
       await r.body?.cancel();

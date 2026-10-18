@@ -167,8 +167,9 @@ function RadioApp() {
 
   // Прямые ссылки на разделы: #apps (из Телеграм-канала «Скачать приложение»)
   useEffect(() => {
-    if (window.location.hash === '#apps') {
-      setCurrentTab('apps');
+    const h = window.location.hash;
+    if (h === '#apps' || h === '#webcams' || h === '#globe') {
+      setCurrentTab(h.slice(1) as MainTab);
       history.replaceState(null, '', window.location.pathname + window.location.search);
     }
   }, []);

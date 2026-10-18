@@ -86,7 +86,7 @@ async function withFooter(text, limit = CAPTION_MAX) {
   return t + f;
 }
 
-async function postPhotoOrText({ photo, caption, buttons, preview = false }) {
+async function postPhotoOrText({ photo, caption, buttons, preview = false, silent = false }) {
   // photo: Buffer (наша карточка), URL или null
   if (photo && Buffer.isBuffer(photo)) {
     try {
@@ -94,6 +94,7 @@ async function postPhotoOrText({ photo, caption, buttons, preview = false }) {
       fd.append('chat_id', CHANNEL);
       fd.append('caption', caption);
       fd.append('parse_mode', 'HTML');
+      if (silent) fd.append('disable_notification', 'true');
       if (buttons) fd.append('reply_markup', JSON.stringify(buttons));
       fd.append('photo', new Blob([photo], { type: 'image/png' }), 'slynet.png');
       const r = await fetchT(`https://api.telegram.org/bot${TOKEN}/sendPhoto`, { method: 'POST', body: fd }, 30000);
@@ -107,7 +108,7 @@ async function postPhotoOrText({ photo, caption, buttons, preview = false }) {
   }
   if (photo) {
     try {
-      return await tg('sendPhoto', { chat_id: CHANNEL, photo, caption, parse_mode: 'HTML', reply_markup: buttons });
+      return await tg('sendPhoto', { chat_id: CHANNEL, photo, caption, parse_mode: 'HTML', reply_markup: buttons, disable_notification: silent });
     } catch (e) {
       log('фото не отправилось, шлём текстом:', e.message);
     }
@@ -117,6 +118,7 @@ async function postPhotoOrText({ photo, caption, buttons, preview = false }) {
     text: caption,
     parse_mode: 'HTML',
     reply_markup: buttons,
+    disable_notification: silent,
     link_preview_options: { is_disabled: !preview },
   });
 }
@@ -338,14 +340,39 @@ const STYLE =
 const COUNTRY_RU = new Intl.DisplayNames(['ru'], { type: 'region' });
 const ROTATION = ['DE', 'FR', 'IT', 'ES', 'GB', 'US', 'BR', 'JP', 'NL', 'PL', 'UA', 'KZ', 'GR', 'TR', 'MX', 'CA', 'AU', 'SE', 'CZ', 'PT', 'AR', 'IN', 'KR', 'CH', 'AT', 'IE', 'NO', 'FI', 'BE', 'IL', 'RS', 'GE', 'AM', 'BY', 'LT', 'LV', 'EE', 'RO', 'BG', 'HU'];
 
+/** Поток играет на нашем сайте? (проверяем с адресом сайта — станции, запрещающие чужие сайты, отсеются) */
+async function streamOk(url) {
+  try {
+    const r = await fetchT(url, { headers: { 'Icy-MetaData': '0', Referer: 'https://tenyls.github.io/', Origin: 'https://tenyls.github.io' } }, 10000);
+    const type = (r.headers.get('content-type') || '').toLowerCase();
+    try {
+      await r.body?.cancel();
+    } catch {}
+    return r.ok && /audio|mpeg|aac|ogg|octet|mpegurl/.test(type);
+  } catch {
+    return false;
+  }
+}
+
 async function pickStation(state) {
+  for (let i = 0; i < 8; i++) {
+    const st = await pickStationOnce(state);
+    if (!st) return null;
+    if (await streamOk(st.url_resolved || st.url)) return st;
+    log('станция не играет на сайте, пропускаем:', st.name);
+    state.stations.push(st.stationuuid); // больше не предлагать
+  }
+  return null;
+}
+
+async function pickStationOnce(state) {
   const catalog = JSON.parse(await fs.readFile(path.join(ROOT, 'public', 'catalog.json'), 'utf8'));
   const content = JSON.parse(await fs.readFile(path.join(ROOT, 'public', 'content.json'), 'utf8').catch(() => '{}'));
   const hidden = new Set((content.hiddenCountries?.radio || []).map((c) => c.toUpperCase()));
   const posted = new Set(state.stations);
 
   // Чередуем: эксклюзив SlyNet ↔ популярная станция другой страны
-  const useExclusive = state.stations.length % 2 === 0;
+  const useExclusive = state.stations.length % 3 === 0; // каждая третья — эксклюзив
   if (useExclusive) {
     const groups = catalog.exclusive || [];
     const pool = groups.flatMap((g) => g.stations.map((s) => ({ ...s, group: g.name, groupNote: g.note }))).filter((s) => !posted.has(s.stationuuid));
@@ -391,10 +418,106 @@ async function postStation(state, isDay = false) {
   const photo =
     (await makeCard({ label: isDay ? 'СТАНЦИЯ ДНЯ' : 'ИНТЕРЕСНАЯ СТАНЦИЯ', title: st.name, subtitle: [country, st.bitrate ? `${st.bitrate} kbps` : '', st.group ? 'Эксклюзив SlyNet' : ''].filter(Boolean).join(' · '), logoUrl: st.favicon })) ||
     BANNER;
-  await postPhotoOrText({ photo, caption: await withFooter(caption), buttons: listenButton(`${SITE}#station=${st.stationuuid}`) });
+  await postPhotoOrText({ photo, caption: await withFooter(caption), buttons: listenButton(`${SITE}#station=${st.stationuuid}`), silent: !isDay });
   await vkPost(caption, `${SITE}#station=${st.stationuuid}`, Buffer.isBuffer(photo) ? photo : null);
   state.stations.push(st.stationuuid);
   log('опубликована станция дня:', st.name);
+}
+
+// ---------- 1б. Веб-камера (Windy через наш сервер) ----------
+const API = 'https://slynet-api.tenylse.workers.dev';
+const CAM_COUNTRIES = ['IT', 'ES', 'FR', 'DE', 'AT', 'CH', 'NO', 'IS', 'GR', 'PT', 'HR', 'NL', 'CZ', 'US', 'CA', 'JP', 'AU', 'NZ', 'GB', 'IE', 'SE', 'FI', 'PL', 'SI', 'MT', 'CY', 'TR', 'TH', 'MX', 'BR'];
+
+async function makeCamCard(imgBuf, title, subtitle) {
+  if (!sharp) return null;
+  try {
+    const bg = await sharp(imgBuf).resize(1280, 720, { fit: 'cover' }).modulate({ brightness: 0.9 }).png().toBuffer();
+    const svg = `<svg width="1280" height="720" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="sh" x1="0" y1="0" x2="0" y2="1"><stop offset=".45" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".85"/></linearGradient></defs>
+      <rect width="1280" height="720" fill="url(#sh)"/>
+      <rect x="48" y="44" width="260" height="52" rx="26" fill="#e11d48"/>
+      <text x="178" y="79" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="24" font-weight="bold" fill="#fff">● ВЕБ-КАМЕРА</text>
+      <text x="56" y="600" font-family="DejaVu Sans, sans-serif" font-size="56" font-weight="bold" fill="#fff">${xmlEsc(title.length > 34 ? title.slice(0, 33) + '…' : title)}</text>
+      <text x="56" y="652" font-family="DejaVu Sans, sans-serif" font-size="30" fill="#d4d4d8">${xmlEsc(subtitle)}</text>
+      <text x="1232" y="680" text-anchor="end" font-family="DejaVu Sans, sans-serif" font-size="26" font-weight="bold" fill="#fff">SlyNet <tspan fill="#34d399">Radio</tspan></text>
+      <text x="1232" y="706" text-anchor="end" font-family="DejaVu Sans, sans-serif" font-size="16" fill="#a1a1aa">Webcams provided by windy.com</text>
+    </svg>`;
+    return await sharp(bg).composite([{ input: Buffer.from(svg) }]).png().toBuffer();
+  } catch (e) {
+    log('карточка камеры не собралась:', e.message);
+    return null;
+  }
+}
+
+async function postWebcam(state) {
+  const content = JSON.parse(await fs.readFile(path.join(ROOT, 'public', 'content.json'), 'utf8').catch(() => '{}'));
+  if ((content.hiddenSections || []).includes('webcams')) {
+    log('раздел веб-камер выключен на сайте — вместо камеры станция');
+    return postStation(state);
+  }
+  const hidden = new Set((content.hiddenCountries?.webcams || []).map((c) => c.toUpperCase()));
+  state.cams = state.cams || [];
+  const posted = new Set(state.cams);
+  const start = (state.camIndex || 0) % CAM_COUNTRIES.length;
+  for (let i = 0; i < 6; i++) {
+    const cc = CAM_COUNTRIES[(start + i) % CAM_COUNTRIES.length];
+    if (hidden.has(cc)) continue;
+    let cams = [];
+    try {
+      const j = await (await fetchT(`${API}/webcams?country=${cc}&lang=ru&offset=${Math.floor(Math.random() * 3) * 50}`, {}, 20000)).json();
+      cams = (j.webcams || []).filter((c) => c.image && !posted.has(c.id));
+    } catch (e) {
+      log('камеры недоступны:', e.message);
+      continue;
+    }
+    cams.sort((a, b) => Number(b.live) - Number(a.live));
+    for (const cam of cams.slice(0, 8)) {
+      // Проверяем, что картинка настоящая (не пустая) и страница камеры открывается
+      let img = null;
+      try {
+        const r = await fetchT(cam.image, {}, 15000);
+        if (r.ok) img = Buffer.from(await r.arrayBuffer());
+      } catch {}
+      if (!img || !sharp) continue;
+      try {
+        const st = await sharp(img).stats();
+        if (st.channels.slice(0, 3).reduce((a, c) => a + c.stdev, 0) / 3 < 15) continue; // однотонная — камера «спит»
+      } catch {
+        continue;
+      }
+      try {
+        const pr = await fetchT(cam.page, { method: 'GET' }, 15000);
+        try {
+          await pr.body?.cancel();
+        } catch {}
+        if (pr.status === 404 || pr.status === 410) continue;
+      } catch {}
+      const country = COUNTRY_RU.of(cam.countryCode || cc) || cam.country;
+      const place = cam.city || cam.region || country;
+      const card = await makeCamCard(img, place, `${country}${cam.live ? ' · прямой эфир' : ''}`);
+      const body =
+        (await ai(
+          STYLE,
+          `Напиши короткий пост (2–3 предложения) для рубрики «Взгляд на мир»: приглашение посмотреть на это место через веб-камеру прямо сейчас. Можно одну-две общеизвестные черты места, без выдуманных подробностей.\nМесто: ${place}, ${country}\nНазвание камеры: ${cam.title}`
+        )) || `Загляните в ${place} (${country}) прямо сейчас — живая картинка с веб-камеры. А под музыку SlyNet Radio смотреть ещё приятнее!`;
+      const caption =
+        `📷 <b>Взгляд на мир: ${esc(place)}</b>\n🌍 ${esc(country)}${cam.live ? ' · 🔴 онлайн' : ''}\n\n${esc(body)}\n\n<i>Webcams provided by <a href="https://www.windy.com/">windy.com</a></i>`;
+      await postPhotoOrText({
+        photo: card || BANNER,
+        caption: await withFooter(caption),
+        buttons: { inline_keyboard: [[{ text: '📷 Смотреть камеру', url: cam.page }], [{ text: '🌍 Все камеры на SlyNet', url: SITE + '#webcams' }]] },
+        silent: true,
+      });
+      await vkPost(caption, SITE + '#webcams', card);
+      state.cams.push(cam.id);
+      state.cams = state.cams.slice(-500);
+      state.camIndex = (start + i + 1) % CAM_COUNTRIES.length;
+      log('опубликована камера:', place, country);
+      return;
+    }
+  }
+  log('подходящей камеры не нашлось — вместо неё станция');
+  return postStation(state);
 }
 
 // ---------- 2. Новости музыки ----------
@@ -561,12 +684,12 @@ async function setup() {
 // Расписание приходит из GitHub (строка cron), по ней понимаем, что публиковать
 function autoMode() {
   const cron = process.env.SCHEDULE || '';
-  if (cron.startsWith('40 18')) return 'ask';
-  if (cron.startsWith('10 15')) return 'promo';
-  const h = Number(cron.split(' ')[1] ?? new Date().getUTCHours());
-  if (h === 6) return 'day';
-  if ([10, 14, 18].includes(h)) return 'station';
-  return 'news';
+  if (cron.startsWith('50 18')) return 'ask';
+  if (cron.startsWith('50 15')) return 'promo';
+  if (cron.startsWith('20 ')) return 'news';
+  if (cron.startsWith('35 ')) return 'webcam';
+  if (cron.startsWith('5 5 ')) return 'day';
+  return 'station';
 }
 
 const mode = (process.argv[2] || 'auto') === 'auto' ? autoMode() : process.argv[2];
@@ -579,6 +702,7 @@ try {
   if (mode === 'day') await postStation(state, true);
   else if (mode === 'station') await postStation(state);
   else if (mode === 'promo') await postPromo(state);
+  else if (mode === 'webcam') await postWebcam(state);
   else if (mode === 'news') await postNews(state);
   else if (mode === 'release') await postRelease(state);
   else if (mode === 'ask') await postAsk(state);
