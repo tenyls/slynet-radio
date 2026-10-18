@@ -87,6 +87,24 @@ async function withFooter(text, limit = CAPTION_MAX) {
 }
 
 async function postPhotoOrText({ photo, caption, buttons, preview = false }) {
+  // photo: Buffer (наша карточка), URL или null
+  if (photo && Buffer.isBuffer(photo)) {
+    try {
+      const fd = new FormData();
+      fd.append('chat_id', CHANNEL);
+      fd.append('caption', caption);
+      fd.append('parse_mode', 'HTML');
+      if (buttons) fd.append('reply_markup', JSON.stringify(buttons));
+      fd.append('photo', new Blob([photo], { type: 'image/png' }), 'slynet.png');
+      const r = await fetchT(`https://api.telegram.org/bot${TOKEN}/sendPhoto`, { method: 'POST', body: fd }, 30000);
+      const j = await r.json();
+      if (j.ok) return j.result;
+      log('фото-карточка не отправилась:', j.description);
+    } catch (e) {
+      log('фото-карточка не отправилась:', e.message);
+    }
+    photo = BANNER;
+  }
   if (photo) {
     try {
       return await tg('sendPhoto', { chat_id: CHANNEL, photo, caption, parse_mode: 'HTML', reply_markup: buttons });
@@ -101,6 +119,80 @@ async function postPhotoOrText({ photo, caption, buttons, preview = false }) {
     reply_markup: buttons,
     link_preview_options: { is_disabled: !preview },
   });
+}
+
+// ---------- фирменная картинка поста (рисуем сами, чтобы не было белых/битых картинок) ----------
+let sharp = null;
+try {
+  sharp = (await import('sharp')).default;
+} catch {
+  log('sharp не установлен — картинки будут баннером');
+}
+const xmlEsc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+/** Логотип станции: скачиваем, проверяем размер и «не однотонность», кладём на тёмную подложку */
+async function stationLogo(url) {
+  if (!sharp || !/^https:\/\//.test(url || '')) return null;
+  try {
+    const r = await fetchT(url, {}, 10000);
+    if (!r.ok) return null;
+    const buf = Buffer.from(await r.arrayBuffer());
+    const img = sharp(buf, { failOn: 'none' });
+    const meta = await img.metadata();
+    if (!meta.width || meta.width < 64 || meta.height < 64) return null;
+    const flat = await sharp(buf).resize(380, 380, { fit: 'contain', background: { r: 24, g: 24, b: 27, alpha: 1 } }).flatten({ background: '#18181b' }).png().toBuffer();
+    const st = await sharp(flat).stats();
+    const spread = st.channels.slice(0, 3).reduce((a, c) => a + c.stdev, 0) / 3;
+    if (spread < 12) return null; // почти однотонная — значит пустая/белая
+    return flat;
+  } catch {
+    return null;
+  }
+}
+
+async function makeCard({ label, title, subtitle, logoUrl }) {
+  if (!sharp) return null;
+  try {
+    const globe = await sharp(path.join(ROOT, 'public', 'logo-globe.png')).resize(380, 380).png().toBuffer();
+    const logo = (await stationLogo(logoUrl)) || globe;
+    // Название: 1–2 строки, шрифт подбираем под длину (ширина поля ~640px)
+    const words = String(title).split(/\s+/);
+    const lines = [];
+    const maxChars = title.length <= 20 ? 20 : 24;
+    for (const w of words) {
+      const last = lines[lines.length - 1];
+      if (last && (last + ' ' + w).length <= maxChars) lines[lines.length - 1] = last + ' ' + w;
+      else lines.push(w);
+    }
+    if (lines.length > 2) lines.splice(1, lines.length - 1, (lines.slice(1).join(' ').slice(0, maxChars - 1) + '…'));
+    const fs1 = lines.length === 1 && title.length <= 20 ? 56 : 44;
+    const titleSvg = lines
+      .map((l, i) => `<text x="580" y="${lines.length === 1 ? 330 : 312 + i * 52}" font-family="DejaVu Sans, sans-serif" font-size="${fs1}" font-weight="bold" fill="#ffffff">${xmlEsc(l.length > maxChars + 2 ? l.slice(0, maxChars) + '…' : l)}</text>`)
+      .join('');
+    const subY = lines.length === 1 ? 395 : 420;
+    const svg = `<svg width="1280" height="720" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="g1" cx="25%" cy="50%" r="55%"><stop offset="0" stop-color="#065f46" stop-opacity=".9"/><stop offset="1" stop-color="#09090b" stop-opacity="0"/></radialGradient>
+        <radialGradient id="g2" cx="90%" cy="0%" r="60%"><stop offset="0" stop-color="#0e7490" stop-opacity=".7"/><stop offset="1" stop-color="#09090b" stop-opacity="0"/></radialGradient>
+        <linearGradient id="acc" x1="0" x2="1"><stop offset="0" stop-color="#22d3ee"/><stop offset=".5" stop-color="#10b981"/><stop offset="1" stop-color="#a3e635"/></linearGradient>
+      </defs>
+      <rect width="1280" height="720" fill="#09090b"/><rect width="1280" height="720" fill="url(#g1)"/><rect width="1280" height="720" fill="url(#g2)"/>
+      <rect x="96" y="150" width="420" height="420" rx="48" fill="#18181b" stroke="url(#acc)" stroke-width="4"/>
+      <text x="580" y="240" font-family="DejaVu Sans, sans-serif" font-size="34" font-weight="bold" fill="#34d399">${xmlEsc(label)}</text>
+      ${titleSvg}
+      <text x="580" y="${subY}" font-family="DejaVu Sans, sans-serif" font-size="30" fill="#a1a1aa">${xmlEsc(subtitle || '')}</text>
+      <rect x="580" y="465" width="420" height="6" rx="3" fill="url(#acc)"/>
+      <text x="580" y="530" font-family="DejaVu Sans, sans-serif" font-size="34" font-weight="bold" fill="#ffffff">SlyNet <tspan fill="#34d399">Radio</tspan></text>
+      <text x="580" y="575" font-family="DejaVu Sans, sans-serif" font-size="24" fill="#71717a">Радио со всего мира · бесплатно</text>
+    </svg>`;
+    return await sharp(Buffer.from(svg))
+      .composite([{ input: logo, left: 116, top: 170 }])
+      .png()
+      .toBuffer();
+  } catch (e) {
+    log('карточка не собралась:', e.message);
+    return null;
+  }
 }
 
 // ---------- нейросеть (Google Gemini) ----------
@@ -205,7 +297,9 @@ async function postStation(state, isDay = false) {
     `${isDay ? '🌅 <b>Станция дня' : '📻 <b>Интересная станция'}: ${esc(st.name)}</b>\n` +
     `${country ? `🌍 ${esc(country)}` : ''}${st.bitrate ? ` · 🎧 ${st.bitrate} kbps` : ''}${st.group ? ' · ⭐ Эксклюзив SlyNet' : ''}\n\n` +
     `${esc(body)}`;
-  const photo = /^https:\/\/.+\.(png|jpe?g|webp)(\?|$)/i.test(st.favicon || '') ? st.favicon : BANNER;
+  const photo =
+    (await makeCard({ label: isDay ? 'СТАНЦИЯ ДНЯ' : 'ИНТЕРЕСНАЯ СТАНЦИЯ', title: st.name, subtitle: [country, st.bitrate ? `${st.bitrate} kbps` : '', st.group ? 'Эксклюзив SlyNet' : ''].filter(Boolean).join(' · '), logoUrl: st.favicon })) ||
+    BANNER;
   await postPhotoOrText({ photo, caption: await withFooter(caption), buttons: listenButton(`${SITE}#station=${st.stationuuid}`) });
   state.stations.push(st.stationuuid);
   log('опубликована станция дня:', st.name);
