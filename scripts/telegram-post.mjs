@@ -47,7 +47,10 @@ async function saveState(s) {
 }
 
 // ---------- Telegram ----------
+// Все посты канала выходят без звука уведомления (так попросил владелец канала)
+const SILENT = true;
 async function tg(method, body) {
+  if (/^send/.test(method)) body = { ...body, disable_notification: SILENT };
   const r = await fetchT(`https://api.telegram.org/bot${TOKEN}/${method}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -94,7 +97,7 @@ async function postPhotoOrText({ photo, caption, buttons, preview = false, silen
       fd.append('chat_id', CHANNEL);
       fd.append('caption', caption);
       fd.append('parse_mode', 'HTML');
-      if (silent) fd.append('disable_notification', 'true');
+      if (silent || SILENT) fd.append('disable_notification', 'true');
       if (buttons) fd.append('reply_markup', JSON.stringify(buttons));
       fd.append('photo', new Blob([photo], { type: 'image/png' }), 'slynet.png');
       const r = await fetchT(`https://api.telegram.org/bot${TOKEN}/sendPhoto`, { method: 'POST', body: fd }, 30000);
