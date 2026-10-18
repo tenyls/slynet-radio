@@ -221,6 +221,17 @@ async function vkPost(html, link, photoBuf) {
     let buf = photoBuf;
     if (!buf) buf = await fs.readFile(path.join(ROOT, 'public', 'telegram-card.png')).catch(() => null);
     if (!VK_BRIDGE_KEY && VK_TOKEN && sharp && buf) {
+      // Сразу пробуем настоящую картинку (загрузка «для сообщений» — ключу сообщества разрешена)
+      try {
+        const jpg = await sharp(buf).jpeg({ quality: 88, mozjpeg: true }).toBuffer();
+        const photo = await vkMsgPhoto(jpg);
+        const res = await vkApi('wall.post', { owner_id: '-' + VK_GROUP, from_group: '1', message: text.slice(0, 15000), attachments: photo });
+        VK_ERROR = '';
+        log('ВК: пост с картинкой опубликован', res?.post_id);
+        return;
+      } catch (e) {
+        log('ВК: картинка сразу не прошла —', e.message, '— ставлю в очередь с превью');
+      }
       // Без ключа администратора: картинка — через страницу-превью на нашем сайте (ВК сам покажет её крупно).
       // Страница появится после публикации сайта, поэтому пост уходит в очередь (режим vkflush, следующий шаг workflow).
       await vkQueueAdd(text, html, link, buf);
