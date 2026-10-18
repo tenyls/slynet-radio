@@ -63,12 +63,24 @@ export const WindyCams: React.FC = () => {
     if (!country) return;
     setLoading(true);
     try {
-      const q = new URLSearchParams({ country, offset: String(offset) });
-      if (category) q.set('category', category);
-      const r = await api<{ total: number; webcams: Cam[] }>(`/webcams?${q}`);
+      const page = (off: number) => {
+        const q = new URLSearchParams({ country, offset: String(off) });
+        if (category) q.set('category', category);
+        return api<{ total: number; webcams: Cam[] }>(`/webcams?${q}`);
+      };
+      // Сразу 3 страницы (до 150 камер), чтобы список городов был полнее
+      const offsets = offset ? [offset] : [0, 50, 100];
+      const pages = await Promise.allSettled(offsets.map(page));
+      const ok = pages.filter((p): p is PromiseFulfilledResult<{ total: number; webcams: Cam[] }> => p.status === 'fulfilled').map((p) => p.value);
+      if (!ok.length) throw new Error('no data');
       setEnabled(true);
-      setTotal(r.total);
-      setCams((prev) => (offset ? [...prev, ...r.webcams] : r.webcams));
+      setTotal(ok[0].total);
+      const fresh = ok.flatMap((p) => p.webcams);
+      setCams((prev) => {
+        const all = offset ? [...prev, ...fresh] : fresh;
+        const seen = new Set<string>();
+        return all.filter((c) => !seen.has(c.id) && seen.add(c.id));
+      });
     } catch {
       if (!offset) setEnabled(false);
     } finally {
@@ -104,17 +116,35 @@ export const WindyCams: React.FC = () => {
           <h2 className="text-lg sm:text-xl font-extrabold text-white">🌍 Камеры мира онлайн</h2>
           <p className="text-xs text-zinc-400">Тысячи камер — смотрите прямо здесь. Выберите страну и город.</p>
         </div>
-        <select
-          value={country}
-          onChange={(e) => setCountry(e.target.value)}
-          className="bg-zinc-900 text-sm font-semibold text-white px-3 py-2.5 rounded-xl border border-zinc-800 focus:border-emerald-400 focus:outline-none"
-        >
-          {countries.map((c) => (
-            <option key={c} value={c}>
-              {flag(c)} {ruNames?.of(c) || c}
-            </option>
-          ))}
-        </select>
+        <div className="flex flex-wrap gap-2">
+          <select
+            value={country}
+            onChange={(e) => setCountry(e.target.value)}
+            aria-label="Страна"
+            className="bg-zinc-900 text-sm font-semibold text-white px-3 py-2.5 rounded-xl border border-zinc-800 focus:border-emerald-400 focus:outline-none"
+          >
+            {countries.map((c) => (
+              <option key={c} value={c}>
+                {flag(c)} {ruNames?.of(c) || c}
+              </option>
+            ))}
+          </select>
+          <select
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+            aria-label="Город"
+            className="bg-zinc-900 text-sm font-semibold text-white px-3 py-2.5 rounded-xl border border-zinc-800 focus:border-emerald-400 focus:outline-none max-w-[60vw] sm:max-w-[240px]"
+          >
+            <option value="">🏙 Все города ({cities.length})</option>
+            {[...cities]
+              .sort((a, b) => a[0].localeCompare(b[0], 'ru'))
+              .map(([name, n]) => (
+                <option key={name} value={name}>
+                  {name} — {n}
+                </option>
+              ))}
+          </select>
+        </div>
       </div>
 
       <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
@@ -128,26 +158,6 @@ export const WindyCams: React.FC = () => {
           </button>
         ))}
       </div>
-
-      {cities.length > 1 && (
-        <div className="flex flex-wrap gap-1.5 mt-2 mb-3 max-h-24 overflow-y-auto">
-          <button
-            onClick={() => setCity('')}
-            className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold border ${!city ? 'bg-emerald-500/20 text-emerald-200 border-emerald-500/40' : 'bg-zinc-900 text-zinc-400 border-zinc-800'}`}
-          >
-            Все города
-          </button>
-          {cities.map(([name, n]) => (
-            <button
-              key={name}
-              onClick={() => setCity(name)}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold border ${city === name ? 'bg-emerald-500/20 text-emerald-200 border-emerald-500/40' : 'bg-zinc-900 text-zinc-400 border-zinc-800'}`}
-            >
-              {name} <span className="text-zinc-600">{n}</span>
-            </button>
-          ))}
-        </div>
-      )}
 
       {loading && !cams.length ? (
         <div className="py-10 flex justify-center">
