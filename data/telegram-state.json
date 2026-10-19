@@ -58,7 +58,11 @@
     "https://www.billboard.com/music/music-news/donnie-wahlberg-plane-skids-off-runway-video-message-1236362867/",
     "https://www.billboard.com/music/rock/bon-jovi-add-2027-stadium-dates-forever-tour-1236362879/",
     "https://www.billboard.com/music/music-news/tate-mcrae-housewife-victorias-secret-fashion-show-2026-1236362781/",
-    "https://pitchfork.com/story/tinashe-is-touring-in-2027/"
+    "https://pitchfork.com/story/tinashe-is-touring-in-2027/",
+    "https://www.billboard.com/music/chart-beat/luminate-by-the-numbers-global-state-of-spanish-music-1236362871/",
+    "https://www.intermedia.ru/news/407535",
+    "https://www.billboard.com/pro/ade-amsterdam-2026-jan-willem-van-de-ven-interview/",
+    "https://www.billboard.com/video/buenos-dias-with-visit-miami-where-music-lives/"
   ],
   "releases": [
     "1.0.6",
@@ -99,6 +103,5 @@
   "featCta": 3,
   "vkPhotoTry": "сервер загрузки ВК не принял файл",
   "showIndex": 1,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkPhotoShown": "не проверено: wall.getById 27: Group authorization failed: method is unavailable with group auth."
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
