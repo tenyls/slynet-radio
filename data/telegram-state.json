@@ -30,14 +30,17 @@
     "https://www.billboard.com/culture/product-recommendations/nfl-london-2026-texans-jaguars-watch-live-online-free-1236359693/",
     "https://www.nme.com/news/music/u2-skip-chile-latin-american-tour-negotiations-reportedly-fall-through-3973450?utm_source=rss&utm_medium=rss&utm_campaign=u2-skip-chile-latin-american-tour-negotiations-reportedly-fall-through",
     "https://www.intermedia.ru/news/407499",
-    "https://www.nme.com/news/music/smashing-pumpkins-billy-corgan-blink-182-travis-barker-most-influential-drummer-3973446?utm_source=rss&utm_medium=rss&utm_campaign=smashing-pumpkins-billy-corgan-blink-182-travis-barker-most-influential-drummer"
+    "https://www.nme.com/news/music/smashing-pumpkins-billy-corgan-blink-182-travis-barker-most-influential-drummer-3973446?utm_source=rss&utm_medium=rss&utm_campaign=smashing-pumpkins-billy-corgan-blink-182-travis-barker-most-influential-drummer",
+    "https://www.intermedia.ru/news/407505",
+    "https://www.intermedia.ru/news/407504",
+    "https://www.rollingstone.com/music/music-news/miley-cyrus-hollywood-bowl-show-criticism-response-1235644514/"
   ],
   "releases": [
     "1.0.6",
     "1.0.8"
   ],
   "askIndex": 1,
-  "lastNewsSource": "NME",
+  "lastNewsSource": "Rolling Stone",
   "lastReleaseAt": 1792346865828,
   "cams": [
     "1573776572",
