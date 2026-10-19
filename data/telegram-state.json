@@ -71,5 +71,6 @@
   ],
   "featStyle": 3,
   "featCta": 3,
-  "vkPhotoTry": "сервер загрузки ВК не принял файл"
+  "vkPhotoTry": "сервер загрузки ВК не принял файл",
+  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
 }
