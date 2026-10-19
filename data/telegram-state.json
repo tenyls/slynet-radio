@@ -78,9 +78,10 @@
     "1335007468",
     "1793918056",
     "1793914463",
-    "1732305455"
+    "1732305455",
+    "1696576892"
   ],
-  "camIndex": 15,
+  "camIndex": 16,
   "vkVia": "photo",
   "featRecent": [
     "exclusive",
@@ -90,6 +91,5 @@
   "featStyle": 3,
   "featCta": 3,
   "vkPhotoTry": "сервер загрузки ВК не принял файл",
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
