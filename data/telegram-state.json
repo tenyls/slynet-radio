@@ -18,7 +18,8 @@
     "ex-fip-world",
     "4f5d2b6c-6664-49e4-8e83-793d69adb3bc",
     "e4f6d392-f704-4cf0-8d26-9c931cebeaf6",
-    "ex-record-guetta"
+    "ex-record-guetta",
+    "ece826dd-3eba-4c89-ab1c-24e34bfc6407"
   ],
   "news": [
     "https://stereogum.com/2514933/she-punk-supergroup-plays-poly-styrene-tribute-in-london/news/",
@@ -71,6 +72,5 @@
   ],
   "featStyle": 3,
   "featCta": 3,
-  "vkPhotoTry": "сервер загрузки ВК не принял файл",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "vkPhotoTry": "сервер загрузки ВК не принял файл"
 }
