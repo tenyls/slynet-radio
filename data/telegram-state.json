@@ -26,7 +26,8 @@
     "96474496-0601-11e8-ae97-52543be04c81",
     "ex-record-mini",
     "d037031b-f31e-4298-b36e-654eaad6416e",
-    "bb38c058-7757-48e7-a73e-ccdc4fad7d2e"
+    "bb38c058-7757-48e7-a73e-ccdc4fad7d2e",
+    "ex-record-rapclassics"
   ],
   "news": [
     "https://stereogum.com/2514933/she-punk-supergroup-plays-poly-styrene-tribute-in-london/news/",
@@ -123,6 +124,5 @@
   "featCta": 4,
   "vkPhotoTry": "сервер загрузки ВК не принял файл",
   "showIndex": 1,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkPhotoShown": "не проверено: wall.getById 27: Group authorization failed: method is unavailable with group auth."
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
