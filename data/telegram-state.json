@@ -59,9 +59,10 @@
     "1793918422",
     "1752830910",
     "1695965635",
-    "1335007468"
+    "1335007468",
+    "1793918056"
   ],
-  "camIndex": 12,
+  "camIndex": 13,
   "vkVia": "photo",
   "featRecent": [
     "exclusive",
@@ -70,6 +71,5 @@
   ],
   "featStyle": 3,
   "featCta": 3,
-  "vkPhotoTry": "сервер загрузки ВК не принял файл",
-  "vkPhotoShown": "не проверено: wall.getById 27: Group authorization failed: method is unavailable with group auth."
+  "vkPhotoTry": "сервер загрузки ВК не принял файл"
 }
