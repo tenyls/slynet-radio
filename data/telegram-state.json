@@ -90,9 +90,10 @@
     "1793914463",
     "1732305455",
     "1696576892",
-    "1793884608"
+    "1793884608",
+    "1512075077"
   ],
-  "camIndex": 17,
+  "camIndex": 18,
   "vkVia": "photo",
   "featRecent": [
     "exclusive",
@@ -103,5 +104,6 @@
   "featCta": 3,
   "vkPhotoTry": "сервер загрузки ВК не принял файл",
   "showIndex": 1,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
+  "vkPhotoShown": "не проверено: wall.getById 27: Group authorization failed: method is unavailable with group auth."
 }
