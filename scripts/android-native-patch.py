@@ -51,6 +51,15 @@ block = '''
 '''
 if 'NowPlayingWidget' not in s:
     s = s.replace('</application>', block + '    </application>', 1)
+# Ссылки slynet://open — «Открыть в приложении» из браузера
+if 'android:scheme="slynet"' not in s:
+    s = re.sub(r'(<activity[^>]*MainActivity[\s\S]*?</intent-filter>)', r'''\1
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="slynet" android:host="open" />
+            </intent-filter>''', s, count=1)
 man.write_text(s)
 
 g = app / 'build.gradle'

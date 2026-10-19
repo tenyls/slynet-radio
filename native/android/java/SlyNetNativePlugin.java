@@ -54,6 +54,15 @@ public class SlyNetNativePlugin extends Plugin {
 
     private String stash(Intent i) {
         if (i == null) return null;
+        android.net.Uri data = i.getData();
+        if (data != null && "slynet".equals(data.getScheme())) {
+            String h = data.getQueryParameter("h");
+            i.setData(null);
+            if (h != null && !h.isEmpty()) {
+                pendingAction = "open:" + h;
+                return pendingAction;
+            }
+        }
         String a = i.getStringExtra("slynet_action");
         if (a != null) {
             pendingAction = a;
@@ -112,6 +121,23 @@ public class SlyNetNativePlugin extends Plugin {
         o.put("exact", exact);
         o.put("next", AlarmScheduler.nextTime(c));
         call.resolve(o);
+    }
+
+    /** Системное окно «Поделиться» (Telegram, WhatsApp, сообщения…) */
+    @PluginMethod
+    public void share(PluginCall call) {
+        Intent send = new Intent(Intent.ACTION_SEND);
+        send.setType("text/plain");
+        send.putExtra(Intent.EXTRA_SUBJECT, call.getString("title", "SlyNet Radio"));
+        send.putExtra(Intent.EXTRA_TEXT, call.getString("text", ""));
+        Intent chooser = Intent.createChooser(send, "Поделиться");
+        chooser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        try {
+            getContext().startActivity(chooser);
+            call.resolve();
+        } catch (Exception e) {
+            call.reject("share failed");
+        }
     }
 
     @PluginMethod
