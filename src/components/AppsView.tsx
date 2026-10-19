@@ -186,6 +186,23 @@ export const AppsView: React.FC = () => {
         </section>
       </div>
 
+      {/* Android Auto */}
+      <section id="android-auto" className="rounded-3xl p-5 sm:p-6 bg-gradient-to-br from-zinc-900 to-orange-950/40 border border-orange-500/25">
+        <div className="flex items-center gap-3 mb-4">
+          <span className="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-500 to-rose-500 flex items-center justify-center shadow-lg shadow-orange-500/30 text-2xl">🚗</span>
+          <div>
+            <h2 className="text-lg font-extrabold text-white">Android Auto</h2>
+            <p className="text-xs text-zinc-400">Избранное, недавние и Radio Record на экране машины. Переключение кнопками руля и голосом.</p>
+          </div>
+        </div>
+        <ol className="space-y-2 text-xs text-zinc-300 list-decimal pl-5">
+          <li>Установите приложение SlyNet Radio для Android (кнопка выше) и добавьте станции в избранное ♥.</li>
+          <li>Пока мы не в Google Play, Android Auto нужно разрешить «неизвестные источники»: откройте <b>Android Auto → Настройки</b>, нажмите 10 раз на строку <b>«Версия»</b> — включится режим разработчика.</li>
+          <li>Меню <b>⋮ → «Для разработчиков»</b> → включите <b>«Неизвестные источники»</b>.</li>
+          <li>Подключите телефон к машине — SlyNet Radio появится среди музыкальных приложений.</li>
+        </ol>
+      </section>
+
       {/* iPhone / iPad */}
       <section className="rounded-3xl p-5 sm:p-6 bg-gradient-to-br from-zinc-900 to-sky-950/60 border border-sky-500/25">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">

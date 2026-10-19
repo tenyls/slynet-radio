@@ -82,10 +82,15 @@ const CAPTION_MAX = 1024;
 /** Текст + подпись, с обрезкой основной части, чтобы влезть в лимит Telegram */
 async function withFooter(text, limit = CAPTION_MAX) {
   const f = await footer();
-  const room = limit - f.length - 5;
-  // обрезаем только по тексту без HTML-тегов внутри (тексты у нас простые: <b>, <a>)
+  // Telegram считает лимит по видимому тексту (без HTML-разметки)
+  const vis = (x) => x.replace(/<[^>]+>/g, '').replace(/&(lt|gt|amp|quot);/g, '_').length;
+  const room = limit - vis(f) - 5;
   let t = text;
-  if (t.length > room) t = t.slice(0, room).replace(/<[^>]*$/, '').replace(/\s+\S*$/, '') + '…';
+  if (vis(t) > room) {
+    t = t.slice(0, room + (t.length - vis(t))).replace(/<[^>]*$/, '').replace(/\s+\S*$/, '') + '…';
+    // закрываем оборванный <b>
+    if ((t.match(/<b>/g) || []).length > (t.match(/<\/b>/g) || []).length) t += '</b>';
+  }
   return t + f;
 }
 
@@ -806,6 +811,19 @@ async function postRelease(state) {
   if (!fresh.length) return log('новых релизов для публикации нет');
   const merged = (k) => [...new Set(fresh.flatMap((r) => r[k] || []))];
   const r = fresh[0];
+  // Свой пост и картинка для крупного обновления (поля post и image в releases.json)
+  if (r.post) {
+    const img = r.image ? await fs.readFile(path.join(ROOT, 'public', r.image)).catch(() => null) : null;
+    await postPhotoOrText({
+      photo: img || BANNER,
+      caption: await withFooter(r.post),
+      buttons: { inline_keyboard: [[{ text: '📲 Скачать новую версию', url: SITE + '#apps' }], [{ text: '▶️ Слушать сейчас', url: SITE }]] },
+    });
+    await vkPost(r.post, SITE + '#apps', img);
+    state.releases.push(...fresh.map((x) => x.version));
+    state.lastReleaseAt = Date.now();
+    return log('опубликован релиз', r.version);
+  }
   const list = (title, arr, icon) => (arr?.length ? `\n<b>${title}</b>\n${arr.map((x) => `${icon} ${esc(x)}`).join('\n')}\n` : '');
   const caption =
     `🚀 <b>SlyNet Radio обновлён до версии ${esc(r.version)}</b>\n${r.title ? `${esc(r.title)}\n` : ''}` +
