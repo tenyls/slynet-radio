@@ -5,7 +5,8 @@ import { nativeVersion, lastUpdateStatus } from '../services/appUpdater';
 
 const REPO = 'https://github.com/tenyls/slynet-radio';
 const APK_PHONE = `${REPO}/releases/download/android-latest/SlyNetRadio.apk`;
-const APK_TV = `${REPO}/releases/download/android-latest/SlyNetRadio-TV.apk`;
+// Одно универсальное приложение для телефонов, планшетов и Android TV
+const APK_TV = APK_PHONE;
 const SITE = 'https://tenyls.github.io/slynet-radio/';
 
 interface Versions {
@@ -133,14 +134,14 @@ export const AppsView: React.FC = () => {
             </span>
             <div>
               <h2 className="text-lg font-extrabold text-white">Android</h2>
-              <p className="text-xs text-zinc-400">Телефоны и планшеты · Android 7+</p>
+              <p className="text-xs text-zinc-400">Одно приложение для телефона, планшета и Android TV · Android 7+</p>
             </div>
           </div>
           <a
             href={APK_PHONE}
             className="flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-extrabold text-sm shadow-lg shadow-emerald-500/30 active:scale-[0.98]"
           >
-            <Download className="w-5 h-5" /> Скачать APK для Android
+            <Download className="w-5 h-5" /> Скачать SlyNet Radio для Android
           </a>
           <div className="space-y-1.5">
             <VersionLine label="Последняя версия APK" value={ver.apk ? `v${ver.apk}` : undefined} date={ver.apkDate} extra={ver.apkSize ? `${(ver.apkSize / 1048576).toFixed(1)} МБ` : ''} />
@@ -165,14 +166,14 @@ export const AppsView: React.FC = () => {
             </span>
             <div>
               <h2 className="text-lg font-extrabold text-white">Android TV</h2>
-              <p className="text-xs text-zinc-400">Телевизоры и приставки на Android TV / Google TV</p>
+              <p className="text-xs text-zinc-400">То же самое приложение — само подстраивается под телевизор и пульт</p>
             </div>
           </div>
           <a
             href={APK_TV}
             className="flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-violet-500 hover:bg-violet-400 text-white font-extrabold text-sm shadow-lg shadow-violet-500/30 active:scale-[0.98]"
           >
-            <Download className="w-5 h-5" /> Скачать APK для Android TV
+            <Download className="w-5 h-5" /> Скачать для Android TV (тот же файл)
           </a>
           <VersionLine label="Последняя версия APK" value={ver.apk ? `v${ver.apk}` : undefined} date={ver.apkDate} />
           <ol className="space-y-2 text-xs text-zinc-400 list-decimal pl-5">
