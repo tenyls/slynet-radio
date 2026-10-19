@@ -1,5 +1,10 @@
 import { isNativeApp } from '../utils/platform';
-import { pickStream, lowerStream, getQualityMode, networkTier, QUALITY_EVENT } from '../services/streamQuality';
+import { pickStream, lowerStream, isWeakMode, QUALITY_EVENT } from '../services/streamQuality';
+import { loadCatalog } from '../services/catalogService';
+
+// Свежие данные эксклюзивных станций (битрейты и запасные потоки) — чинят старые копии в избранном/истории
+const exclusiveById = new Map<string, Station>();
+loadCatalog().then((c) => (c.exclusive || []).forEach((g) => g.stations.forEach((st) => exclusiveById.set(st.stationuuid, st))));
 import React, { createContext, useContext, useState, useRef, useEffect, useCallback } from 'react';
 import { Station, EqualizerBand, RecordedTrack, PlayedTrackHistory, RadioAlarm, RecognizedTrack } from '../types/radio';
 import { registerStationClick } from '../services/radioApi';
@@ -235,10 +240,11 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       }
     };
 
-    // Слабая сеть: 2 «заикания» за 30 секунд → переходим на поток полегче того же эфира
+    // Режим «Слабый интернет»: 2 «заикания» за 30 секунд → переходим на поток полегче того же эфира.
+    // В обычном режиме качество не скачет — всегда максимальное.
     const handleWaiting = () => {
       setIsLoading(true);
-      if (!startedRef.current || getQualityMode() === 'high') return;
+      if (!startedRef.current || !isWeakMode()) return;
       const now = Date.now();
       stallsRef.current = [...stallsRef.current.filter((t) => now - t < 30000), now];
       const st = currentStationRef.current;
@@ -249,7 +255,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           streamUrlRef.current = lower.url;
           audio.src = lower.url;
           audio.play().catch(() => {});
-          const upd = { ...st, bitrate: lower.bitrate };
+          const upd = { ...st, playBitrate: lower.bitrate };
           currentStationRef.current = upd;
           setCurrentStation(upd);
         }
@@ -472,7 +478,12 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         playlistRef.current = [station];
       }
 
-      // Поток под качество сети (если у станции есть несколько битрейтов)
+      // Старая копия эксклюзива (из избранного/истории) → берём свежие данные из каталога
+      const fresh = exclusiveById.get(station.stationuuid);
+      if (fresh) station = { ...station, ...fresh };
+      if (station.playBitrate) station = { ...station, playBitrate: undefined };
+
+      // Поток: максимальное качество, а в режиме «Слабый интернет» — лёгкий
       const picked = pickStream(station);
       const streamUrl = picked.url;
       streamUrlRef.current = streamUrl;
@@ -485,7 +496,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         return;
       }
 
-      const shown = picked.bitrate && picked.bitrate !== station.bitrate ? { ...station, bitrate: picked.bitrate } : station;
+      const shown = picked.bitrate && picked.bitrate !== station.bitrate ? { ...station, playBitrate: picked.bitrate } : station;
       setCurrentStation(shown);
       currentStationRef.current = shown;
       setCurrentTrackTitle('');
@@ -579,16 +590,17 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       const st = currentStationRef.current;
       const audio = audioRef.current;
       if (!st || !st.alt?.length || !audio || audio.paused) return;
-      const want = pickStream(st, networkTier());
-      if (want.url === streamUrlRef.current) return;
-      // Сеть улучшилась — не прерываем эфир, лучшее качество включится со следующей станцией
       const userChoice = e?.type === QUALITY_EVENT;
-      if (!userChoice && want.bitrate > (st.bitrate || 0)) return;
+      // Сеть сама по себе меняет поток только в режиме «Слабый интернет» и только вниз
+      if (!userChoice && !isWeakMode()) return;
+      const want = pickStream(st);
+      if (want.url === streamUrlRef.current) return;
+      if (!userChoice && want.bitrate > (st.playBitrate || st.bitrate || 0)) return;
       streamUrlRef.current = want.url;
       stallsRef.current = [];
       audio.src = want.url;
       audio.play().catch(() => {});
-      const upd = { ...st, bitrate: want.bitrate };
+      const upd = { ...st, playBitrate: want.bitrate };
       currentStationRef.current = upd;
       setCurrentStation(upd);
     };

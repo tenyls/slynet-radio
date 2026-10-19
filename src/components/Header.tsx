@@ -3,6 +3,7 @@ import { getMyCountry } from '../services/geoService';
 import { useViewMode } from '../hooks/useViewMode';
 import { isSectionHidden } from '../utils/visibility';
 import React, { useState, useRef } from 'react';
+import { WeakNetToggle } from './QualityChip';
 import {
   Search,
   X,
@@ -297,6 +298,9 @@ export const Header: React.FC<HeaderProps> = ({
               >
                 {viewMode === 'list' ? '☰ Список' : '▦ Плитка'}
               </button>
+
+              {/* Качество звука: максимальное или режим для слабого интернета */}
+              <WeakNetToggle />
 
               {/* Глобус как radio.garden */}
               {!isSectionHidden(settings, 'globe') && (

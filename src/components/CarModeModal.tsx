@@ -173,7 +173,7 @@ export const CarModeModal: React.FC<CarModeModalProps> = ({
               </span>
               {currentStation?.bitrate && (
                 <span className="text-xs font-mono text-zinc-400">
-                  {currentStation.bitrate} kbps
+                  {currentStation.playBitrate || currentStation.bitrate} kbps
                 </span>
               )}
             </div>

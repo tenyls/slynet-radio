@@ -50,6 +50,7 @@ import { AlarmModal } from './components/AlarmModal';
 import { WebcamsView } from './components/WebcamsView';
 import { SyncModal, importFavoritesFromLink } from './components/SyncModal';
 import { AboutModal } from './components/AboutModal';
+import { QualityChip } from './components/QualityChip';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ArtistsView } from './components/ArtistsView';
 import { LiveTVView } from './components/LiveTVView';
@@ -470,6 +471,9 @@ function RadioApp() {
             >
               <Send className="w-4 h-4" />
             </button>
+
+            {/* Качество звука (мобильная шапка) */}
+            <QualityChip hasVariants />
 
             {/* Sleep timer button on mobile */}
             <button

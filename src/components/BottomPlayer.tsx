@@ -131,7 +131,7 @@ export const BottomPlayer: React.FC<BottomPlayerProps> = ({
                 </span>
                 {currentStation?.bitrate && currentStation.bitrate > 0 ? (
                   <span className="hidden sm:inline-block px-1.5 py-0.2 bg-zinc-800 text-[10px] font-mono tabular-nums text-emerald-400 font-bold rounded shrink-0">
-                    {currentStation.bitrate}k
+                    {currentStation.playBitrate || currentStation.bitrate}k
                   </span>
                 ) : null}
               </div>

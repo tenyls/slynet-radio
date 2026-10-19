@@ -4,17 +4,18 @@
  */
 import { Station } from '../types/radio';
 
-export type QualityMode = 'auto' | 'high' | 'saver';
+export type QualityMode = 'high' | 'weak';
 export type Tier = 'low' | 'mid' | 'high';
 const KEY = 'slynet_quality';
 const EVENT = 'slynet_quality_changed';
 
+/** По умолчанию — всегда максимальное качество. «Слабый интернет» включает пользователь сам. */
 export function getQualityMode(): QualityMode {
   try {
     const v = localStorage.getItem(KEY);
-    return v === 'high' || v === 'saver' ? v : 'auto';
+    return v === 'weak' || v === 'saver' ? 'weak' : 'high';
   } catch {
-    return 'auto';
+    return 'high';
   }
 }
 export function setQualityMode(m: QualityMode) {
@@ -23,9 +24,10 @@ export function setQualityMode(m: QualityMode) {
   } catch {}
   window.dispatchEvent(new CustomEvent(EVENT));
 }
+export const isWeakMode = () => getQualityMode() === 'weak';
 export const QUALITY_EVENT = EVENT;
 
-/** Оценка сети по данным браузера (Android/Chrome). На iPhone данных нет — считаем «хорошей», а дальше смотрим на заикания. */
+/** Оценка сети по данным браузера (Android/Chrome). На iPhone данных нет. */
 export function networkTier(): Tier {
   const c = (navigator as any).connection;
   if (!c) return 'high';
@@ -42,15 +44,16 @@ export function variants(st: Station): { bitrate: number; url: string; codec?: s
   return list.filter((v) => !seen.has(v.url) && seen.add(v.url)).sort((a, b) => a.bitrate - b.bitrate);
 }
 
-const LIMIT: Record<Tier, number> = { low: 64, mid: 128, high: 10000 };
-
-/** Какой поток включить для этой станции сейчас */
-export function pickStream(st: Station, tier?: Tier): { url: string; bitrate: number } {
+/** Какой поток включить: в обычном режиме — самый качественный; в режиме «Слабый интернет» — лёгкий (до 64 kbps) */
+export function pickStream(st: Station): { url: string; bitrate: number } {
   const v = variants(st);
   if (v.length <= 1) return { url: st.url_resolved || st.url, bitrate: st.bitrate || 0 };
-  const mode = getQualityMode();
-  const t: Tier = mode === 'high' ? 'high' : mode === 'saver' ? 'low' : tier || networkTier();
-  const fit = v.filter((x) => x.bitrate <= LIMIT[t]);
+  if (!isWeakMode()) {
+    const best = v[v.length - 1];
+    return { url: best.url, bitrate: best.bitrate };
+  }
+  const limit = networkTier() === 'high' ? 96 : 64;
+  const fit = v.filter((x) => x.bitrate <= limit);
   const chosen = fit.length ? fit[fit.length - 1] : v[0];
   return { url: chosen.url, bitrate: chosen.bitrate };
 }
