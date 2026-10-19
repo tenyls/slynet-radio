@@ -150,6 +150,7 @@ export interface RadioAlarm {
   time: string; // "07:30"
   stationUuid: string;
   stationName: string;
+  stationUrl?: string; // поток для нативного будильника Android (играет при закрытом приложении)
   fadeDurationSec: number; // 10, 30, 60
   days: number[]; // 0=Sun, 1=Mon, etc.
 }

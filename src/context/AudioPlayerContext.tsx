@@ -1,6 +1,7 @@
 import { isNativeApp } from '../utils/platform';
 import { pickStream, lowerStream, isWeakMode, QUALITY_EVENT } from '../services/streamQuality';
 import { loadCatalog } from '../services/catalogService';
+import { hasNative, nativeNowPlaying, nativeSetAlarm, nativeStopAlarm, nativeLaunchAction, onNative } from '../services/nativeBridge';
 
 // Свежие данные эксклюзивных станций (битрейты и запасные потоки) — чинят старые копии в избранном/истории
 const exclusiveById = new Map<string, Station>();
@@ -986,11 +987,22 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     try {
       localStorage.setItem(ALARM_KEY, JSON.stringify(newAlarm));
     } catch {}
+    // Android-приложение: системный будильник — сработает, даже если приложение закрыто
+    const [hh, mm] = (newAlarm.time || '07:30').split(':').map((x) => parseInt(x, 10) || 0);
+    nativeSetAlarm({
+      enabled: !!newAlarm.enabled && !!newAlarm.stationUrl,
+      hour: hh,
+      minute: mm,
+      days: newAlarm.days || [],
+      url: newAlarm.stationUrl || '',
+      name: newAlarm.stationName || 'SlyNet Radio',
+      fadeSec: newAlarm.fadeDurationSec || 20,
+    });
   }, []);
 
-  // ALARM CLOCK WATCHER
+  // ALARM CLOCK WATCHER (в Android-приложении будильник нативный — этот не нужен)
   useEffect(() => {
-    if (!alarm.enabled || !alarm.time) return;
+    if (!alarm.enabled || !alarm.time || hasNative()) return;
 
     const checkAlarm = () => {
       const now = new Date();
@@ -1030,6 +1042,45 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const interval = setInterval(checkAlarm, 1000);
     return () => clearInterval(interval);
   }, [alarm, playlist, currentStation, playStation, setVolume]);
+
+  // ---- Android: виджет и запуск с виджета / из будильника ----
+  const nativeRef = useRef({ togglePlayPause: () => {}, playStation: (_s: Station) => {}, recent: [] as Station[], alarm });
+  nativeRef.current = { togglePlayPause, playStation, recent: recentStations, alarm };
+  useEffect(() => {
+    if (!hasNative()) return;
+    nativeNowPlaying(currentStation?.name || 'SlyNet Radio', currentStation?.country || '', isPlaying);
+  }, [currentStation?.stationuuid, isPlaying]);
+  useEffect(() => {
+    if (!hasNative()) return;
+    const handle = (action: string) => {
+      const n = nativeRef.current;
+      if (action === 'toggle') return n.togglePlayPause();
+      if (action === 'alarm') {
+        // будильник сработал, пользователь открыл приложение — продолжаем ту же станцию уже в приложении
+        nativeStopAlarm();
+        const a = n.alarm;
+        const st =
+          n.recent.find((s) => s.stationuuid === a.stationUuid) ||
+          (a.stationUrl ? ({ stationuuid: a.stationUuid || 'alarm', name: a.stationName, url: a.stationUrl, url_resolved: a.stationUrl } as Station) : null);
+        if (st) n.playStation(st);
+        return;
+      }
+      if (action === 'play') {
+        const cur = currentStationRef.current;
+        if (cur) {
+          if (audioRef.current?.paused) n.togglePlayPause();
+        } else if (n.recent[0]) n.playStation(n.recent[0]);
+      }
+    };
+    const off1 = onNative('remote', handle);
+    const off2 = onNative('launchAction', handle);
+    // приложение открыто с виджета/из уведомления будильника
+    setTimeout(() => nativeLaunchAction().then((a) => a && handle(a)), 1200);
+    return () => {
+      off1();
+      off2();
+    };
+  }, []);
 
   // Sleep timer interval with gentle fade-out in final 30 seconds
   useEffect(() => {

@@ -51,6 +51,8 @@ import { WebcamsView } from './components/WebcamsView';
 import { SyncModal, importFavoritesFromLink } from './components/SyncModal';
 import { AboutModal } from './components/AboutModal';
 import { QualityChip } from './components/QualityChip';
+import { hasNative, nativeSaveLibrary, LibItem } from './services/nativeBridge';
+import { pickStream } from './services/streamQuality';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ArtistsView } from './components/ArtistsView';
 import { LiveTVView } from './components/LiveTVView';
@@ -98,6 +100,16 @@ function RadioApp() {
   } = useAudio();
 
   const { favorites, isFavorite, toggleFavorite, favoritesCount } = useFavorites();
+  // Android Auto: избранное, недавние и Radio Record — в нативную часть приложения
+  const { recentStations } = useAudio();
+  useEffect(() => {
+    if (!hasNative()) return;
+    const item = (st: Station): LibItem => ({ id: st.stationuuid, name: st.name, url: pickStream(st).url, subtitle: [st.country, (st.tags || '').split(',')[0]].filter(Boolean).join(' · ') });
+    loadCatalog().then((c) => {
+      const record = (c.exclusive || []).find((g) => g.id === 'record')?.stations || [];
+      nativeSaveLibrary({ fav: favorites.slice(0, 100).map(item), recent: recentStations.slice(0, 20).map(item), record: record.map(item) });
+    });
+  }, [favorites, recentStations]);
   const { settings, updateSettings, togglePro, setTheme, resetLogo, setLanguage } = useSlyNetSettings();
   const { customStations, addCustomStation, deleteCustomStation } = useCustomStations();
 

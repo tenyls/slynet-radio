@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useAudio } from '../context/AudioPlayerContext';
 import { Station, RadioAlarm } from '../types/radio';
 import { Bell, X, Check, Volume2, Calendar, Radio, Sparkles, Clock } from 'lucide-react';
+import { pickStream } from '../services/streamQuality';
+import { hasNative } from '../services/nativeBridge';
 
 interface AlarmModalProps {
   onClose: () => void;
@@ -46,6 +48,7 @@ export const AlarmModal: React.FC<AlarmModalProps> = ({ onClose, favorites }) =>
       time,
       stationUuid,
       stationName: targetStation?.name || 'Радио SlyNet',
+      stationUrl: targetStation ? pickStream(targetStation).url : undefined,
       fadeDurationSec,
       days: selectedDays,
     };
@@ -84,7 +87,11 @@ export const AlarmModal: React.FC<AlarmModalProps> = ({ onClose, favorites }) =>
                   </span>
                 )}
               </h2>
-              <p className="text-xs text-zinc-400">Просыпайтесь под любимую станцию с мягким звуком</p>
+              <p className="text-xs text-zinc-400">
+                {hasNative()
+                  ? 'Сработает, даже если приложение закрыто'
+                  : 'Просыпайтесь под любимую станцию с мягким звуком (сайт должен быть открыт)'}
+              </p>
             </div>
           </div>
 
