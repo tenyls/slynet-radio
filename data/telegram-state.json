@@ -51,9 +51,11 @@
   "camIndex": 8,
   "vkVia": "photo",
   "featRecent": [
-    "exclusive"
+    "exclusive",
+    "playlist"
   ],
-  "featStyle": 1,
-  "featCta": 1,
-  "vkPhotoTry": "сервер загрузки ВК не принял файл"
+  "featStyle": 2,
+  "featCta": 2,
+  "vkPhotoTry": "сервер загрузки ВК не принял файл",
+  "vkPhotoShown": "не проверено: wall.getById 27: Group authorization failed: method is unavailable with group auth."
 }
