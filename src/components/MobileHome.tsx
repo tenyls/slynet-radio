@@ -124,7 +124,7 @@ export const MobileHome: React.FC<Props> = ({
         >
           <ListMusic className="w-7 h-7 text-zinc-950 shrink-0" />
           <span className="min-w-0">
-            <span className="block text-sm font-extrabold text-zinc-950 leading-tight">Мой плейлист</span>
+            <span className="block text-sm font-extrabold text-zinc-950 leading-tight">Мои плейлисты</span>
             <span className="block text-[10px] font-bold text-zinc-900/80 uppercase tracking-wide">{favoritesCount ? `${favoritesCount} станций` : 'Собрать свой'}</span>
           </span>
         </button>

@@ -53,6 +53,9 @@ import { AboutModal } from './components/AboutModal';
 import { QualityChip } from './components/QualityChip';
 import { hasNative, nativeSaveLibrary, LibItem } from './services/nativeBridge';
 import { pickStream } from './services/streamQuality';
+import { ShareSheet } from './components/ShareSheet';
+import { AddToPlaylistModal, SharedPlaylistModal } from './components/PlaylistModals';
+import { SharedPlaylist, parseSharedPlaylist, parseSharedStation, openInAppLink } from './services/share';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ArtistsView } from './components/ArtistsView';
 import { LiveTVView } from './components/LiveTVView';
@@ -187,24 +190,45 @@ function RadioApp() {
     }
   }, []);
 
-  // Ссылка «поделиться станцией»: #station=<uuid>
+  // Ссылки «поделиться»: #station=<id>, #st=<станция целиком>, #pl=<плейлист>
   const [sharedStation, setSharedStation] = useState<Station | null>(null);
+  const [sharedPlaylist, setSharedPlaylist] = useState<SharedPlaylist | null>(null);
+  const [appLink, setAppLink] = useState<string | null>(null);
   useEffect(() => {
-    const m = /#station=([0-9a-z-]{8,80})/i.exec(window.location.hash);
-    if (!m) return;
-    history.replaceState(null, '', window.location.pathname + window.location.search);
-    const id = m[1];
-    // Эксклюзив (Record, SomaFM…) ищем в нашем каталоге, остальные — в Radio Browser
-    if (id.startsWith('ex-')) {
-      loadCatalog()
-        .then((c) => {
-          const st = (c.exclusive || []).flatMap((g) => g.stations).find((x) => x.stationuuid === id);
-          if (st) setSharedStation(st);
-        })
-        .catch(() => {});
-    } else {
-      fetchStationsByUuids([id]).then((l) => l[0] && setSharedStation(l[0])).catch(() => {});
-    }
+    const handle = () => {
+      const h = window.location.hash;
+      const ms = /#station=([0-9a-z-]{8,80})/i.exec(h);
+      const mst = /#st=([A-Za-z0-9_-]+)/.exec(h);
+      const mpl = /#pl=([A-Za-z0-9_-]+)/.exec(h);
+      if (!ms && !mst && !mpl) return;
+      setAppLink(openInAppLink(h));
+      history.replaceState(null, '', window.location.pathname + window.location.search);
+      if (mpl) {
+        const pl = parseSharedPlaylist(mpl[1]);
+        if (pl) setSharedPlaylist(pl);
+        return;
+      }
+      if (mst) {
+        const st = parseSharedStation(mst[1]);
+        if (st) setSharedStation(st);
+        return;
+      }
+      const id = ms![1];
+      // Эксклюзив (Record, FIP…) ищем в нашем каталоге, остальные — в Radio Browser
+      if (id.startsWith('ex-')) {
+        loadCatalog()
+          .then((c) => {
+            const st = (c.exclusive || []).flatMap((g) => g.stations).find((x) => x.stationuuid === id);
+            if (st) setSharedStation(st);
+          })
+          .catch(() => {});
+      } else {
+        fetchStationsByUuids([id]).then((l) => l[0] && setSharedStation(l[0])).catch(() => {});
+      }
+    };
+    handle();
+    window.addEventListener('hashchange', handle);
+    return () => window.removeEventListener('hashchange', handle);
   }, []);
 
   // Размер каталога для главной + перенос избранного по ссылке/QR (#fav=...)
@@ -561,14 +585,28 @@ function RadioApp() {
               <Play className="w-6 h-6 fill-current ml-0.5" />
             </button>
             <div className="min-w-0 flex-1">
-              <div className="text-[11px] text-emerald-300">Вам прислали станцию</div>
+              <div className="text-[11px] text-emerald-300">💚 Вам рекомендуют станцию</div>
               <div className="text-sm font-bold text-white truncate">{sharedStation.name}</div>
             </div>
+            {appLink && (
+              <a href={appLink} className="shrink-0 px-3 py-2 rounded-xl bg-zinc-900/80 border border-emerald-500/40 text-[11px] font-bold text-emerald-200">
+                Открыть в приложении
+              </a>
+            )}
             <button onClick={() => setSharedStation(null)} className="p-2 text-zinc-400" aria-label="Закрыть">
               <X className="w-4 h-4" />
             </button>
           </div>
         )}
+
+        {sharedPlaylist && appLink && (
+          <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-[67] px-4 py-2.5 rounded-2xl bg-zinc-900 border border-emerald-500/40 shadow-2xl">
+            <a href={appLink} className="text-xs font-bold text-emerald-200">📱 Открыть в приложении SlyNet</a>
+          </div>
+        )}
+        {sharedPlaylist && <SharedPlaylistModal data={sharedPlaylist} onClose={() => setSharedPlaylist(null)} />}
+        <ShareSheet />
+        <AddToPlaylistModal />
 
         {notice && (
           <div className="mx-4 sm:mx-6 mt-4 p-3 bg-emerald-950/60 border border-emerald-700/60 rounded-2xl text-xs text-emerald-200 font-semibold">
@@ -734,7 +772,7 @@ function RadioApp() {
                       className="px-5 py-3 rounded-2xl bg-gradient-to-r from-emerald-500/25 to-lime-400/20 hover:from-emerald-500/35 text-white font-bold text-xs border border-emerald-400/50 flex items-center justify-center gap-2 transition-colors"
                     >
                       <ListMusic className="w-4 h-4 text-emerald-300" />
-                      <span>Мой плейлист{favoritesCount ? ` · ${favoritesCount}` : ''}</span>
+                      <span>Мои плейлисты{favoritesCount ? ` · ${favoritesCount}` : ''}</span>
                     </button>
 
                     <button

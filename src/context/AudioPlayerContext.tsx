@@ -1054,6 +1054,10 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     if (!hasNative()) return;
     const handle = (action: string) => {
       const n = nativeRef.current;
+      if (action.startsWith('open:')) {
+        window.location.hash = action.slice(5);
+        return;
+      }
       if (action === 'toggle') return n.togglePlayPause();
       if (action === 'alarm') {
         // будильник сработал, пользователь открыл приложение — продолжаем ту же станцию уже в приложении

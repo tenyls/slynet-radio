@@ -117,9 +117,12 @@ export default {
         if (p === '/sync/data' && request.method === 'GET') return json((await env.DB.get('data:' + auth.login, 'json')) || {});
         if (p === '/sync/data' && request.method === 'PUT') {
           const body = await request.text();
-          if (body.length > 300000) return json({ error: 'Слишком много данных' }, 413);
+          if (body.length > 1500000) return json({ error: 'Слишком много данных' }, 413);
           const d = JSON.parse(body);
-          const clean = { favorites: Array.isArray(d.favorites) ? d.favorites.slice(0, 500) : [], recognizedTracks: Array.isArray(d.recognizedTracks) ? d.recognizedTracks.slice(0, 200) : [], updatedAt: Date.now() };
+          const playlists = Array.isArray(d.playlists)
+            ? d.playlists.slice(0, 50).filter((p) => p && typeof p.id === 'string').map((p) => ({ id: String(p.id).slice(0, 40), name: String(p.name || '').slice(0, 60), from: p.from ? String(p.from).slice(0, 30) : undefined, createdAt: Number(p.createdAt) || 0, updatedAt: Number(p.updatedAt) || 0, stations: Array.isArray(p.stations) ? p.stations.slice(0, 200) : [] }))
+            : [];
+          const clean = { favorites: Array.isArray(d.favorites) ? d.favorites.slice(0, 500) : [], recognizedTracks: Array.isArray(d.recognizedTracks) ? d.recognizedTracks.slice(0, 200) : [], playlists, updatedAt: Date.now() };
           await env.DB.put('data:' + auth.login, JSON.stringify(clean));
           return json({ ok: true, updatedAt: clean.updatedAt });
         }

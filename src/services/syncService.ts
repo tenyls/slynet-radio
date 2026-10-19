@@ -4,6 +4,7 @@
  */
 import { api, hasApi, userSession } from './apiService';
 import { FAVORITES_STORAGE_KEY } from '../hooks/useFavorites';
+import { PLAYLISTS_KEY } from '../hooks/usePlaylists';
 
 const TRACKS_KEY = 'slynet_recognized_tracks_v1';
 export const LOCAL_UPDATED_KEY = 'slynet_sync_local_updated';
@@ -34,19 +35,23 @@ export function markLocalChanged() {
 export async function syncNow(opts: { mergeFirst?: boolean } = {}): Promise<'pulled' | 'pushed' | 'merged' | 'skip'> {
   const { token } = userSession.get();
   if (!hasApi() || !token) return 'skip';
-  const server = await api<{ favorites?: any[]; recognizedTracks?: any[]; updatedAt?: number }>('/sync/data', { token });
+  const server = await api<{ favorites?: any[]; recognizedTracks?: any[]; playlists?: any[]; updatedAt?: number }>('/sync/data', { token });
+  const localPl = readArr(PLAYLISTS_KEY);
   const localFav = readArr(FAVORITES_STORAGE_KEY);
   const localTracks = readArr(TRACKS_KEY);
   const localUpdated = num(LOCAL_UPDATED_KEY);
   const serverUpdated = server.updatedAt || 0;
 
-  const apply = (fav: any[], tracks: any[]) => {
+  const apply = (fav: any[], tracks: any[], pls?: any[]) => {
     localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(fav));
     localStorage.setItem(TRACKS_KEY, JSON.stringify(tracks));
+    // плейлисты: только если сервер их уже хранит (старая версия сервера их не знает — локальные не трогаем)
+    if (Array.isArray(pls)) localStorage.setItem(PLAYLISTS_KEY, JSON.stringify(pls));
     window.dispatchEvent(new CustomEvent('slynet_favorites_changed'));
+    window.dispatchEvent(new CustomEvent('slynet_playlists_changed'));
   };
-  const push = async (fav: any[], tracks: any[]) => {
-    const r = await api<{ updatedAt: number }>('/sync/data', { method: 'PUT', body: { favorites: fav, recognizedTracks: tracks }, token });
+  const push = async (fav: any[], tracks: any[], pls: any[] = readArr(PLAYLISTS_KEY)) => {
+    const r = await api<{ updatedAt: number }>('/sync/data', { method: 'PUT', body: { favorites: fav, recognizedTracks: tracks, playlists: pls }, token });
     localStorage.setItem(LOCAL_UPDATED_KEY, String(r.updatedAt));
   };
 
@@ -59,11 +64,12 @@ export async function syncNow(opts: { mergeFirst?: boolean } = {}): Promise<'pul
     };
     const fav = uniq([...(server.favorites || []), ...localFav], (s) => s.stationuuid);
     const tracks = uniq([...(server.recognizedTracks || []), ...localTracks], (t) => `${t.artist}|${t.title}`.toLowerCase());
-    apply(fav, tracks);
-    await push(fav, tracks);
+    const pls = uniq([...(server.playlists || []), ...localPl], (p) => p.id);
+    apply(fav, tracks, pls);
+    await push(fav, tracks, pls);
     result = 'merged';
   } else if (serverUpdated > localUpdated) {
-    apply(server.favorites || [], server.recognizedTracks || []);
+    apply(server.favorites || [], server.recognizedTracks || [], server.playlists);
     localStorage.setItem(LOCAL_UPDATED_KEY, String(serverUpdated));
     result = 'pulled';
   } else {

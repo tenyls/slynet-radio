@@ -11,6 +11,7 @@ interface SlyNetNativePlugin {
   setAlarm(o: Record<string, unknown>): Promise<{ exact: boolean; next: number }>;
   stopAlarm(): Promise<void>;
   openExactAlarmSettings(): Promise<void>;
+  share(o: { title: string; text: string }): Promise<void>;
   addListener(event: 'remote' | 'launchAction', cb: (d: { action?: string }) => void): Promise<{ remove: () => void }>;
 }
 
@@ -67,3 +68,6 @@ export const onNative = (event: 'remote' | 'launchAction', cb: (action: string) 
     h?.remove();
   };
 };
+
+/** Системное окно «Поделиться» Android (в приложении у WebView нет navigator.share) */
+export const nativeShare = (title: string, text: string) => safe(() => Native.share({ title, text }));

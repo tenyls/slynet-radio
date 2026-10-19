@@ -1,3 +1,6 @@
+import { ListPlus as ListPlusIcon } from 'lucide-react';
+import { openShare } from './ShareSheet';
+import { openAddToPlaylist } from './PlaylistModals';
 import { WeakNetToggle } from './QualityChip';
 import { StationLogo } from './StationLogo';
 import { FEATURES } from '../utils/platform';
@@ -198,22 +201,7 @@ export const FullScreenPlayer: React.FC<FullScreenPlayerProps> = ({ isFavorite, 
     }
   };
 
-  const onShare = async () => {
-    if (!/^[0-9a-f-]{36}$/i.test(currentStation.stationuuid)) {
-      setSavedNotice('Этой станцией нельзя поделиться ссылкой');
-      setTimeout(() => setSavedNotice(null), 2200);
-      return;
-    }
-    const url = `${window.location.href.split('#')[0]}#station=${currentStation.stationuuid}`;
-    try {
-      if (navigator.share) await navigator.share({ title: currentStation.name, text: `Слушаю «${currentStation.name}» в SlyNet Radio`, url });
-      else {
-        await navigator.clipboard.writeText(url);
-        setSavedNotice('Ссылка скопирована');
-        setTimeout(() => setSavedNotice(null), 2200);
-      }
-    } catch {}
-  };
+  const onShare = () => openShare({ kind: 'station', station: currentStation });
 
   const onBookmark = () => {
     const ok = bookmarkCurrentTrack();
@@ -360,9 +348,17 @@ export const FullScreenPlayer: React.FC<FullScreenPlayerProps> = ({ isFavorite, 
               onClick={onShare}
               aria-label="Поделиться станцией"
               title="Поделиться станцией"
-              className="w-10 h-10 rounded-xl flex items-center justify-center active:scale-95 bg-zinc-800/70 hover:bg-zinc-800 text-zinc-300"
+              className="w-10 h-10 rounded-xl flex items-center justify-center active:scale-95 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30"
             >
               <Share2 className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => openAddToPlaylist(currentStation)}
+              aria-label="В плейлист"
+              title="Добавить в плейлист"
+              className="w-10 h-10 rounded-xl flex items-center justify-center active:scale-95 bg-zinc-800/70 hover:bg-zinc-800 text-zinc-300"
+            >
+              <ListPlusIcon className="w-4 h-4" />
             </button>
             <button
               onClick={onBookmark}
