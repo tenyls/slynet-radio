@@ -750,13 +750,10 @@ async function postNews(state) {
   const fresh = all
     .filter((i) => !posted.has(i.link) && Date.now() - i.date.getTime() < 2 * 86400000)
     .sort((a, b) => b.date - a.date);
-  if (!fresh.length) {
-    log('свежих новостей нет — вместо неё интересная станция');
-    return postStation(state);
-  }
+  if (!fresh.length) return log('свежих новостей нет — в этот час пропускаем (станции и так выходят каждый час)');
   // Пробуем самые свежие (чередуя источники): нейросеть пишет по-русски и отбрасывает не-музыкальное
   const lastSource = state.lastNewsSource;
-  const ordered = [...fresh.filter((i) => i.source !== lastSource), ...fresh.filter((i) => i.source === lastSource)].slice(0, 6);
+  const ordered = [...fresh.filter((i) => i.source !== lastSource), ...fresh.filter((i) => i.source === lastSource)].slice(0, 4);
   let item = null;
   let title = '';
   let body = '';
@@ -783,10 +780,7 @@ async function postNews(state) {
     }
     state.news.push(cand.link);
   }
-  if (!item) {
-    log('подходящей новости на русском нет — вместо неё интересная станция');
-    return postStation(state);
-  }
+  if (!item) return log('подходящей музыкальной новости нет — в этот час пропускаем');
   const caption = await withFooter(
     `🎵 <b>${esc(title)}</b>\n\n${esc(body)}\n\n🔗 Источник: <a href="${esc(item.link)}">${esc(item.source)}</a>`,
     4000
