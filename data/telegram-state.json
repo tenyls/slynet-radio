@@ -64,10 +64,11 @@
   "vkVia": "photo",
   "featRecent": [
     "exclusive",
-    "playlist"
+    "playlist",
+    "history"
   ],
-  "featStyle": 2,
-  "featCta": 2,
+  "featStyle": 3,
+  "featCta": 3,
   "vkPhotoTry": "сервер загрузки ВК не принял файл",
   "vkPhotoShown": "не проверено: wall.getById 27: Group authorization failed: method is unavailable with group auth."
 }
