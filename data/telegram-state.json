@@ -39,11 +39,12 @@
   ],
   "releases": [
     "1.0.6",
-    "1.0.8"
+    "1.0.8",
+    "1.0.10"
   ],
   "askIndex": 1,
   "lastNewsSource": "Rolling Stone",
-  "lastReleaseAt": 1792346865828,
+  "lastReleaseAt": 1792406553178,
   "cams": [
     "1573776572",
     "1793917390",
@@ -64,6 +65,5 @@
   ],
   "featStyle": 2,
   "featCta": 2,
-  "vkPhotoTry": "сервер загрузки ВК не принял файл",
-  "vkPhotoShown": "не проверено: wall.getById 27: Group authorization failed: method is unavailable with group auth."
+  "vkPhotoTry": "сервер загрузки ВК не принял файл"
 }
