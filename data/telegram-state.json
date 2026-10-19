@@ -38,7 +38,11 @@
     "https://www.nme.com/news/music/smashing-pumpkins-billy-corgan-blink-182-travis-barker-most-influential-drummer-3973446?utm_source=rss&utm_medium=rss&utm_campaign=smashing-pumpkins-billy-corgan-blink-182-travis-barker-most-influential-drummer",
     "https://www.intermedia.ru/news/407505",
     "https://www.intermedia.ru/news/407504",
-    "https://www.rollingstone.com/music/music-news/miley-cyrus-hollywood-bowl-show-criticism-response-1235644514/"
+    "https://www.rollingstone.com/music/music-news/miley-cyrus-hollywood-bowl-show-criticism-response-1235644514/",
+    "https://www.billboard.com/culture/tv-film/este-haim-how-stevie-nicks-ursula-inspired-marvel-role-1236362102/",
+    "https://www.billboard.com/music/rock/motley-crue-2027-las-vegas-carnival-sins-residency-dates-1236362235/",
+    "https://www.intermedia.ru/news/407506",
+    "https://www.intermedia.ru/news/407528"
   ],
   "releases": [
     "1.0.6",
@@ -72,5 +76,6 @@
   ],
   "featStyle": 3,
   "featCta": 3,
-  "vkPhotoTry": "сервер загрузки ВК не принял файл"
+  "vkPhotoTry": "сервер загрузки ВК не принял файл",
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
