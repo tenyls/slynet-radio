@@ -41,9 +41,10 @@
     "1793917390",
     "1793912494",
     "1793914027",
-    "1793915519"
+    "1793915519",
+    "1413589505"
   ],
-  "camIndex": 5,
+  "camIndex": 6,
   "vkVia": "photo",
   "featRecent": [
     "exclusive"
@@ -51,5 +52,5 @@
   "featStyle": 1,
   "featCta": 1,
   "vkPhotoTry": "сервер загрузки ВК не принял файл",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "vkPhotoShown": "не проверено: wall.getById 27: Group authorization failed: method is unavailable with group auth."
 }
