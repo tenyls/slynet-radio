@@ -84,7 +84,11 @@
     "https://www.billboard.com/video/creativity-to-international-expansion-grupo-frontera-study/",
     "https://www.billboard.com/pro/mariah-carey-wins-dismissal-brother-defamation-lawsuit/",
     "https://stereogum.com/2515085/dominic-fike-shares-new-single-pangea-earns-first-top-10-hit-with-8-year-old-babydoll/music/",
-    "https://www.billboard.com/pro/black-music-action-coalition-statement-music-layoffs/"
+    "https://www.billboard.com/pro/black-music-action-coalition-statement-music-layoffs/",
+    "https://www.intermedia.ru/news/407458",
+    "https://www.billboard.com/lists/muna-tour-bus-catches-fire/",
+    "https://www.billboard.com/lists/82world-la-festival-2026-best-moments/",
+    "https://www.billboard.com/music/concerts/pitch-music-arts-2027-lineup-1236363410/"
   ],
   "releases": [
     "1.0.6",
@@ -132,6 +136,5 @@
   "featCta": 4,
   "vkPhotoTry": "сервер загрузки ВК не принял файл",
   "showIndex": 1,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkPhotoShown": "не проверено: wall.getById 27: Group authorization failed: method is unavailable with group auth."
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
