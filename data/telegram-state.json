@@ -109,7 +109,8 @@
     "https://www.intermedia.ru/news/407549",
     "https://www.intermedia.ru/news/407541",
     "https://www.nme.com/news/film/jaafar-jackson-cut-third-act-of-michael-biopic-child-abuse-allegations-3973588?utm_source=rss&utm_medium=rss&utm_campaign=jaafar-jackson-cut-third-act-of-michael-biopic-child-abuse-allegations",
-    "https://www.nme.com/news/music/lily-allens-polka-dot-butt-plug-is-now-for-sale-in-her-new-line-of-sex-toys-3973581?utm_source=rss&utm_medium=rss&utm_campaign=lily-allens-polka-dot-butt-plug-is-now-for-sale-in-her-new-line-of-sex-toys"
+    "https://www.nme.com/news/music/lily-allens-polka-dot-butt-plug-is-now-for-sale-in-her-new-line-of-sex-toys-3973581?utm_source=rss&utm_medium=rss&utm_campaign=lily-allens-polka-dot-butt-plug-is-now-for-sale-in-her-new-line-of-sex-toys",
+    "https://www.nme.com/news/gaming-news/league-of-legends-k-pop-virtual-group-k-da-members-madison-beer-3973607?utm_source=rss&utm_medium=rss&utm_campaign=league-of-legends-k-pop-virtual-group-k-da-members-madison-beer"
   ],
   "releases": [
     "1.0.6",
@@ -118,7 +119,7 @@
     "1.0.11"
   ],
   "askIndex": 1,
-  "lastNewsSource": "Rolling Stone",
+  "lastNewsSource": "NME",
   "lastReleaseAt": 1792421132030,
   "cams": [
     "1573776572",
@@ -162,7 +163,5 @@
   "featStyle": 5,
   "featCta": 5,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
-  "showIndex": 1,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "showIndex": 1
 }
