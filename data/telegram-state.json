@@ -194,5 +194,6 @@
   "featStyle": 7,
   "featCta": 7,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
-  "showIndex": 2
+  "showIndex": 2,
+  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
 }
