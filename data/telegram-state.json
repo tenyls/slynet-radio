@@ -134,9 +134,10 @@
     "1434026150",
     "1793918054",
     "1662908470",
-    "1611327985"
+    "1611327985",
+    "1664961877"
   ],
-  "camIndex": 27,
+  "camIndex": 28,
   "vkVia": "photo",
   "featRecent": [
     "exclusive",
@@ -148,6 +149,5 @@
   "featStyle": 5,
   "featCta": 5,
   "vkPhotoTry": "сервер загрузки ВК не принял файл",
-  "showIndex": 1,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
+  "showIndex": 1
 }
