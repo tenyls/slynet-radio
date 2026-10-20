@@ -116,7 +116,8 @@
     "https://www.billboard.com/pro/cd-baby-molly-neuman-evolution-indie-music-90s-now/",
     "https://www.billboard.com/pro/harvey-mason-jr-paley-los-angeles-board-of-governors/",
     "https://www.billboard.com/music/pop/lady-gaga-hints-new-music-dont-worry-1236363425/",
-    "https://www.intermedia.ru/news/407544"
+    "https://www.intermedia.ru/news/407544",
+    "https://stereogum.com/2515100/claire-rousay-zander-raymond-announce-new-album-something-good-hear-cant-we-have-both/music/"
   ],
   "releases": [
     "1.0.6",
@@ -125,7 +126,7 @@
     "1.0.11"
   ],
   "askIndex": 1,
-  "lastNewsSource": "NME",
+  "lastNewsSource": "Stereogum",
   "lastReleaseAt": 1792421132030,
   "cams": [
     "1573776572",
@@ -172,6 +173,5 @@
   "featStyle": 6,
   "featCta": 6,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
-  "showIndex": 1,
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "showIndex": 1
 }
