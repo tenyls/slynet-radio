@@ -94,7 +94,11 @@
     "https://www.intermedia.ru/news/407513",
     "https://www.intermedia.ru/news/407538",
     "https://www.intermedia.ru/news/407497",
-    "https://www.billboard.com/music/music-news/swae-lee-australian-tour-2027-same-difference-1236363395/"
+    "https://www.billboard.com/music/music-news/swae-lee-australian-tour-2027-same-difference-1236363395/",
+    "https://www.intermedia.ru/news/407536",
+    "https://www.nme.com/news/music/has-sam-fender-shared-the-locations-of-his-2027-uk-stadium-tour-3973564?utm_source=rss&utm_medium=rss&utm_campaign=has-sam-fender-shared-the-locations-of-his-2027-uk-stadium-tour",
+    "https://www.billboard.com/video/jop-from-fuerza-regida-accepts-publisher-of-the-year-award/",
+    "https://www.billboard.com/video/omar-al-joulani-presents-hans-schafer-executive-of-the-year/"
   ],
   "releases": [
     "1.0.6",
@@ -145,5 +149,5 @@
   "featCta": 5,
   "vkPhotoTry": "сервер загрузки ВК не принял файл",
   "showIndex": 1,
-  "vkPhotoShown": "не проверено: wall.getById 27: Group authorization failed: method is unavailable with group auth."
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
