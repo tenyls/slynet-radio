@@ -99,7 +99,11 @@
     "https://www.intermedia.ru/news/407536",
     "https://www.nme.com/news/music/has-sam-fender-shared-the-locations-of-his-2027-uk-stadium-tour-3973564?utm_source=rss&utm_medium=rss&utm_campaign=has-sam-fender-shared-the-locations-of-his-2027-uk-stadium-tour",
     "https://www.billboard.com/video/jop-from-fuerza-regida-accepts-publisher-of-the-year-award/",
-    "https://www.billboard.com/video/omar-al-joulani-presents-hans-schafer-executive-of-the-year/"
+    "https://www.billboard.com/video/omar-al-joulani-presents-hans-schafer-executive-of-the-year/",
+    "https://www.intermedia.ru/news/407548",
+    "https://www.intermedia.ru/news/407546",
+    "https://www.billboard.com/video/george-prajin-regional-mexican-albums-label-of-the-year/",
+    "https://www.billboard.com/video/ozuna-presents-alex-gallardo-with-latin-airplay-label-award/"
   ],
   "releases": [
     "1.0.6",
@@ -151,6 +155,5 @@
   "featCta": 5,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 1,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
