@@ -58,7 +58,8 @@
     "de478916-6d8d-4997-9894-9d068bcf1857",
     "a9c5e895-0b34-4f17-9147-2b9b9747a124",
     "ex-record-techouse",
-    "b2e362d0-b8e0-11e9-acb2-52543be04c81"
+    "b2e362d0-b8e0-11e9-acb2-52543be04c81",
+    "4694a5fd-c9e9-439d-94c6-c2aeb8f17171"
   ],
   "news": [
     "https://stereogum.com/2514933/she-punk-supergroup-plays-poly-styrene-tribute-in-london/news/",
@@ -292,5 +293,5 @@
   "featCta": 11,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 3,
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
