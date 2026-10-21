@@ -222,9 +222,10 @@
     "1597436714",
     "1590004312",
     "1730505175",
-    "1793914394"
+    "1793914394",
+    "1731954712"
   ],
-  "camIndex": 14,
+  "camIndex": 15,
   "vkVia": "photo",
   "featRecent": [
     "exclusive",
@@ -240,5 +241,5 @@
   "featCta": 8,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 2,
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
