@@ -200,7 +200,9 @@
     "https://www.billboard.com/pro/ozuna-empire-publishing-deal/",
     "https://www.rollingstone.com/music/music-news/beck-in-the-night-zoolander-tonight-show-1235645901/",
     "https://stereogum.com/2515194/wendy-eisenberg-releases-surprise-new-companion-album-wweennddyy-eeiisseennbbeerrgg/music/",
-    "https://www.intermedia.ru/news/407585"
+    "https://www.intermedia.ru/news/407585",
+    "https://stereogum.com/2515212/clap-your-hands-say-yeah-announce-new-album-burned-hear-fever-of-the-mind/music/",
+    "https://pitchfork.com/story/clap-your-hands-say-yeah-launch-new-album-burned-2027-tour/"
   ],
   "releases": [
     "1.0.6",
@@ -209,7 +211,7 @@
     "1.0.11"
   ],
   "askIndex": 1,
-  "lastNewsSource": "NME",
+  "lastNewsSource": "Pitchfork",
   "lastReleaseAt": 1792421132030,
   "cams": [
     "1573776572",
@@ -276,7 +278,5 @@
   "featStyle": 2,
   "featCta": 10,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
-  "showIndex": 2,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "showIndex": 2
 }
