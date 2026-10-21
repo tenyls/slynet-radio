@@ -203,7 +203,11 @@
     "https://stereogum.com/2515194/wendy-eisenberg-releases-surprise-new-companion-album-wweennddyy-eeiisseennbbeerrgg/music/",
     "https://www.intermedia.ru/news/407585",
     "https://stereogum.com/2515212/clap-your-hands-say-yeah-announce-new-album-burned-hear-fever-of-the-mind/music/",
-    "https://pitchfork.com/story/clap-your-hands-say-yeah-launch-new-album-burned-2027-tour/"
+    "https://pitchfork.com/story/clap-your-hands-say-yeah-launch-new-album-burned-2027-tour/",
+    "https://www.billboard.com/music/awards/flavor-flav-2026-clio-sports-awards-honor-1236364443/",
+    "https://www.rollingstone.com/music/music-news/douglas-dulgarian-they-are-gutting-a-body-of-water-gofundme-1235645945/",
+    "https://www.intermedia.ru/news/407582",
+    "https://stereogum.com/2515227/my-wonderful-boyfriend-chip-city/music/"
   ],
   "releases": [
     "1.0.6",
@@ -281,6 +285,5 @@
   "featCta": 10,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 2,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
