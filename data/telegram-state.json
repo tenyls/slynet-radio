@@ -213,7 +213,11 @@
     "https://stereogum.com/2515238/doechii-catwoman/music/",
     "https://www.billboard.com/music/rb-hip-hop/aew-swerve-strickland-rap-max-b-wwe-interview-1236364464/",
     "https://www.rollingstone.com/music/music-news/hilary-duff-holiday-things-ep-1235645720/",
-    "https://stereogum.com/2515234/chvrches-announce-new-album-all-the-kings-men/music/"
+    "https://stereogum.com/2515234/chvrches-announce-new-album-all-the-kings-men/music/",
+    "https://www.billboard.com/music/music-news/travis-kelce-reveals-jason-kelce-call-taylor-swift-messed-up-1236364497/",
+    "https://stereogum.com/2515253/maz-announces-new-ep-loveandpain-hear-the-title-track/music/",
+    "https://stereogum.com/2515249/ben-folds-five-announce-reunion-tour/news/",
+    "https://stereogum.com/2515245/fenne-lily-stranger-things/music/"
   ],
   "releases": [
     "1.0.6",
@@ -293,6 +297,5 @@
   "featCta": 11,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 3,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
