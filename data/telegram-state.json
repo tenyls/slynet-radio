@@ -53,7 +53,8 @@
     "8c0a93e5-7e5a-499d-85eb-347e40445ad1",
     "ex-record-mix",
     "2d9dfa25-7379-460b-8cd0-fe163af26ebe",
-    "948408f4-0060-44fa-a26c-bf313f6c774d"
+    "948408f4-0060-44fa-a26c-bf313f6c774d",
+    "ex-nightride-chillsynth"
   ],
   "news": [
     "https://stereogum.com/2514933/she-punk-supergroup-plays-poly-styrene-tribute-in-london/news/",
@@ -263,7 +264,5 @@
   "featStyle": 2,
   "featCta": 10,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
-  "showIndex": 2,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "showIndex": 2
 }
