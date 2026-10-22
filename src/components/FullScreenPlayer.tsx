@@ -1,7 +1,8 @@
+import { Sparkles } from 'lucide-react';
 import { ListPlus as ListPlusIcon } from 'lucide-react';
 import { openShare } from './ShareSheet';
 import { openAddToPlaylist } from './PlaylistModals';
-import { SimilarStations } from './SimilarStations';
+import { findSimilar } from './SimilarStations';
 import { WeakNetToggle } from './QualityChip';
 import { StationLogo } from './StationLogo';
 import { FEATURES } from '../utils/platform';
@@ -56,7 +57,7 @@ interface FullScreenPlayerProps {
   onToggleFavorite: () => void;
 }
 
-type SheetTab = 'stations' | 'country' | 'genre' | 'artists' | 'results';
+type SheetTab = 'similar' | 'stations' | 'country' | 'genre' | 'artists' | 'results';
 
 const formatTime = (seconds: number) => {
   const m = Math.floor(seconds / 60);
@@ -101,6 +102,16 @@ export const FullScreenPlayer: React.FC<FullScreenPlayerProps> = ({ isFavorite, 
 
   // Шторка быстрого выбора (не выходя из плеера)
   const [sheet, setSheet] = useState<SheetTab | null>(null);
+  const [similar, setSimilar] = useState<Station[] | null>(null);
+  useEffect(() => {
+    if (sheet !== 'similar' || !currentStation) return;
+    let alive = true;
+    setSimilar(null);
+    findSimilar(currentStation).then((l) => alive && setSimilar(l));
+    return () => {
+      alive = false;
+    };
+  }, [sheet, currentStation?.stationuuid]);
   const [sheetCountry, setSheetCountry] = useState('');
   const [sheetGenre, setSheetGenre] = useState<GenreCategory | null>(null);
   const [results, setResults] = useState<Station[]>([]);
@@ -500,6 +511,10 @@ export const FullScreenPlayer: React.FC<FullScreenPlayerProps> = ({ isFavorite, 
 
           {/* Горячие кнопки: выбор без выхода из плеера */}
           <div className="flex gap-1.5 mt-1.5 shrink-0">
+            <button onClick={() => setSheet('similar')} className={quickBtn}>
+              <Sparkles className="w-3.5 h-3.5 text-amber-300 shrink-0" />
+              <span className="truncate">Похожие</span>
+            </button>
             <button onClick={() => setSheet('country')} className={quickBtn}>
               <Globe className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
               <span className="truncate">{sheetCountry ? COUNTRIES.find((c) => c.code === sheetCountry)?.flag : 'Страна'}</span>
@@ -512,14 +527,7 @@ export const FullScreenPlayer: React.FC<FullScreenPlayerProps> = ({ isFavorite, 
               <ListMusic className="w-3.5 h-3.5 text-lime-400 shrink-0" />
               <span className="truncate">Станции</span>
             </button>
-            <button onClick={() => setSheet('artists')} className={quickBtn}>
-              <Mic2 className="w-3.5 h-3.5 text-violet-300 shrink-0" />
-              <span className="truncate">Артисты</span>
-            </button>
           </div>
-
-          {/* Похожие станции */}
-          <SimilarStations station={currentStation} onPlay={(s, list) => playStation(s, list)} />
 
           {/* Сайт станции */}
           {currentStation.homepage && /^https?:\/\//.test(currentStation.homepage) && (
@@ -545,6 +553,7 @@ export const FullScreenPlayer: React.FC<FullScreenPlayerProps> = ({ isFavorite, 
               <div className="flex items-center gap-1 p-2 border-b border-zinc-800 shrink-0 overflow-x-auto scrollbar-none">
                 {(
                   [
+                    ['similar', '✨ Похожие'],
                     ['country', 'Страна'],
                     ['genre', 'Жанр'],
                     ['stations', 'Станции'],
@@ -603,6 +612,19 @@ export const FullScreenPlayer: React.FC<FullScreenPlayerProps> = ({ isFavorite, 
                         {g.name}
                       </button>
                     ))}
+                  </div>
+                )}
+
+                {sheet === 'similar' && (
+                  <div className="space-y-1">
+                    <p className="text-[11px] text-zinc-500 px-1 pb-1">Похожие на «{currentStation.name}»</p>
+                    {similar === null ? (
+                      <p className="text-xs text-zinc-400 p-2">Подбираем станции…</p>
+                    ) : similar.length ? (
+                      similar.map((st) => stationRow(st, similar))
+                    ) : (
+                      <p className="text-xs text-zinc-400 p-2">Похожих станций не нашлось — попробуйте «Жанр».</p>
+                    )}
                   </div>
                 )}
 

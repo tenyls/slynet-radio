@@ -173,6 +173,7 @@ export interface FetchOptions {
 }
 
 import { isStationQuarantined } from './quarantineService';
+import { isGloballyDead } from './streamCheck';
 
 /**
  * Normalizes station name to catch duplicate streams like:
@@ -202,6 +203,7 @@ export function deduplicateStations(stations: Station[]): Station[] {
     if (!st.isCustom && !isFamilySafe(st)) continue;
     if (!st.isCustom && isRadioCountryHidden(st.countrycode)) continue;
     if (isStationQuarantined(st.stationuuid)) continue;
+    if (isGloballyDead(st.stationuuid)) continue;
 
     // Normalizing stream host and path
     let streamKey = '';

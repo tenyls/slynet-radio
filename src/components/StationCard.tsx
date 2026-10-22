@@ -1,5 +1,6 @@
 import { StationLogo } from './StationLogo';
 import React, { useState } from 'react';
+import { useGeoBlocked } from '../services/streamCheck';
 import { Station } from '../types/radio';
 import { Play, Pause, Heart, Sparkles } from 'lucide-react';
 import { StationFallbackIcon } from './StationFallbackIcon';
@@ -37,6 +38,7 @@ export const StationCard: React.FC<StationCardProps> = ({
   const flag = getCountryFlag(station?.countrycode || '');
   const countryName = station?.country || station?.countrycode || 'Мир';
   const bitrateText = station?.bitrate && station.bitrate > 0 ? `${station.bitrate} kbps` : '';
+  const geoBlocked = useGeoBlocked(station?.stationuuid || '');
 
   return (
     <div
@@ -113,6 +115,13 @@ export const StationCard: React.FC<StationCardProps> = ({
         >
           <Heart className={`w-4 h-4 ${isFavorite ? 'fill-white' : ''}`} />
         </button>
+
+        {/* Закрыта для страны слушателя (проверено нашим сервером) */}
+        {geoBlocked && (
+          <div title="Станция не открывается из вашей страны — это ограничение самой станции, не SlyNet" className="absolute top-2 left-2 z-10 px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/90 text-zinc-950">
+            🔒 не в вашей стране
+          </div>
+        )}
 
         {/* Bitrate Badge on Image corner */}
         <div className="absolute bottom-2 left-2 z-10 px-1.5 py-0.5 rounded text-[10px] font-mono tabular-nums font-bold bg-black/75 backdrop-blur-sm text-cyan-300 border border-white/10">

@@ -47,11 +47,12 @@ export default {
     const url = new URL(request.url);
     const p = url.pathname.replace(/\/+$/, '') || '/';
     try {
-      if (p === '/' || p === '/health') return json({ ok: true, service: 'slynet-api', kv: !!env.DB, publish: !!env.GITHUB_TOKEN, telegram: !!env.TELEGRAM_BOT_TOKEN, windy: !!env.WINDY_API_KEY, vk: !!env.VK_CLIENT_ID, share: true, playlists: true, version: '2026-10-23' });
+      if (p === '/' || p === '/health') return json({ ok: true, service: 'slynet-api', kv: !!env.DB, publish: !!env.GITHUB_TOKEN, telegram: !!env.TELEGRAM_BOT_TOKEN, windy: !!env.WINDY_API_KEY, vk: !!env.VK_CLIENT_ID, share: true, playlists: true, probe: true, version: '2026-10-23b' });
       if (p === '/s') return sharePage(url);
       if (p === '/meta') return await handleMeta(url, json, ctx);
       if (p === '/webcams') return await handleWebcams(url, env, json, ctx);
-      if (p === '/geo') return json({ country: request.cf?.country || '', city: request.cf?.city || '' }, 200, { 'Cache-Control': 'no-store' });
+      if (p === '/geo') return json({ country: request.cf?.country || '', city: request.cf?.city || '', ip: request.headers.get('CF-Connecting-IP') || '' }, 200, { 'Cache-Control': 'no-store' });
+      if (p === '/probe') return await handleProbe(url, json, ctx);
 
       if (!env.DB) return json({ error: 'KV не подключено (привязка DB)' }, 500);
       const ip = request.headers.get('CF-Connecting-IP') || '0';
@@ -272,6 +273,41 @@ async function vkAccessToken(env) {
     await env.DB.put('vk:auth', JSON.stringify({ ...a, error: e.message, errorAt: now() }));
     return { error: 'Не удалось обновить ключ ВК: ' + e.message + '. Подключите ВК в админке заново.' };
   }
+}
+
+// ---------- Проверка потока: станция не играет у человека — она мёртвая или закрыта для его страны? ----------
+// Без базы данных: результат кэшируется на 10 минут (бесплатный кэш Cloudflare).
+async function handleProbe(url, json, ctx) {
+  const target = String(url.searchParams.get('u') || '');
+  let u;
+  try {
+    u = new URL(target);
+  } catch {
+    return json({ error: 'bad url' }, 400);
+  }
+  if (!/^https?:$/.test(u.protocol) || isPrivateHost(u.hostname)) return json({ error: 'bad url' }, 400);
+  const cacheKey = new Request('https://probe.slynet/' + encodeURIComponent(u.href));
+  const cache = caches.default;
+  const hit = await cache.match(cacheKey);
+  if (hit) return json(await hit.json(), 200, { 'Cache-Control': 'no-store' });
+  let result;
+  const t0 = Date.now();
+  try {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 8000);
+    const r = await fetch(u.href, { headers: { 'Icy-MetaData': '0', 'User-Agent': 'SlyNetRadio/1.0 (+https://tenyls.github.io/slynet-radio/)', Referer: 'https://tenyls.github.io/' }, signal: ctrl.signal, redirect: 'follow' });
+    clearTimeout(timer);
+    const type = (r.headers.get('content-type') || '').toLowerCase();
+    try {
+      await r.body?.cancel();
+    } catch {}
+    const audio = /audio|mpeg|aac|ogg|octet|mpegurl|x-scpls|pls|video\/mp2t/.test(type);
+    result = { ok: r.ok && audio, status: r.status, type, ms: Date.now() - t0 };
+  } catch (e) {
+    result = { ok: false, status: 0, error: 'timeout', ms: Date.now() - t0 };
+  }
+  ctx.waitUntil(cache.put(cacheKey, new Response(JSON.stringify(result), { headers: { 'Cache-Control': 'max-age=600', 'Content-Type': 'application/json' } })));
+  return json(result, 200, { 'Cache-Control': 'no-store' });
 }
 
 // ---------- Красивые превью ссылок «Поделиться» (Telegram, ВК, WhatsApp читают эти теги) ----------

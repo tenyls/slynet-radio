@@ -134,7 +134,13 @@ export const SharedPlaylistModal: React.FC<{ data: SharedPlaylist; onClose: () =
           </div>
           {stations && stations.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-4">
-              <button onClick={() => playStation(stations[0], stations)} className="px-4 py-2.5 rounded-xl bg-emerald-500 text-zinc-950 text-sm font-extrabold flex items-center gap-2 active:scale-95">
+              <button
+                onClick={() => {
+                  playStation(stations[0], stations);
+                  onClose(); // закрываем окно — внизу сразу виден плеер
+                }}
+                className="px-4 py-2.5 rounded-xl bg-emerald-500 text-zinc-950 text-sm font-extrabold flex items-center gap-2 active:scale-95"
+              >
                 <Play className="w-4 h-4 fill-zinc-950" /> Слушать
               </button>
               <button

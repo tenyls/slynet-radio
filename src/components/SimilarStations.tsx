@@ -8,7 +8,7 @@ const GENERIC = new Set(['radio', 'music', 'fm', 'internet', 'online', 'webradio
 const cache = new Map<string, Station[]>();
 
 /** Похожие станции: тот же жанр (сначала из той же страны) или соседи по эксклюзиву */
-async function findSimilar(st: Station): Promise<Station[]> {
+export async function findSimilar(st: Station): Promise<Station[]> {
   if (cache.has(st.stationuuid)) return cache.get(st.stationuuid)!;
   const norm = (n: string) => n.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, '');
   const seen = new Set([norm(st.name)]);

@@ -1,5 +1,6 @@
 import { StationLogo } from './StationLogo';
 import React, { useState } from 'react';
+import { useGeoBlocked } from '../services/streamCheck';
 import { Play, Pause, Heart, Music2 } from 'lucide-react';
 import { Station } from '../types/radio';
 import { getCountryFlag } from '../constants/countries';
@@ -16,6 +17,7 @@ interface StationRowProps {
 
 /** Компактная строка станции для режима «Список» */
 export const StationRow: React.FC<StationRowProps> = ({ station, isCurrent, isPlaying, isFavorite, trackTitle, onPlay, onToggleFavorite }) => {
+  const geoBlocked = useGeoBlocked(station.stationuuid);
   const [imgError, setImgError] = useState(false);
   const active = isCurrent && isPlaying;
   const genre = (station.tags || '').split(',').map((t) => t.trim()).filter(Boolean)[0];
@@ -46,6 +48,11 @@ export const StationRow: React.FC<StationRowProps> = ({ station, isCurrent, isPl
 
       <div className="min-w-0 flex-1">
         <div className="text-sm font-semibold text-white truncate">{station.name}</div>
+        {geoBlocked && (
+          <div className="text-[11px] text-amber-300 truncate" title="Ограничение самой станции, не SlyNet">
+            🔒 Не открывается из вашей страны
+          </div>
+        )}
         <div className="text-[11px] text-zinc-400 truncate">
           {isCurrent && trackTitle ? <span className="text-emerald-300">🎵 {trackTitle}</span> : [genre, station.bitrate ? `${station.bitrate} kbps` : ''].filter(Boolean).join(' · ')}
         </div>

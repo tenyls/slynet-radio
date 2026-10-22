@@ -1,3 +1,4 @@
+import { setDeadStations } from './streamCheck';
 import { DATA_BASE } from '../utils/platform';
 /**
  * Проверенный каталог (public/catalog.json), который каждый день собирает робот GitHub
@@ -34,6 +35,8 @@ export interface Catalog {
   deadLinks: string[];
   exclusive?: { id: string; name: string; note: string; stations: Station[] }[];
   curated?: CuratedList[];
+  /** станции, которые робот ночью нашёл мёртвыми (прячем у всех) */
+  dead?: string[];
 }
 
 const EMPTY: Catalog = { generatedAt: null, artists: {}, series: [], tv: [], deadLinks: [] };
@@ -44,6 +47,10 @@ export function loadCatalog(): Promise<Catalog> {
     promise = fetch(`${DATA_BASE}catalog.json?d=${new Date().toISOString().slice(0, 13)}`, { cache: 'no-cache' })
       .then((r) => (r.ok ? r.json() : EMPTY))
       .then((j) => ({ ...EMPTY, ...j }))
+      .then((c) => {
+        if (Array.isArray(c.dead)) setDeadStations(c.dead);
+        return c;
+      })
       .catch(() => EMPTY);
   }
   return promise;

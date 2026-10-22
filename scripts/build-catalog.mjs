@@ -583,6 +583,51 @@ async function buildCurated(exclusive) {
   return out;
 }
 
+// ---------- 8. Ночная проверка станций жанров: мёртвые прячем у всех ----------
+// «Мёртвая» = сервер не отвечает, ссылки нет (404/410), ошибка сервера или вместо звука страница.
+// Ответ «доступ запрещён» (401/403/451) — это ограничение по стране/IP, такие станции НЕ прячем.
+async function streamStatus(url) {
+  try {
+    const r = await fetchWithTimeout(url, { headers: { 'Icy-MetaData': '0', Referer: 'https://tenyls.github.io/', Origin: 'https://tenyls.github.io' } }, 10000);
+    const type = (r.headers.get('content-type') || '').toLowerCase();
+    try {
+      await r.body?.cancel();
+    } catch {}
+    if (r.ok && /audio|mpeg|aac|ogg|octet|mpegurl|x-scpls|pls|video\/mp2t/.test(type)) return 'ok';
+    if ([401, 403, 451].includes(r.status)) return 'blocked';
+    return 'dead';
+  } catch {
+    return 'dead';
+  }
+}
+
+async function buildDead() {
+  const src = await fs.readFile(path.join(ROOT, 'src', 'constants', 'genres.ts'), 'utf8');
+  const tags = [...new Set([...src.matchAll(/\btag: '([^']+)'/g)].map((m) => m[1]).filter(Boolean))];
+  const byId = new Map();
+  for (const tag of tags) {
+    try {
+      const list = await searchRB({ tag, limit: '80' });
+      for (const s of list) if (!byId.has(s.stationuuid)) byId.set(s.stationuuid, s.url_resolved || s.url);
+    } catch (e) {
+      log(`проверка станций: ${tag} — ${e.message}`);
+    }
+  }
+  const ids = [...byId.keys()];
+  log(`проверка станций: ${tags.length} жанров, ${ids.length} станций…`);
+  const first = await pool(ids, 24, (id) => streamStatus(byId.get(id)));
+  // повторно проверяем «упавшие» — медленнее, чтобы не спутать с кратким сбоем
+  const retry = ids.filter((_, i) => first[i] === 'dead');
+  const second = await pool(retry, 8, (id) => streamStatus(byId.get(id)));
+  const dead = retry.filter((_, i) => second[i] === 'dead');
+  stats.checkedStations = ids.length;
+  stats.deadStations = dead.length;
+  stats.blockedStations = first.filter((x) => x === 'blocked').length;
+  log(`проверка станций: мёртвых ${dead.length}, закрыты по стране/IP ${stats.blockedStations}`);
+  if (ids.length && dead.length > ids.length * 0.6) throw new Error('подозрительно много мёртвых — сеть робота?');
+  return dead;
+}
+
 // ---------- запуск ----------
 const prev = await fs.readFile(OUT, 'utf8').then(JSON.parse).catch(() => ({}));
 const safe = async (name, fn, fallback) => {
@@ -604,6 +649,7 @@ const catalog = {
   exclusive: await safe('эксклюзив', buildExclusive, prev.exclusive || []),
 };
 catalog.curated = await safe('подборки', () => buildCurated(catalog.exclusive), prev.curated || []);
+catalog.dead = await safe('проверка станций', buildDead, prev.dead || []);
 await safe('глобус', buildGeo, null);
 catalog.stats = stats;
 

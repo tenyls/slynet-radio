@@ -1,6 +1,7 @@
 import { isNativeApp } from '../utils/platform';
 import { pickStream, lowerStream, isWeakMode, QUALITY_EVENT } from '../services/streamQuality';
 import { loadCatalog } from '../services/catalogService';
+import { probeStream, markGeoBlocked, clearGeoBlocked, myNetwork } from '../services/streamCheck';
 import { hasNative, nativeNowPlaying, nativeSetAlarm, nativeStopAlarm, nativeLaunchAction, onNative } from '../services/nativeBridge';
 
 // Свежие данные эксклюзивных станций (битрейты и запасные потоки) — чинят старые копии в избранном/истории
@@ -264,6 +265,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
     const handlePlaying = () => {
       startedRef.current = true;
+      if (currentStationRef.current) clearGeoBlocked(currentStationRef.current.stationuuid);
       clearConnectTimeout();
       setIsLoading(false);
       setIsPlaying(true);
@@ -275,27 +277,9 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
     const handleError = () => {
       clearConnectTimeout();
-      setIsLoading(false);
-      setIsPlaying(false);
       const st = currentStationRef.current;
       if (st) {
-        quarantineStation(st.stationuuid, st.name, st.url, 'Ошибка воспроизведения потока');
-        setError(`Поток «${st.name}» недоступен. Переключаем на следующую станцию...`);
-        const pl = playlistRef.current;
-        if (pl && pl.length > 1) {
-          const idx = pl.findIndex((s) => s.stationuuid === st.stationuuid);
-          const next = pl[(idx + 1) % pl.length];
-          if (next) {
-            setTimeout(() => {
-              if (audioRef.current) {
-                audioRef.current.src = next.url_resolved || next.url;
-                audioRef.current.play().catch(() => {});
-                setCurrentStation(next);
-                setCurrentTrackTitle('');
-              }
-            }, 1000);
-          }
-        }
+        failureRef.current(st, streamUrlRef.current || st.url_resolved || st.url, 'Ошибка воспроизведения потока');
       } else {
         setError('Не удалось подключиться к аудиопотоку этой станции');
       }
@@ -537,17 +521,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       // 9s connection timeout (мобильный интернет бывает медленным): quarantine & auto-skip to next station
       connectTimeoutRef.current = setTimeout(() => {
         if (!audioRef.current || audioRef.current.paused) {
-          quarantineStation(station.stationuuid, station.name, streamUrl, 'Таймаут подключения > 4.5 сек');
-          setError(`Станция «${station.name}» не ответила за 9 секунд. Переключаем...`);
-          setIsLoading(false);
-          const pl = playlistRef.current;
-          if (pl && pl.length > 1) {
-            const idx = pl.findIndex((s) => s.stationuuid === station.stationuuid);
-            const next = pl[(idx + 1) % pl.length];
-            if (next && next.stationuuid !== station.stationuuid) {
-              playStation(next, pl);
-            }
-          }
+          failureRef.current(station, streamUrl, 'Не ответила за 9 секунд');
         }
       }, 9000);
 
@@ -1042,6 +1016,54 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const interval = setInterval(checkAlarm, 1000);
     return () => clearInterval(interval);
   }, [alarm, playlist, currentStation, playStation, setVolume]);
+
+  // ---- Станция не запустилась: повтор, проверка через сервер, понятное объяснение ----
+  const retriedRef = useRef<Set<string>>(new Set());
+  const failingRef = useRef('');
+  const playStationRef = useRef(playStation);
+  playStationRef.current = playStation;
+  const failureRef = useRef<(st: Station, url: string, reason: string) => void>(() => {});
+  failureRef.current = async (st: Station, url: string, reason: string) => {
+    if (failingRef.current === st.stationuuid) return;
+    failingRef.current = st.stationuuid;
+    const stillThis = () => currentStationRef.current?.stationuuid === st.stationuuid;
+    // Наши проверенные станции (эксклюзив) — сначала одна повторная попытка: часто это короткий сбой сети
+    if (st.stationuuid.startsWith('ex-') && !retriedRef.current.has(st.stationuuid)) {
+      retriedRef.current.add(st.stationuuid);
+      setError(`«${st.name}»: переподключаемся…`);
+      setTimeout(() => {
+        failingRef.current = '';
+        if (stillThis() && audioRef.current) {
+          audioRef.current.src = url;
+          audioRef.current.play().catch(() => {});
+        }
+      }, 1500);
+      return;
+    }
+    setIsLoading(true);
+    setError(`Проверяем «${st.name}»…`);
+    const verdict = await probeStream(url);
+    failingRef.current = '';
+    if (!stillThis()) return;
+    setIsLoading(false);
+    setIsPlaying(false);
+    if (verdict === 'ok') {
+      // У нашего сервера станция играет — значит, она закрыта для страны/IP слушателя. Не прячем и не листаем.
+      markGeoBlocked(st.stationuuid);
+      const net = await myNetwork();
+      const where = net?.country ? ` (страна: ${net.country}${net.ip ? `, ваш IP: ${net.ip}` : ''})` : '';
+      setError(`🔒 «${st.name}» не открывается из вашей страны${where}. Это ограничение самой станции, а не SlyNet — попробуйте другую станцию.`);
+      return;
+    }
+    quarantineStation(st.stationuuid, st.name, url, reason);
+    setError(verdict === 'dead' ? `⚠️ «${st.name}» сейчас не работает — скрыли её у вас. Включаем следующую…` : `Поток «${st.name}» недоступен. Включаем следующую…`);
+    const pl = playlistRef.current;
+    if (pl && pl.length > 1) {
+      const idx = pl.findIndex((x) => x.stationuuid === st.stationuuid);
+      const next = pl[(idx + 1) % pl.length];
+      if (next && next.stationuuid !== st.stationuuid) setTimeout(() => stillThis() && playStationRef.current(next, pl), 1500);
+    }
+  };
 
   // ---- Android: виджет и запуск с виджета / из будильника ----
   const nativeRef = useRef({ togglePlayPause: () => {}, playStation: (_s: Station) => {}, recent: [] as Station[], alarm });
