@@ -1,6 +1,7 @@
 import { isNativeApp } from '../utils/platform';
 import { pickStream, lowerStream, isWeakMode, QUALITY_EVENT } from '../services/streamQuality';
 import { loadCatalog } from '../services/catalogService';
+import { setStream, loadHls, preloadHlsIfNeeded } from '../services/hlsAudio';
 import { probeStream, markGeoBlocked, clearGeoBlocked, myNetwork } from '../services/streamCheck';
 import { hasNative, nativeNowPlaying, nativeSetAlarm, nativeStopAlarm, nativeLaunchAction, onNative } from '../services/nativeBridge';
 
@@ -255,7 +256,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         if (lower) {
           stallsRef.current = [];
           streamUrlRef.current = lower.url;
-          audio.src = lower.url;
+          setStream(audio, lower.url);
           audio.play().catch(() => {});
           const upd = { ...st, playBitrate: lower.bitrate };
           currentStationRef.current = upd;
@@ -528,8 +529,17 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       try {
         // Direct stream loading without crossOrigin to prevent CORS rejection on Icecast/Shoutcast
         audioRef.current.removeAttribute('crossOrigin');
-        audioRef.current.src = streamUrl;
         audioRef.current.volume = isMuted ? 0 : volume;
+        if (!setStream(audioRef.current, streamUrl)) {
+          // HLS-поток на компьютере: ждём hls.js и запускаем
+          const a = audioRef.current;
+          loadHls().then(() => {
+            if (streamUrlRef.current !== streamUrl) return;
+            setStream(a, streamUrl);
+            a.play().catch(() => {});
+          });
+          return;
+        }
 
         if (audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
           audioCtxRef.current.resume().catch(() => {});
@@ -573,7 +583,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       if (!userChoice && want.bitrate > (st.playBitrate || st.bitrate || 0)) return;
       streamUrlRef.current = want.url;
       stallsRef.current = [];
-      audio.src = want.url;
+      setStream(audio, want.url);
       audio.play().catch(() => {});
       const upd = { ...st, playBitrate: want.bitrate };
       currentStationRef.current = upd;
@@ -1017,6 +1027,8 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return () => clearInterval(interval);
   }, [alarm, playlist, currentStation, playStation, setVolume]);
 
+  useEffect(() => preloadHlsIfNeeded(), []);
+
   // ---- Станция не запустилась: повтор, проверка через сервер, понятное объяснение ----
   const retriedRef = useRef<Set<string>>(new Set());
   const failingRef = useRef('');
@@ -1034,7 +1046,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       setTimeout(() => {
         failingRef.current = '';
         if (stillThis() && audioRef.current) {
-          audioRef.current.src = url;
+          setStream(audioRef.current, url);
           audioRef.current.play().catch(() => {});
         }
       }, 1500);
