@@ -258,7 +258,11 @@
     "https://www.nme.com/news/music/grian-chatten-fontaines-dc-had-no-idea-ai-used-marianne-video-i-dont-condone-it-3973822?utm_source=rss&utm_medium=rss&utm_campaign=grian-chatten-fontaines-dc-had-no-idea-ai-used-marianne-video-i-dont-condone-it",
     "https://www.billboard.com/lists/amy-winehouse-back-to-black-tribute-concert-best-moments/",
     "https://www.billboard.com/pro/spotify-q3-earnings-report-subscriber-gains-revenue-growth/",
-    "https://www.billboard.com/music/rock/queens-of-the-stone-age-tonight-show-performance-watch-1236365591/"
+    "https://www.billboard.com/music/rock/queens-of-the-stone-age-tonight-show-performance-watch-1236365591/",
+    "https://www.billboard.com/music/rock/talking-heads-coffee-table-book-new-feeling-details-1236365611/",
+    "https://www.nme.com/news/music/watch-mark-ronson-salaam-remi-corinne-bailey-rae-jessie-reyez-and-more-celebrate-20-years-of-back-to-black-with-amy-winehouses-band-at-londons-roundhouse-3973831?utm_source=rss&utm_medium=rss&utm_campaign=watch-mark-ronson-salaam-remi-corinne-bailey-rae-jessie-reyez-and-more-celebrate-20-years-of-back-to-black-with-amy-winehouses-band-at-londons-roundhouse",
+    "https://www.nme.com/news/music/noel-gallagher-to-appear-on-final-season-of-chicken-shop-date-3973817?utm_source=rss&utm_medium=rss&utm_campaign=noel-gallagher-to-appear-on-final-season-of-chicken-shop-date",
+    "https://www.billboard.com/music/country/john-anderson-death-reaction-1236365421/"
   ],
   "releases": [
     "1.0.6",
@@ -349,6 +353,5 @@
   "featCta": 13,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 3,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
