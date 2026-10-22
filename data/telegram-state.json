@@ -302,7 +302,11 @@
     "https://pitchfork.com/story/westside-gunn-announces-new-album-heelmatic/",
     "https://www.billboard.com/pro/damon-dash-roc-a-fella-movie-rights-bankruptcy/",
     "https://www.billboard.com/pro/feds-respond-to-pooh-shiesty-complaints/",
-    "https://www.billboard.com/culture/product-recommendations/acotar-books-6-7-release-dates-sarah-j-maas-buy-online-1236365976/"
+    "https://www.billboard.com/culture/product-recommendations/acotar-books-6-7-release-dates-sarah-j-maas-buy-online-1236365976/",
+    "https://www.billboard.com/pro/spotify-co-ceos-talk-ai-music-remixing-tool-subscribers/",
+    "https://www.rollingstone.com/music/music-news/john-mayer-new-label-sob-rock-records-1235646820/",
+    "https://www.billboard.com/pro/global-nightlife-report-new-york-seoul-sydney-scenes-rate/",
+    "https://www.billboard.com/lists/john-anderson-top-songs-chart-hits/"
   ],
   "releases": [
     "1.0.6",
@@ -402,6 +406,5 @@
   "featCta": 16,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 1,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
