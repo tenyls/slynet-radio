@@ -70,4 +70,12 @@ export const onNative = (event: 'remote' | 'launchAction', cb: (action: string) 
 };
 
 /** Системное окно «Поделиться» Android (в приложении у WebView нет navigator.share) */
-export const nativeShare = (title: string, text: string) => safe(() => Native.share({ title, text }));
+export const nativeShare = async (title: string, text: string): Promise<boolean> => {
+  if (!hasNative()) return false;
+  try {
+    await Native.share({ title, text });
+    return true;
+  } catch {
+    return false; // старый APK без этой функции
+  }
+};

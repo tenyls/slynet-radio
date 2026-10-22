@@ -166,7 +166,9 @@ export const canSystemShare = () => hasNative() || typeof navigator.share === 'f
 export function shareTo(target: ShareTarget, text: string, url: string, title = 'SlyNet Radio'): Promise<boolean> | boolean {
   const full = `${text}\n${url}`;
   const open = (u: string) => {
-    window.open(u, '_blank', 'noopener');
+    // В Android-приложении новое окно не открывается — переходим по ссылке, приложение само откроет Telegram/WhatsApp/ВК
+    if (hasNative()) window.location.href = u;
+    else window.open(u, '_blank', 'noopener');
     return true;
   };
   switch (target) {
@@ -182,7 +184,8 @@ export function shareTo(target: ShareTarget, text: string, url: string, title = 
       return copyText(full);
     case 'system':
     default:
-      if (hasNative()) return nativeShare(title, full).then(() => true);
+      // если системное окно недоступно (старая версия приложения) — копируем текст со ссылкой
+      if (hasNative()) return nativeShare(title, full).then((ok) => ok || copyText(full).then(() => false));
       if (typeof navigator.share === 'function') {
         return navigator
           .share({ title, text, url })

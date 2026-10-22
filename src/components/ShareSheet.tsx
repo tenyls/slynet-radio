@@ -59,14 +59,13 @@ export const ShareSheet: React.FC = () => {
   const send = (t: ShareTarget) => {
     // без await перед вызовом — так требует Safari на iPhone
     const r = shareTo(t, text, url, title);
-    if (t === 'copy') {
-      Promise.resolve(r).then((ok) => {
-        if (ok) {
-          setCopied(true);
-          setTimeout(() => setCopied(false), 2000);
-        }
-      });
-    }
+    Promise.resolve(r).then((ok) => {
+      // «копировать» — или системное окно не открылось и мы скопировали текст вместо него
+      if ((t === 'copy' && ok) || (t === 'system' && !ok)) {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2500);
+      }
+    });
   };
 
   return createPortal(
@@ -139,7 +138,7 @@ export const ShareSheet: React.FC = () => {
             </button>
           )}
           <button onClick={() => send('copy')} className="py-3 rounded-2xl bg-zinc-800 text-white text-sm font-bold flex items-center justify-center gap-2 active:scale-[0.98]">
-            {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />} {copied ? 'Скопировано' : 'Копировать'}
+            {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />} {copied ? 'Скопировано — вставьте в чат' : 'Копировать'}
           </button>
           <button onClick={() => setQr((v) => !v)} className={`py-3 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 active:scale-[0.98] ${qr ? 'bg-emerald-500/20 text-emerald-200' : 'bg-zinc-800 text-white'}`}>
             <QrCode className="w-4 h-4" /> QR-код
