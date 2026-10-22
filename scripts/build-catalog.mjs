@@ -527,6 +527,58 @@ async function buildGeo() {
   await fs.writeFile(path.join(ROOT, 'public', 'geo.json'), JSON.stringify({ generatedAt: new Date().toISOString(), points }));
 }
 
+// ---------- 7. Подборки SlyNet: готовые проверенные плейлисты под настроение ----------
+const CURATED = [
+  { id: 'morning', name: 'Доброе утро', emoji: '☀️', note: 'Лёгкие хиты, чтобы проснуться с улыбкой', gradient: 'from-amber-400 via-orange-500 to-rose-500', tags: ['pop', 'adult contemporary', 'easy listening', 'hits'], ex: [/Radio Paradise — Main Mix/, /Radio Swiss Pop/, /FIP Pop/] },
+  { id: 'drive', name: 'В дорогу', emoji: '🚗', note: 'Рок и драйв для поездок', gradient: 'from-sky-500 via-indigo-500 to-violet-600', tags: ['classic rock', 'rock', 'hits', 'dance'], ex: [/Radio Paradise — Rock Mix/, /FIP Rock/, /Record — Rock$/, /Record — Big Hits/] },
+  { id: 'focus', name: 'Работа без слов', emoji: '🎧', note: 'Спокойный фон для учёбы и работы', gradient: 'from-emerald-500 via-teal-500 to-cyan-600', tags: ['ambient', 'lounge', 'classical', 'instrumental', 'lofi'], ex: [/Radio Paradise — Mellow/, /Radio Swiss Classic/, /Nightride FM — Chillsynth/, /Record — Chill-Out/] },
+  { id: 'friday', name: 'Вечер пятницы', emoji: '🪩', note: 'Танцевальные хиты и клубные сеты', gradient: 'from-fuchsia-500 via-pink-500 to-rose-500', tags: ['dance', 'house', 'disco', 'edm'], ex: [/Record — Record$/, /Record — Party 24\/7/, /Record — Summer Dance/, /Record — Megamix/, /FIP Electro/] },
+  { id: 'chill', name: 'Чилл и лаунж', emoji: '🌙', note: 'Для вечера и хорошего настроения', gradient: 'from-indigo-600 via-purple-600 to-slate-800', tags: ['chillout', 'chill', 'lounge', 'downtempo'], ex: [/Record — Chill House/, /Record — Deep$/, /FIP Groove/, /Radio Paradise — Global/] },
+  { id: 'jazz', name: 'Джаз-кафе', emoji: '🎷', note: 'Джаз, соул и боссанова', gradient: 'from-yellow-600 via-amber-700 to-stone-800', tags: ['jazz', 'smooth jazz', 'bossa nova', 'soul'], ex: [/FIP Jazz/, /Radio Swiss Jazz/] },
+  { id: 'retro', name: 'Хиты 80-х и 90-х', emoji: '📼', note: 'Легендарные песни, которые знают все', gradient: 'from-pink-500 via-purple-500 to-cyan-500', tags: ['80s', '90s', 'oldies', 'retro'], ex: [/Record — Супердискотека 90-х/, /Record — Record 80-х/, /Record — Хиты всех времен/] },
+  { id: 'ru', name: 'Русские хиты', emoji: '🎤', note: 'Популярная музыка на русском', gradient: 'from-red-500 via-rose-600 to-blue-700', tags: ['russian pop', 'русская музыка', 'russian'], cc: 'RU', ex: [/Record — Russian Mix/, /Record — Russian Hits/, /Record — Russian Gold/] },
+];
+
+async function buildCurated(exclusive) {
+  const exAll = (exclusive || []).flatMap((g) => g.stations);
+  const out = [];
+  for (const c of CURATED) {
+    const picked = [];
+    const seen = new Set();
+    const add = (s) => {
+      const k = norm(s.name);
+      if (!k || seen.has(k)) return;
+      seen.add(k);
+      picked.push(s);
+    };
+    for (const re of c.ex) exAll.filter((s) => re.test(s.name)).slice(0, 1).forEach(add);
+    const cand = [];
+    for (const tag of c.tags) {
+      try {
+        const list = await searchRB({ tag, order: 'votes', limit: '40', ...(c.cc ? { countrycode: c.cc } : {}) });
+        cand.push(...list.filter((s) => (s.bitrate || 0) >= 96 || !s.bitrate).map(slim));
+      } catch (e) {
+        log(`подборки: ${c.id}/${tag} — ${e.message}`);
+      }
+    }
+    const uniq = [];
+    const seenC = new Set([...seen]);
+    for (const s of cand) {
+      const k = norm(s.name);
+      if (!k || seenC.has(k)) continue;
+      seenC.add(k);
+      uniq.push(s);
+    }
+    const ok = await pool(uniq.slice(0, 30), 10, (s) => audioAlive(s.url_resolved || s.url));
+    uniq.slice(0, 30).filter((_, i) => ok[i]).forEach(add);
+    if (picked.length >= 5) out.push({ id: c.id, name: c.name, emoji: c.emoji, note: c.note, gradient: c.gradient, stations: picked.slice(0, 14) });
+  }
+  stats.curated = out.length;
+  log(`подборки: ${out.map((c) => `${c.name} ${c.stations.length}`).join(', ')}`);
+  if (out.length < 3) throw new Error('слишком мало подборок');
+  return out;
+}
+
 // ---------- запуск ----------
 const prev = await fs.readFile(OUT, 'utf8').then(JSON.parse).catch(() => ({}));
 const safe = async (name, fn, fallback) => {
@@ -547,6 +599,7 @@ const catalog = {
   deadLinks: await safe('ссылки', buildDeadLinks, prev.deadLinks || []),
   exclusive: await safe('эксклюзив', buildExclusive, prev.exclusive || []),
 };
+catalog.curated = await safe('подборки', () => buildCurated(catalog.exclusive), prev.curated || []);
 await safe('глобус', buildGeo, null);
 catalog.stats = stats;
 
