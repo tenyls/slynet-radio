@@ -68,7 +68,8 @@
     "9cd72f5e-5395-4c61-a9a3-923a70cbffcb",
     "ex-record-techno",
     "960c6812-0601-11e8-ae97-52543be04c81",
-    "32f2eb10-b498-4c85-96aa-7d9c266d9910"
+    "32f2eb10-b498-4c85-96aa-7d9c266d9910",
+    "ex-record-christmas-chill"
   ],
   "news": [
     "https://stereogum.com/2514933/she-punk-supergroup-plays-poly-styrene-tribute-in-london/news/",
@@ -337,6 +338,5 @@
   "featStyle": 5,
   "featCta": 13,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
-  "showIndex": 3,
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "showIndex": 3
 }
