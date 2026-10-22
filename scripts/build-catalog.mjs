@@ -540,7 +540,7 @@ const CURATED = [
 ];
 
 // Имена, которые в подборки не берём: торрент-трекеры, «ТВ»-станции, IPTV
-const CURATED_BAN = /kinozal|torrent|rutor|rutracker|iptv|\.tv\b|\btv\b|телеканал/i;
+const CURATED_BAN = /kinozal|torrent|rutor|rutracker|iptv|\.tv\b|\btv\b|телеканал|soloviev|соловь|звезда|zvezda|anon\.fm|news|новост|talk/i;
 async function buildCurated(exclusive) {
   const exAll = (exclusive || []).flatMap((g) => g.stations);
   const out = [];
