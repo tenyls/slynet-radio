@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Plus, Check, Heart, Play, Pause, ListPlus, Save, Loader2 } from 'lucide-react';
+import { X, Plus, Check, Heart, Play, Pause, ListPlus, Save, Loader2, Share2 } from 'lucide-react';
+import { openShare } from './ShareSheet';
 import { Station } from '../types/radio';
 import { usePlaylists } from '../hooks/usePlaylists';
 import { useFavorites } from '../hooks/useFavorites';
@@ -102,7 +103,7 @@ export async function resolveShared(pl: SharedPlaylist): Promise<Station[]> {
 }
 
 /** Плейлист, присланный другом: послушать, сохранить себе целиком или выбрать понравившиеся станции */
-export const SharedPlaylistModal: React.FC<{ data: SharedPlaylist; onClose: () => void }> = ({ data, onClose }) => {
+export const SharedPlaylistModal: React.FC<{ data: SharedPlaylist; onClose: () => void; preset?: Station[]; label?: string; note?: string }> = ({ data, onClose, preset, label, note }) => {
   const [stations, setStations] = useState<Station[] | null>(null);
   const [saved, setSaved] = useState(false);
   const { create } = usePlaylists();
@@ -110,8 +111,9 @@ export const SharedPlaylistModal: React.FC<{ data: SharedPlaylist; onClose: () =
   const { playStation, currentStation, isPlaying, togglePlayPause } = useAudio();
 
   useEffect(() => {
-    resolveShared(data).then(setStations);
-  }, [data]);
+    if (preset) setStations(preset);
+    else resolveShared(data).then(setStations);
+  }, [data, preset]);
 
   const allFav = () => stations?.forEach((s) => !isFavorite(s.stationuuid) && toggleFavorite(s));
   const favCount = stations?.filter((s) => favorites.some((f) => f.stationuuid === s.stationuuid)).length || 0;
@@ -122,9 +124,9 @@ export const SharedPlaylistModal: React.FC<{ data: SharedPlaylist; onClose: () =
         <div className="p-5 pb-3 bg-gradient-to-br from-emerald-500/20 via-cyan-500/10 to-transparent rounded-t-3xl">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <div className="text-[11px] font-bold uppercase tracking-wider text-emerald-300">🎁 Вам прислали плейлист</div>
+              <div className="text-[11px] font-bold uppercase tracking-wider text-emerald-300">{label || '🎁 Вам прислали плейлист'}</div>
               <h2 className="text-xl font-extrabold text-white truncate">{data.name}</h2>
-              <div className="text-xs text-zinc-400">{stations ? `${stations.length} станций` : 'Загружаем станции…'}{data.by ? ` · от ${data.by}` : ''}</div>
+              <div className="text-xs text-zinc-400">{note ? `${note} · ` : ''}{stations ? `${stations.length} станций` : 'Загружаем станции…'}{data.by ? ` · от ${data.by}` : ''}</div>
             </div>
             <button onClick={onClose} className="p-2 -mr-2 text-zinc-400" aria-label="Закрыть">
               <X className="w-5 h-5" />
@@ -147,6 +149,9 @@ export const SharedPlaylistModal: React.FC<{ data: SharedPlaylist; onClose: () =
               </button>
               <button onClick={allFav} className="px-4 py-2.5 rounded-xl bg-zinc-800 text-white text-sm font-bold flex items-center gap-2 active:scale-95">
                 <Heart className="w-4 h-4 text-rose-400" /> {favCount === stations.length ? 'Все в избранном' : 'Всё в избранное'}
+              </button>
+              <button onClick={() => openShare({ kind: 'playlist', name: data.name, stations })} className="px-4 py-2.5 rounded-xl bg-zinc-800 text-white text-sm font-bold flex items-center gap-2 active:scale-95">
+                <Share2 className="w-4 h-4 text-emerald-300" /> Поделиться
               </button>
             </div>
           )}

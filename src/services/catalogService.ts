@@ -16,6 +16,16 @@ export interface CatalogTvChannel {
   quality: string;
 }
 
+/** Подборка SlyNet: готовый плейлист под настроение (собирает робот каталога) */
+export interface CuratedList {
+  id: string;
+  name: string;
+  emoji: string;
+  note: string;
+  gradient: string;
+  stations: Station[];
+}
+
 export interface Catalog {
   generatedAt: string | null;
   artists: Record<string, Station[]>;
@@ -23,6 +33,7 @@ export interface Catalog {
   tv: CatalogTvChannel[];
   deadLinks: string[];
   exclusive?: { id: string; name: string; note: string; stations: Station[] }[];
+  curated?: CuratedList[];
 }
 
 const EMPTY: Catalog = { generatedAt: null, artists: {}, series: [], tv: [], deadLinks: [] };

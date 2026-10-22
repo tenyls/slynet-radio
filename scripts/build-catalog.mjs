@@ -539,15 +539,19 @@ const CURATED = [
   { id: 'ru', name: 'Русские хиты', emoji: '🎤', note: 'Популярная музыка на русском', gradient: 'from-red-500 via-rose-600 to-blue-700', tags: ['russian pop', 'русская музыка', 'russian'], cc: 'RU', ex: [/Record — Russian Mix/, /Record — Russian Hits/, /Record — Russian Gold/] },
 ];
 
+// Имена, которые в подборки не берём: торрент-трекеры, «ТВ»-станции, IPTV
+const CURATED_BAN = /kinozal|torrent|rutor|rutracker|iptv|\.tv\b|\btv\b|телеканал/i;
 async function buildCurated(exclusive) {
   const exAll = (exclusive || []).flatMap((g) => g.stations);
   const out = [];
   for (const c of CURATED) {
     const picked = [];
     const seen = new Set();
+    // ключ похожести: первые 12 букв названия без «HD», цифр и знаков (убирает почти-дубли)
+    const key = (n) => norm(n).replace(/\bhd\b|\d+/g, '').replace(/\s+/g, '').slice(0, 12);
     const add = (s) => {
-      const k = norm(s.name);
-      if (!k || seen.has(k)) return;
+      const k = key(s.name);
+      if (!k || seen.has(k) || CURATED_BAN.test(s.name)) return;
       seen.add(k);
       picked.push(s);
     };
@@ -564,8 +568,8 @@ async function buildCurated(exclusive) {
     const uniq = [];
     const seenC = new Set([...seen]);
     for (const s of cand) {
-      const k = norm(s.name);
-      if (!k || seenC.has(k)) continue;
+      const k = key(s.name);
+      if (!k || seenC.has(k) || CURATED_BAN.test(s.name)) continue;
       seenC.add(k);
       uniq.push(s);
     }

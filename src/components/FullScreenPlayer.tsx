@@ -1,6 +1,7 @@
 import { ListPlus as ListPlusIcon } from 'lucide-react';
 import { openShare } from './ShareSheet';
 import { openAddToPlaylist } from './PlaylistModals';
+import { SimilarStations } from './SimilarStations';
 import { WeakNetToggle } from './QualityChip';
 import { StationLogo } from './StationLogo';
 import { FEATURES } from '../utils/platform';
@@ -516,6 +517,9 @@ export const FullScreenPlayer: React.FC<FullScreenPlayerProps> = ({ isFavorite, 
               <span className="truncate">Артисты</span>
             </button>
           </div>
+
+          {/* Похожие станции */}
+          <SimilarStations station={currentStation} onPlay={(s, list) => playStation(s, list)} />
 
           {/* Сайт станции */}
           {currentStation.homepage && /^https?:\/\//.test(currentStation.homepage) && (

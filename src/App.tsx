@@ -56,6 +56,7 @@ import { pickStream } from './services/streamQuality';
 import { ShareSheet } from './components/ShareSheet';
 import { AddToPlaylistModal, SharedPlaylistModal } from './components/PlaylistModals';
 import { SharedPlaylist, parseSharedPlaylist, parseSharedStation, openInAppLink } from './services/share';
+import { CuratedSection } from './components/CuratedSection';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ArtistsView } from './components/ArtistsView';
 import { LiveTVView } from './components/LiveTVView';
@@ -799,6 +800,8 @@ function RadioApp() {
 
               {/* Под баннером: мой плейлист, Radio Record, эксклюзив, затем «Продолжить слушать» */}
               <MyPlaylist onGoFavorites={() => setCurrentTab('favorites')} />
+
+              <CuratedSection />
 
               <RecordSpotlight />
 

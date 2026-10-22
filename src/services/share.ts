@@ -5,6 +5,29 @@
 import { Station } from '../types/radio';
 import { GENRES } from '../constants/genres';
 import { hasNative, nativeShare } from './nativeBridge';
+import { getApiBase } from './apiService';
+
+// Красивые превью ссылок через наш сервер — включаются, когда на сервере есть эта функция
+let previewBase = '';
+let previewChecked = false;
+export async function checkSharePreview(): Promise<boolean> {
+  if (previewChecked) return !!previewBase;
+  const b = getApiBase();
+  if (!b) return false;
+  previewChecked = true;
+  try {
+    const h = await fetch(b + '/health', { cache: 'no-store' }).then((r) => r.json());
+    if (h?.share) previewBase = b;
+  } catch {}
+  return !!previewBase;
+}
+const withPreview = (siteUrl: string, title: string, desc: string, img = '') => {
+  if (!previewBase) return siteUrl;
+  const h = siteUrl.slice(siteUrl.indexOf('#'));
+  const q = new URLSearchParams({ h, n: title, d: desc });
+  if (img.startsWith('https://')) q.set('i', img);
+  return `${previewBase}/s?${q}`;
+};
 
 export const PUBLIC_SITE = 'https://tenyls.github.io/slynet-radio/';
 
@@ -36,8 +59,8 @@ export function unpack(p: Packed): { id: string; station?: Station } {
 
 // ---------- ссылки ----------
 export function stationLink(st: Station): string {
-  if (isGlobalId(st.stationuuid)) return `${PUBLIC_SITE}#station=${st.stationuuid}`;
-  return `${PUBLIC_SITE}#st=${toB64(JSON.stringify(pack(st)))}`;
+  const site = isGlobalId(st.stationuuid) ? `${PUBLIC_SITE}#station=${st.stationuuid}` : `${PUBLIC_SITE}#st=${toB64(JSON.stringify(pack(st)))}`;
+  return withPreview(site, `🎧 ${st.name} — слушать в SlyNet Radio`, describeStation(st), st.favicon || '');
 }
 
 export interface SharedPlaylist {
@@ -50,7 +73,8 @@ export const PLAYLIST_LIMIT = 60;
 export function playlistLink(name: string, stations: Station[], by?: string): string {
   const data: SharedPlaylist = { name: name.slice(0, 60), items: stations.slice(0, PLAYLIST_LIMIT).map(pack) };
   if (by) data.by = by.slice(0, 30);
-  return `${PUBLIC_SITE}#pl=${toB64(JSON.stringify(data))}`;
+  const names = stations.slice(0, 4).map((s) => s.name).join(', ');
+  return withPreview(`${PUBLIC_SITE}#pl=${toB64(JSON.stringify(data))}`, `🎶 Плейлист «${data.name}» — ${stations.length} станций`, `${names}${stations.length > 4 ? '…' : ''} — слушай и сохрани себе в SlyNet Radio`);
 }
 
 export function parseSharedPlaylist(code: string): SharedPlaylist | null {

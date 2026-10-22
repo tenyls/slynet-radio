@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { X, Copy, Check, QrCode, Share2, RefreshCw } from 'lucide-react';
 import { Station } from '../types/radio';
 import { StationLogo } from './StationLogo';
-import { shareTo, ShareTarget, canSystemShare, stationLink, stationShareText, playlistLink, playlistShareText } from '../services/share';
+import { checkSharePreview, shareTo, ShareTarget, canSystemShare, stationLink, stationShareText, playlistLink, playlistShareText } from '../services/share';
 
 export type ShareSubject =
   | { kind: 'station'; station: Station }
@@ -27,6 +27,10 @@ export const ShareSheet: React.FC = () => {
   const [text, setText] = useState('');
   const [copied, setCopied] = useState(false);
   const [qr, setQr] = useState(false);
+  const [, setPreviewReady] = useState(false);
+  useEffect(() => {
+    if (subject) checkSharePreview().then(setPreviewReady);
+  }, [subject]);
   const canvas = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
