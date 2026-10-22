@@ -239,7 +239,11 @@
     "https://www.rollingstone.com/music/music-news/talking-heads-new-feeling-book-1235646227/",
     "https://www.nme.com/news/music/chvrches-announce-album-all-the-kings-men-2027-uk-ireland-north-america-tour-3973779?utm_source=rss&utm_medium=rss&utm_campaign=chvrches-announce-album-all-the-kings-men-2027-uk-ireland-north-america-tour",
     "https://consequence.net/2026/10/chvrches-all-the-kings-men-2027-tour/",
-    "https://www.intermedia.ru/news/407574"
+    "https://www.intermedia.ru/news/407574",
+    "https://www.intermedia.ru/news/407600",
+    "https://www.intermedia.ru/news/407524",
+    "https://www.intermedia.ru/news/407514",
+    "https://www.rollingstone.com/music/music-news/jack-avery-gabbie-gonzalez-murder-plot-custody-daughter-1235646294/"
   ],
   "releases": [
     "1.0.6",
@@ -325,5 +329,5 @@
   "featCta": 12,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 3,
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
