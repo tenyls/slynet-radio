@@ -370,7 +370,11 @@
     "https://www.rollingstone.com/music/music-news/chappell-roan-performance-pinkpantheress-lola-young-1235647178/",
     "https://pitchfork.com/story/noel-gallagher-talks-vegans-macca-underwear-on-chicken-shop-date/",
     "https://www.billboard.com/lists/executive-turntable-barbara-cane-retires-from-bmi/",
-    "https://www.billboard.com/music/rb-hip-hop/drake-travis-scott-quavo-druski-snl-host-reactions-1236367271/"
+    "https://www.billboard.com/music/rb-hip-hop/drake-travis-scott-quavo-druski-snl-host-reactions-1236367271/",
+    "https://www.rollingstone.com/music/music-news/slayyyter-cancels-european-u-k-tour-laryngitis-vocal-tears-1235647296/",
+    "https://www.billboard.com/music/chart-beat/ella-langley-loving-life-again-number-1-country-airplay-chart-1236367306/",
+    "https://www.billboard.com/pro/stevie-wonder-lawsuit-evict-woman-hollywood-house/",
+    "https://www.billboard.com/music/pop/slayyyter-cancels-2026-tour-dates-laryngitis-vocal-cord-tears-1236367295/"
   ],
   "releases": [
     "1.0.6",
@@ -486,6 +490,5 @@
   "featCta": 19,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 2,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
