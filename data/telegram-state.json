@@ -350,7 +350,11 @@
     "https://www.intermedia.ru/news/407628",
     "https://www.nme.com/news/music/watch-my-chemical-romance-bring-out-fake-dallas-cowboys-cheerleaders-hollywood-bowl-3974041?utm_source=rss&utm_medium=rss&utm_campaign=watch-my-chemical-romance-bring-out-fake-dallas-cowboys-cheerleaders-hollywood-bowl",
     "https://www.intermedia.ru/news/407636",
-    "https://www.intermedia.ru/news/407637"
+    "https://www.intermedia.ru/news/407637",
+    "https://stereogum.com/2515417/worlds-top-autograph-seeker-apologizes-to-harry-styles-after-heated-street-encounter/news/",
+    "https://pitchfork.com/story/haywire-set-jam-packed-2027-tour/",
+    "https://www.billboard.com/video/billboard-hot-latin-songs-top-10-countdown-october-24-2026/",
+    "https://www.nme.com/news/music/the-strokes-phoebe-bridgers-musical-guests-snl-3974064?utm_source=rss&utm_medium=rss&utm_campaign=the-strokes-phoebe-bridgers-musical-guests-snl"
   ],
   "releases": [
     "1.0.6",
@@ -462,6 +466,5 @@
   "featCta": 18,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 1,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
