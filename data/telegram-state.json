@@ -343,7 +343,11 @@
     "https://www.intermedia.ru/news/407633",
     "https://www.billboard.com/music/rock/2027-sonic-temple-festival-lineup-blink-182-turnstile-1236367059/",
     "https://www.intermedia.ru/news/407632",
-    "https://www.nme.com/news/music/suede-interview-mercury-prize-new-anarcho-punk-album-manic-street-preachers-tour-3973989?utm_source=rss&utm_medium=rss&utm_campaign=suede-interview-mercury-prize-new-anarcho-punk-album-manic-street-preachers-tour"
+    "https://www.nme.com/news/music/suede-interview-mercury-prize-new-anarcho-punk-album-manic-street-preachers-tour-3973989?utm_source=rss&utm_medium=rss&utm_campaign=suede-interview-mercury-prize-new-anarcho-punk-album-manic-street-preachers-tour",
+    "https://www.billboard.com/lists/most-played-song-biggest-artist-warm-2026-dance-insights-report/",
+    "https://www.intermedia.ru/news/407628",
+    "https://www.nme.com/news/music/watch-my-chemical-romance-bring-out-fake-dallas-cowboys-cheerleaders-hollywood-bowl-3974041?utm_source=rss&utm_medium=rss&utm_campaign=watch-my-chemical-romance-bring-out-fake-dallas-cowboys-cheerleaders-hollywood-bowl",
+    "https://www.intermedia.ru/news/407636"
   ],
   "releases": [
     "1.0.6",
@@ -453,6 +457,5 @@
   "featCta": 18,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 1,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
