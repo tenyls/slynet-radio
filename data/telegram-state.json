@@ -381,7 +381,11 @@
     "https://stereogum.com/2515493/bruiser-wolf-conductor-williams-aint-got-time/music/",
     "https://stereogum.com/2515345/the-5-best-songs-of-the-week-649/lists/the-5-best-songs-of-the-week/",
     "https://stereogum.com/2515477/mark-william-lewis-adrenaline/music/",
-    "https://www.billboard.com/music/music-news/billy-corgan-fan-olivia-rodrigo-what-he-likes-her-music-1236367252/"
+    "https://www.billboard.com/music/music-news/billy-corgan-fan-olivia-rodrigo-what-he-likes-her-music-1236367252/",
+    "https://www.billboard.com/music/rb-hip-hop/yung-miami-drake-spend-dat-remix-1236367368/",
+    "https://www.billboard.com/music/chart-beat/case-closed-vol-109-billboard-japan-book-hot-100-1236367405/",
+    "https://www.billboard.com/culture/product-recommendations/katseye-daniela-lounge-campaign-interview-oct-2026-buy-1236367361/",
+    "https://www.billboard.com/music/latin/aarp-celebrated-power-of-music-legacy-billboard-latin-week-1236367323/"
   ],
   "releases": [
     "1.0.6",
@@ -499,6 +503,5 @@
   "featCta": 20,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 2,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
