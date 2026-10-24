@@ -580,9 +580,10 @@
     "1508414023",
     "1664137209",
     "1585193477",
-    "1659883099"
+    "1659883099",
+    "1576639866"
   ],
-  "camIndex": 23,
+  "camIndex": 24,
   "vkVia": "photo",
   "featRecent": [
     "quality",
@@ -597,6 +598,5 @@
   "featStyle": 8,
   "featCta": 24,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
-  "showIndex": 3,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
+  "showIndex": 3
 }
