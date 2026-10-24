@@ -392,7 +392,8 @@
     "https://www.billboard.com/photos/billboard-latin-music-week-2026-photo-booth-anuel-aa-becky-g-maluma-more-1236365751/",
     "https://www.billboard.com/music/music-news/noel-gallagher-chicken-shop-date-vegetarians-paul-mccartney-1236367401/",
     "https://www.billboard.com/pro/vince-gill-charlie-handsome-2026-nmpa-gold-platinum-gala/",
-    "https://www.billboard.com/culture/product-recommendations/matchbox-twenty-2027-tour-tickets-buy-shop-online-1236367080/"
+    "https://www.billboard.com/culture/product-recommendations/matchbox-twenty-2027-tour-tickets-buy-shop-online-1236367080/",
+    "https://www.billboard.com/music/rb-hip-hop/drake-40th-birthday-backstreet-boys-surprise-performance-1236367504/"
   ],
   "releases": [
     "1.0.6",
@@ -402,7 +403,7 @@
     "1.0.12"
   ],
   "askIndex": 1,
-  "lastNewsSource": "InterMedia",
+  "lastNewsSource": "Billboard",
   "lastReleaseAt": 1792708314941,
   "cams": [
     "1573776572",
@@ -512,7 +513,5 @@
   "featStyle": 4,
   "featCta": 20,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
-  "showIndex": 2,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "showIndex": 2
 }
