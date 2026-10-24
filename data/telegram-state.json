@@ -458,7 +458,11 @@
     "https://consequence.net/2026/10/system-of-a-down-second-third-2027-rose-bowl-shows/",
     "https://www.intermedia.ru/news/407639",
     "https://consequence.net/2026/10/adela-nicole-kidman-aint-in-la-fallon-watch/",
-    "https://stereogum.com/2515408/kacey-musgraves-announces-middle-of-nowhere-vol-2-tex-mex-tapes-hear-two-tracks/music/"
+    "https://stereogum.com/2515408/kacey-musgraves-announces-middle-of-nowhere-vol-2-tex-mex-tapes-hear-two-tracks/music/",
+    "https://pitchfork.com/story/10-new-albums-you-should-listen-to-now-alchemical-sisters-fine-shabazz-palaces/",
+    "https://www.intermedia.ru/news/407631",
+    "https://stereogum.com/2515071/the-black-parade-turns-20/reviews/the-anniversary/",
+    "https://consequence.net/2026/10/toni-cornell-cover-suicide-surrender/"
   ],
   "releases": [
     "1.0.6",
@@ -594,5 +598,5 @@
   "featCta": 24,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 3,
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
