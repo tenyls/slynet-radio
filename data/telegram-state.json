@@ -437,7 +437,11 @@
     "https://www.intermedia.ru/news/407654",
     "https://stereogum.com/2515438/yeule-hysterique/music/",
     "https://www.intermedia.ru/news/407586",
-    "https://consequence.net/2026/10/haywire-2027-world-tour/"
+    "https://consequence.net/2026/10/haywire-2027-world-tour/",
+    "https://stereogum.com/2515530/slayyyter-addresses-people-trying-to-recancel-her-cancels-rest-of-tour/news/",
+    "https://stereogum.com/2515526/dallas-cowboys-cheerleaders-take-legal-action-against-my-chemical-romance-over-staged-shootout/news/",
+    "https://stereogum.com/2515419/panchiko-announce-new-album-chimera-feat-billy-woods-mei-semones-clarion-more/music/",
+    "https://pitchfork.com/story/chappell-roan-duets-with-caroline-polachek-pinkpantheress-and-lola-young/"
   ],
   "releases": [
     "1.0.6",
@@ -568,6 +572,5 @@
   "featCta": 23,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 2,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
