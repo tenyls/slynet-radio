@@ -453,7 +453,11 @@
     "https://consequence.net/2026/10/tony-iommi-from-the-dark-album-stream/",
     "https://www.rollingstone.com/music/music-news/elvis-presley-rightsholders-anthropic-lawsuit-infringement-1235647682/",
     "https://www.billboard.com/music/rb-hip-hop/jay-z-la-night-one-guests-blue-ivy-john-legend-scarface-1236367544/",
-    "https://www.billboard.com/video/doja-cat-meta-interview/"
+    "https://www.billboard.com/video/doja-cat-meta-interview/",
+    "https://consequence.net/2026/10/system-of-a-down-second-third-2027-rose-bowl-shows/",
+    "https://www.intermedia.ru/news/407639",
+    "https://consequence.net/2026/10/adela-nicole-kidman-aint-in-la-fallon-watch/",
+    "https://stereogum.com/2515408/kacey-musgraves-announces-middle-of-nowhere-vol-2-tex-mex-tapes-hear-two-tracks/music/"
   ],
   "releases": [
     "1.0.6",
@@ -588,6 +592,5 @@
   "featCta": 24,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 3,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
