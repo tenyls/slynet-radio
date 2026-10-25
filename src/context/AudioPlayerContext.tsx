@@ -208,6 +208,11 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const streamUrlRef = useRef<string>('');
   const stallsRef = useRef<number[]>([]);
   const startedRef = useRef(false);
+  // Живой эфир после паузы: iPhone рвёт соединение со станцией, старый поток «мёртвый» —
+  // запоминаем, когда поставили на паузу, и при «▶» подключаемся заново
+  const pausedAtRef = useRef(0);
+  const resumeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const stallTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const previousVolumeRef = useRef<number>(0.85);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const sourceNodeRef = useRef<MediaElementAudioSourceNode | null>(null);
@@ -245,8 +250,25 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     // Режим «Слабый интернет»: 2 «заикания» за 30 секунд → переходим на поток полегче того же эфира.
     // В обычном режиме качество не скачет — всегда максимальное.
+    const clearStallTimer = () => {
+      if (stallTimerRef.current) {
+        clearTimeout(stallTimerRef.current);
+        stallTimerRef.current = null;
+      }
+    };
     const handleWaiting = () => {
       setIsLoading(true);
+      // Звук завис дольше 12 секунд (часто после сворачивания на iPhone) — переподключаемся к эфиру
+      if (startedRef.current && !stallTimerRef.current) {
+        stallTimerRef.current = setTimeout(() => {
+          stallTimerRef.current = null;
+          const url = streamUrlRef.current;
+          if (!audio.paused && url && audio.readyState < 3) {
+            setStream(audio, url);
+            audio.play().catch(() => {});
+          }
+        }, 12000);
+      }
       if (!startedRef.current || !isWeakMode()) return;
       const now = Date.now();
       stallsRef.current = [...stallsRef.current.filter((t) => now - t < 30000), now];
@@ -266,6 +288,12 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
     const handlePlaying = () => {
       startedRef.current = true;
+      pausedAtRef.current = 0;
+      clearStallTimer();
+      if (resumeTimerRef.current) {
+        clearTimeout(resumeTimerRef.current);
+        resumeTimerRef.current = null;
+      }
       if (currentStationRef.current) clearGeoBlocked(currentStationRef.current.stationuuid);
       clearConnectTimeout();
       setIsLoading(false);
@@ -273,6 +301,8 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       setError(null);
     };
     const handlePause = () => {
+      if (!pausedAtRef.current) pausedAtRef.current = Date.now();
+      clearStallTimer();
       setIsPlaying(false);
       setIsLoading(false);
     };
@@ -310,6 +340,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     return () => {
       clearConnectTimeout();
+      clearStallTimer();
       audio.removeEventListener('waiting', handleWaiting);
       audio.removeEventListener('playing', handlePlaying);
       audio.removeEventListener('pause', handlePause);
@@ -413,35 +444,80 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   }, [isMuted, volume]);
 
+  // Продолжить эфир после паузы (кнопка в приложении, экран блокировки, наушники).
+  // Пауза дольше 3 секунд → подключаемся к станции заново: старое соединение iPhone уже закрыл,
+  // а у живого радио всё равно нечего «досматривать». Не заиграло за 10 секунд — ещё одна попытка.
+  const resumeLive = useCallback(() => {
+    const a = audioRef.current;
+    const url = streamUrlRef.current;
+    if (!a || !url) return;
+    setError(null);
+    setIsLoading(true);
+    if (audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
+      audioCtxRef.current.resume().catch(() => {});
+    }
+    const stale = !pausedAtRef.current || Date.now() - pausedAtRef.current > 3000 || !!a.error || a.readyState === 0;
+    const start = (attempt: number) => {
+      if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+      resumeTimerRef.current = setTimeout(() => {
+        resumeTimerRef.current = null;
+        if (streamUrlRef.current !== url) return;
+        if (attempt === 0) {
+          setStream(a, url);
+          start(1);
+        } else {
+          setIsLoading(false);
+          setIsPlaying(false);
+          setError('Не удалось продолжить эфир — нажмите ▶ ещё раз или выберите другую станцию');
+        }
+      }, 10000);
+      a.play()
+        .then(() => setIsPlaying(true))
+        .catch((err) => console.warn('Play failed:', err));
+    };
+    if (stale && !setStream(a, url)) {
+      loadHls().then(() => {
+        if (streamUrlRef.current !== url) return;
+        setStream(a, url);
+        start(0);
+      });
+      return;
+    }
+    start(0);
+  }, []);
+
   // Toggle play / pause
   const togglePlayPause = useCallback(() => {
     if (!audioRef.current || !currentStation) return;
 
     if (isPlaying) {
+      if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+      resumeTimerRef.current = null;
       audioRef.current.pause();
       setIsPlaying(false);
     } else {
-      setError(null);
-      setIsLoading(true);
-      if (audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
-        audioCtxRef.current.resume();
-      }
-      const playPromise = audioRef.current.play();
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            setIsPlaying(true);
-            setIsLoading(false);
-          })
-          .catch((err) => {
-            console.warn('Play failed:', err);
-            setIsLoading(false);
-            setIsPlaying(false);
-            setError('Ошибка воспроизведения аудиопотока');
-          });
-      }
+      resumeLive();
     }
-  }, [isPlaying, currentStation]);
+  }, [isPlaying, currentStation, resumeLive]);
+
+  // Вернулись в приложение (iPhone: из фона или после блокировки) — если эфир «завис», переподключаемся
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState !== 'visible') return;
+      const a = audioRef.current;
+      const url = streamUrlRef.current;
+      if (a && url && !a.paused && startedRef.current && a.readyState < 3) {
+        setStream(a, url);
+        a.play().catch(() => {});
+      }
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('pageshow', onVisible);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('pageshow', onVisible);
+    };
+  }, []);
 
   // Play station implementation with 4.5s timeout auto-quarantine and history recording
   const playStation = useCallback(
@@ -1159,8 +1235,8 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   // Карточка «Сейчас играет» на экране блокировки, в шторке, на часах и в машине.
   // В приложении Android — через нативный модуль (он же держит звук при выключенном экране),
   // в браузере/на iPhone — через стандартный Media Session.
-  const controlsRef = useRef({ playNext, playPrevious });
-  controlsRef.current = { playNext, playPrevious };
+  const controlsRef = useRef({ playNext, playPrevious, resumeLive });
+  controlsRef.current = { playNext, playPrevious, resumeLive };
   useEffect(() => {
     if (!currentStation) return;
     const tags = currentStation.tags ? currentStation.tags.split(',').slice(0, 2).join(', ') : 'Радио';
@@ -1176,11 +1252,10 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       ],
     };
     const state = isPlaying ? 'playing' : 'paused';
-    const play = () => {
-      audioRef.current?.play().catch(() => {});
-      setIsPlaying(true);
-    };
+    const play = () => controlsRef.current.resumeLive();
     const pause = () => {
+      if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+      resumeTimerRef.current = null;
       audioRef.current?.pause();
       setIsPlaying(false);
     };
