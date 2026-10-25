@@ -526,7 +526,9 @@
     "https://consequence.net/2026/10/tinashe-2027-tour-dates/",
     "https://www.billboard.com/culture/product-recommendations/barcelona-real-madrid-2026-laliga-soccer-watch-online-free-1236365640/",
     "https://pitchfork.com/story/elvis-presley-catalog-owners-sue-ai-company-anthropic-for-copyright-infringement/",
-    "https://www.billboard.com/music/country/miranda-lambert-halftime-cowboys-thanksgiving-1236367616/"
+    "https://www.billboard.com/music/country/miranda-lambert-halftime-cowboys-thanksgiving-1236367616/",
+    "https://www.billboard.com/music/concerts/jay-z-la-night-2-dr-dre-snoop-dogg-too-short-guests-1236367642/",
+    "https://www.billboard.com/music/chart-beat/olivia-rodrigo-you-seem-pretty-sad-back-to-no1-billboard200-1236367607/"
   ],
   "releases": [
     "1.0.6",
@@ -677,6 +679,5 @@
   "featCta": 27,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 1,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
