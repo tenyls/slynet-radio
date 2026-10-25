@@ -496,7 +496,11 @@
     "https://www.nme.com/news/music/elvis-presley-rightsholders-sue-anthropic-copyright-infringement-274-songs-3974178?utm_source=rss&utm_medium=rss&utm_campaign=elvis-presley-rightsholders-sue-anthropic-copyright-infringement-274-songs",
     "https://www.intermedia.ru/news/407665",
     "https://www.intermedia.ru/news/407638",
-    "https://consequence.net/2026/10/tickets-on-sale-today-zach-bryan-tinashe-iron-maiden-matchbox-twenty/"
+    "https://consequence.net/2026/10/tickets-on-sale-today-zach-bryan-tinashe-iron-maiden-matchbox-twenty/",
+    "https://www.intermedia.ru/news/407651",
+    "https://www.billboard.com/music/music-news/cardi-b-katseye-concert-daughters-kulture-blossom-1236367584/",
+    "https://www.billboard.com/culture/product-recommendations/nfl-paris-2026-burna-boy-halftime-show-watch-live-free-1236365165/",
+    "https://www.billboard.com/music/music-news/macklemore-free-palestine-red-rocks-ed-sheeran-tour-exit-1236367576/"
   ],
   "releases": [
     "1.0.6",
@@ -640,6 +644,5 @@
   "featCta": 26,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 3,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
