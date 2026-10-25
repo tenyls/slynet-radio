@@ -480,7 +480,11 @@
     "https://www.intermedia.ru/news/407653",
     "https://www.nme.com/news/music/sam-fender-scraps-front-standing-tickets-reduced-prices-2027-stadium-tour-3974164?utm_source=rss&utm_medium=rss&utm_campaign=sam-fender-scraps-front-standing-tickets-reduced-prices-2027-stadium-tour",
     "https://www.nme.com/news/music/panchiko-new-album-chimera-glitchy-single-one-car-hits-another-3974049?utm_source=rss&utm_medium=rss&utm_campaign=panchiko-new-album-chimera-glitchy-single-one-car-hits-another",
-    "https://www.intermedia.ru/news/407641"
+    "https://www.intermedia.ru/news/407641",
+    "https://www.intermedia.ru/news/407663",
+    "https://www.nme.com/news/music/my-chemical-romance-legal-action-dallas-cowboys-cheerleaders-hollywood-bowl-3974167?utm_source=rss&utm_medium=rss&utm_campaign=my-chemical-romance-legal-action-dallas-cowboys-cheerleaders-hollywood-bowl",
+    "https://www.intermedia.ru/news/407662",
+    "https://consequence.net/2026/10/spanish-drum-virtuoso-el-estepario-siberiano-nine-inch-nails/"
   ],
   "releases": [
     "1.0.6",
@@ -621,6 +625,5 @@
   "featCta": 25,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 3,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
