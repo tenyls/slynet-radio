@@ -501,7 +501,11 @@
     "https://www.intermedia.ru/news/407651",
     "https://www.billboard.com/music/music-news/cardi-b-katseye-concert-daughters-kulture-blossom-1236367584/",
     "https://www.billboard.com/culture/product-recommendations/nfl-paris-2026-burna-boy-halftime-show-watch-live-free-1236365165/",
-    "https://www.billboard.com/music/music-news/macklemore-free-palestine-red-rocks-ed-sheeran-tour-exit-1236367576/"
+    "https://www.billboard.com/music/music-news/macklemore-free-palestine-red-rocks-ed-sheeran-tour-exit-1236367576/",
+    "https://www.rollingstone.com/music/music-news/jay-z-snoop-dogg-dr-dre-medley-los-angeles-show-1235647696/",
+    "https://www.intermedia.ru/news/407655",
+    "https://www.billboard.com/music/rb-hip-hop/drake-i-want-it-that-way-backstreet-boys-40th-birthday-1236367560/",
+    "https://www.billboard.com/pro/elvis-presley-estate-sues-suno-anthropic/"
   ],
   "releases": [
     "1.0.6",
@@ -646,6 +650,5 @@
   "featCta": 26,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 3,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
