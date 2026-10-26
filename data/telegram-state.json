@@ -146,8 +146,6 @@
     "2037c9d4-8d99-48f1-b5f1-eb60dc015773"
   ],
   "news": [
-    "https://stereogum.com/2514933/she-punk-supergroup-plays-poly-styrene-tribute-in-london/news/",
-    "https://pitchfork.com/story/watch-taylor-swift-debut-the-fate-of-ophelia-live-at-the-academy-museum-gala/",
     "https://www.rollingstone.com/music/music-news/bob-dylan-new-guitarist-randy-newman-tour-launch-1235644415/",
     "https://www.billboard.com/music/music-news/taylor-swift-fate-of-ophelia-live-debut-academy-museum-gala-1236362416/",
     "https://pitchfork.com/story/john-wilson-is-making-a-harry-styles-tour-documentary/",
@@ -545,7 +543,9 @@
     "https://www.intermedia.ru/news/407666",
     "https://www.billboard.com/lists/snubs-surprises-2026-caribbean-music-awards-jab-dennery/",
     "https://www.billboard.com/lists/2026-caribbean-music-awards-best-moments-soca-dancehall/",
-    "https://www.billboard.com/music/music-news/lisa-press-play-best-new-music-poll-results-1236367660/"
+    "https://www.billboard.com/music/music-news/lisa-press-play-best-new-music-poll-results-1236367660/",
+    "https://www.nme.com/news/music/phoebe-bridgers-all-points-east-2027-line-up-tickets-tour-london-3974184?utm_source=rss&utm_medium=rss&utm_campaign=phoebe-bridgers-all-points-east-2027-line-up-tickets-tour-london",
+    "https://www.intermedia.ru/news/407667"
   ],
   "releases": [
     "1.0.6",
@@ -702,6 +702,5 @@
   "featCta": 29,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 1,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
