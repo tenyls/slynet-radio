@@ -155,10 +155,6 @@
     "067467aa-0430-4c24-9d17-6de0e4258349"
   ],
   "news": [
-    "https://www.billboard.com/pro/supreme-court-wont-overturn-vetter-ruling/",
-    "https://www.billboard.com/music/music-news/donnie-wahlberg-plane-skids-off-runway-video-message-1236362867/",
-    "https://www.billboard.com/music/rock/bon-jovi-add-2027-stadium-dates-forever-tour-1236362879/",
-    "https://www.billboard.com/music/music-news/tate-mcrae-housewife-victorias-secret-fashion-show-2026-1236362781/",
     "https://pitchfork.com/story/tinashe-is-touring-in-2027/",
     "https://www.billboard.com/music/chart-beat/luminate-by-the-numbers-global-state-of-spanish-music-1236362871/",
     "https://www.intermedia.ru/news/407535",
@@ -554,7 +550,11 @@
     "https://stereogum.com/2515626/the-flaming-lips-announce-first-post-steven-drozd-album-the-teardrop-throbs-hear-god-will-control-the-werewolves/music/",
     "https://www.rollingstone.com/music/music-news/tate-mcrae-billboard-hot-100-number-two-olivia-rodrigo-1235645932/",
     "https://stereogum.com/2515621/lazer-bullet-announce-debut-album-40k-psychosis-angel-hear-angel-shit/music/",
-    "https://www.nme.com/news/music/heartworms-interview-guess-im-stuck-in-the-dark-new-album-interpol-bloc-party-tour-3974261?utm_source=rss&utm_medium=rss&utm_campaign=heartworms-interview-guess-im-stuck-in-the-dark-new-album-interpol-bloc-party-tour"
+    "https://www.nme.com/news/music/heartworms-interview-guess-im-stuck-in-the-dark-new-album-interpol-bloc-party-tour-3974261?utm_source=rss&utm_medium=rss&utm_campaign=heartworms-interview-guess-im-stuck-in-the-dark-new-album-interpol-bloc-party-tour",
+    "https://stereogum.com/2515605/omnis-philip-frobos-announces-new-solo-album-taste-for-the-unsavory-hear-the-handoff-feat-gustafs-lydia-gammill/music/",
+    "https://consequence.net/2026/10/sharon-osbourne-visits-ozzy-osbourne-grave-every-day/",
+    "https://pitchfork.com/story/sophia-stel-is-going-on-the-greatest-tour-of-all-time/",
+    "https://consequence.net/2026/10/judeline-los-angeles-new-album-bby-wow-karol-g/"
   ],
   "releases": [
     "1.0.6",
@@ -719,6 +719,5 @@
   "featCta": 31,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 2,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
