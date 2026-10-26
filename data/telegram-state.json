@@ -151,7 +151,8 @@
     "9638c05b-0601-11e8-ae97-52543be04c81",
     "c2b724db-9ddb-41e2-b190-324014c55467",
     "ex-record-cadillac",
-    "d82775da-f080-44d2-8de0-0effb81db596"
+    "d82775da-f080-44d2-8de0-0effb81db596",
+    "067467aa-0430-4c24-9d17-6de0e4258349"
   ],
   "news": [
     "https://www.billboard.com/pro/supreme-court-wont-overturn-vetter-ruling/",
@@ -718,6 +719,5 @@
   "featCta": 31,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 2,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
