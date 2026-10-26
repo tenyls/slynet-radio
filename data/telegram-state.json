@@ -156,10 +156,6 @@
     "ex-record-tiesto"
   ],
   "news": [
-    "https://pitchfork.com/story/tinashe-is-touring-in-2027/",
-    "https://www.billboard.com/music/chart-beat/luminate-by-the-numbers-global-state-of-spanish-music-1236362871/",
-    "https://www.intermedia.ru/news/407535",
-    "https://www.billboard.com/pro/ade-amsterdam-2026-jan-willem-van-de-ven-interview/",
     "https://www.billboard.com/video/buenos-dias-with-visit-miami-where-music-lives/",
     "https://www.billboard.com/music/music-news/ariana-grande-dog-coco-death-tribute-message-1236363000/",
     "https://www.billboard.com/music/pop/cyndi-lauper-fashion-auction-1236362952/",
@@ -555,7 +551,11 @@
     "https://stereogum.com/2515605/omnis-philip-frobos-announces-new-solo-album-taste-for-the-unsavory-hear-the-handoff-feat-gustafs-lydia-gammill/music/",
     "https://consequence.net/2026/10/sharon-osbourne-visits-ozzy-osbourne-grave-every-day/",
     "https://pitchfork.com/story/sophia-stel-is-going-on-the-greatest-tour-of-all-time/",
-    "https://consequence.net/2026/10/judeline-los-angeles-new-album-bby-wow-karol-g/"
+    "https://consequence.net/2026/10/judeline-los-angeles-new-album-bby-wow-karol-g/",
+    "https://stereogum.com/2515652/evilgiane-slimesito-announce-new-album-evilslime-2-out-friday-hear-georgia-state/news/",
+    "https://www.rollingstone.com/music/music-news/flaming-lips-teardrop-throbs-album-announcement-1235648060/",
+    "https://pitchfork.com/story/the-flaming-lips-reveal-a-album-the-teardrop-throbs/",
+    "https://consequence.net/2026/10/foreigner-2027-vegas-residency/"
   ],
   "releases": [
     "1.0.6",
@@ -721,6 +721,5 @@
   "featCta": 32,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 2,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
