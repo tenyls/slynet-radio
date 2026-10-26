@@ -149,10 +149,6 @@
     "8ea65019-e270-4737-868c-b4fc754cb4f1"
   ],
   "news": [
-    "https://www.intermedia.ru/news/407494",
-    "https://www.nme.com/news/music/watch-michael-stipe-join-members-the-national-rem-ebow-the-letter-3973454?utm_source=rss&utm_medium=rss&utm_campaign=watch-michael-stipe-join-members-the-national-rem-ebow-the-letter",
-    "https://www.billboard.com/culture/product-recommendations/nfl-london-2026-texans-jaguars-watch-live-online-free-1236359693/",
-    "https://www.nme.com/news/music/u2-skip-chile-latin-american-tour-negotiations-reportedly-fall-through-3973450?utm_source=rss&utm_medium=rss&utm_campaign=u2-skip-chile-latin-american-tour-negotiations-reportedly-fall-through",
     "https://www.intermedia.ru/news/407499",
     "https://www.nme.com/news/music/smashing-pumpkins-billy-corgan-blink-182-travis-barker-most-influential-drummer-3973446?utm_source=rss&utm_medium=rss&utm_campaign=smashing-pumpkins-billy-corgan-blink-182-travis-barker-most-influential-drummer",
     "https://www.intermedia.ru/news/407505",
@@ -548,7 +544,11 @@
     "https://www.intermedia.ru/news/407671",
     "https://www.intermedia.ru/news/407669",
     "https://www.intermedia.ru/news/407673",
-    "https://www.nme.com/news/music/watch-turnstile-play-gig-60000-people-raise-220k-for-humanitarian-aid-washington-monument-3974228?utm_source=rss&utm_medium=rss&utm_campaign=watch-turnstile-play-gig-60000-people-raise-220k-for-humanitarian-aid-washington-monument"
+    "https://www.nme.com/news/music/watch-turnstile-play-gig-60000-people-raise-220k-for-humanitarian-aid-washington-monument-3974228?utm_source=rss&utm_medium=rss&utm_campaign=watch-turnstile-play-gig-60000-people-raise-220k-for-humanitarian-aid-washington-monument",
+    "https://www.intermedia.ru/news/407670",
+    "https://www.nme.com/news/music/pulp-announce-one-off-hometown-pop-up-at-hallamshire-hotel-to-celebrate-sheffield-walk-of-fame-3974262?utm_source=rss&utm_medium=rss&utm_campaign=pulp-announce-one-off-hometown-pop-up-at-hallamshire-hotel-to-celebrate-sheffield-walk-of-fame",
+    "https://stereogum.com/2515286/the-number-ones-futures-wait-for-u-feat-drake-tems/columns/the-number-ones/",
+    "https://www.intermedia.ru/news/407680"
   ],
   "releases": [
     "1.0.6",
@@ -708,6 +708,5 @@
   "featCta": 29,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 1,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
