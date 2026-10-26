@@ -150,10 +150,6 @@
     "ex-fip-reggae"
   ],
   "news": [
-    "https://www.intermedia.ru/news/407499",
-    "https://www.nme.com/news/music/smashing-pumpkins-billy-corgan-blink-182-travis-barker-most-influential-drummer-3973446?utm_source=rss&utm_medium=rss&utm_campaign=smashing-pumpkins-billy-corgan-blink-182-travis-barker-most-influential-drummer",
-    "https://www.intermedia.ru/news/407505",
-    "https://www.intermedia.ru/news/407504",
     "https://www.rollingstone.com/music/music-news/miley-cyrus-hollywood-bowl-show-criticism-response-1235644514/",
     "https://www.billboard.com/culture/tv-film/este-haim-how-stevie-nicks-ursula-inspired-marvel-role-1236362102/",
     "https://www.billboard.com/music/rock/motley-crue-2027-las-vegas-carnival-sins-residency-dates-1236362235/",
@@ -549,7 +545,11 @@
     "https://www.intermedia.ru/news/407670",
     "https://www.nme.com/news/music/pulp-announce-one-off-hometown-pop-up-at-hallamshire-hotel-to-celebrate-sheffield-walk-of-fame-3974262?utm_source=rss&utm_medium=rss&utm_campaign=pulp-announce-one-off-hometown-pop-up-at-hallamshire-hotel-to-celebrate-sheffield-walk-of-fame",
     "https://stereogum.com/2515286/the-number-ones-futures-wait-for-u-feat-drake-tems/columns/the-number-ones/",
-    "https://www.intermedia.ru/news/407680"
+    "https://www.intermedia.ru/news/407680",
+    "https://www.rollingstone.com/music/music-news/chris-brown-2023-london-nightclub-assault-sentencing-1235647830/",
+    "https://www.intermedia.ru/news/407668",
+    "https://pitchfork.com/story/the-weeknd-debuts-hong-kong-in-hong-kong/",
+    "https://stereogum.com/2515567/aap-rocky-accused-of-plagiarizing-part-of-ai-assisted-shroom-clouds-video/news/"
   ],
   "releases": [
     "1.0.6",
@@ -710,6 +710,5 @@
   "featCta": 30,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 1,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
