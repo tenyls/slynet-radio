@@ -166,10 +166,6 @@
     "de39fc19-0636-4d05-acbb-2aba2c0d1f7a"
   ],
   "news": [
-    "https://www.billboard.com/video/ozuna-presents-alex-gallardo-with-latin-airplay-label-award/",
-    "https://www.intermedia.ru/news/407549",
-    "https://www.intermedia.ru/news/407541",
-    "https://www.nme.com/news/film/jaafar-jackson-cut-third-act-of-michael-biopic-child-abuse-allegations-3973588?utm_source=rss&utm_medium=rss&utm_campaign=jaafar-jackson-cut-third-act-of-michael-biopic-child-abuse-allegations",
     "https://www.nme.com/news/music/lily-allens-polka-dot-butt-plug-is-now-for-sale-in-her-new-line-of-sex-toys-3973581?utm_source=rss&utm_medium=rss&utm_campaign=lily-allens-polka-dot-butt-plug-is-now-for-sale-in-her-new-line-of-sex-toys",
     "https://www.nme.com/news/gaming-news/league-of-legends-k-pop-virtual-group-k-da-members-madison-beer-3973607?utm_source=rss&utm_medium=rss&utm_campaign=league-of-legends-k-pop-virtual-group-k-da-members-madison-beer",
     "https://www.billboard.com/pro/cd-baby-molly-neuman-evolution-indie-music-90s-now/",
@@ -565,7 +561,11 @@
     "https://stereogum.com/2515664/dead-mans-bones-share-lost-in-the-night-first-new-music-in-17-years/music/",
     "https://stereogum.com/2515598/back-to-black-turns-20/reviews/the-anniversary/",
     "https://www.intermedia.ru/news/407700",
-    "https://www.intermedia.ru/news/407692"
+    "https://www.intermedia.ru/news/407692",
+    "https://stereogum.com/2515679/neil-young-sues-trump-pac-over-rockin-in-the-free-world/news/",
+    "https://www.nme.com/news/music/kings-of-leon-announce-uk-european-exclusive-london-show-buy-tickets-3974370?utm_source=rss&utm_medium=rss&utm_campaign=kings-of-leon-announce-uk-european-exclusive-london-show-buy-tickets",
+    "https://www.rollingstone.com/music/music-news/ryan-gosling-dead-mans-bones-new-song-lost-in-the-night-1235648447/",
+    "https://www.intermedia.ru/news/407702"
   ],
   "releases": [
     "1.0.6",
@@ -741,6 +741,5 @@
   "featCta": 34,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 2,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
