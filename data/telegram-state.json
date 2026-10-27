@@ -168,10 +168,6 @@
     "ex-record-recordclubshow"
   ],
   "news": [
-    "https://www.billboard.com/music/pop/lady-gaga-hints-new-music-dont-worry-1236363425/",
-    "https://www.intermedia.ru/news/407544",
-    "https://stereogum.com/2515100/claire-rousay-zander-raymond-announce-new-album-something-good-hear-cant-we-have-both/music/",
-    "https://www.intermedia.ru/news/407539",
     "https://www.nme.com/news/music/the-rolling-stones-surprise-release-breezy-new-single-who-you-callin-crazy-3973619?utm_source=rss&utm_medium=rss&utm_campaign=the-rolling-stones-surprise-release-breezy-new-single-who-you-callin-crazy",
     "https://www.billboard.com/pro/believe-licensing-agreement-spotify-ai-remixing/",
     "https://www.intermedia.ru/news/407557",
@@ -567,7 +563,11 @@
     "https://www.rollingstone.com/music/music-news/kiss-end-of-the-road-tour-documentary-trailer-1235648469/",
     "https://stereogum.com/2515615/mia-joy-announces-new-album-star-echo-heavy-dove-hear-wings-of-desire/music/",
     "https://stereogum.com/2515683/macklemore-kicks-off-free-palestine-tour-with-hozier-kneecap-ed-sheerans-backing-band/news/",
-    "https://pitchfork.com/story/shelved-david-bowie-concert-film-revived-for-immersive-live-show/"
+    "https://pitchfork.com/story/shelved-david-bowie-concert-film-revived-for-immersive-live-show/",
+    "https://www.intermedia.ru/news/407714",
+    "https://pitchfork.com/story/listen-to-mj-lenderman-cover-lambchops-weakened/",
+    "https://stereogum.com/2515638/the-healing-power-of-horses-announce-new-ep-8725-hear-xstick_xstick/music/",
+    "https://stereogum.com/2515688/lambchops-new-songs-get-covered-on-demoed-ep-hear-mj-lendermans-weakened/music/"
   ],
   "releases": [
     "1.0.6",
@@ -745,6 +745,5 @@
   "featCta": 34,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 2,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
