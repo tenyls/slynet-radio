@@ -169,10 +169,6 @@
     "4a17b7fa-42a0-4c32-bdc6-dc1c59066c96"
   ],
   "news": [
-    "https://www.billboard.com/photos/latin-power-players-2026-best-photos-fuerza-regida-ozuna-1236363508/",
-    "https://www.intermedia.ru/news/407561",
-    "https://www.billboard.com/video/latin-musics-independent-revolution-billboard/",
-    "https://www.billboard.com/video/rise-of-latin-music-globally-billboard-latin-music-week-2026/",
     "https://www.billboard.com/music/rb-hip-hop/jay-z-super-bowl-halftime-show-headliner-rumors-fans-react-1236363538/",
     "https://www.nme.com/news/music/industry-leaders-call-for-backing-our-bbc-our-music-campaign-goodwill-cannot-secure-music-3973611?utm_source=rss&utm_medium=rss&utm_campaign=industry-leaders-call-for-backing-our-bbc-our-music-campaign-goodwill-cannot-secure-music",
     "https://www.intermedia.ru/news/407563",
@@ -568,7 +564,11 @@
     "https://stereogum.com/2515707/hum-announce-2027-tour/news/",
     "https://www.nme.com/news/music/white-house-tips-nicki-minaj-as-next-press-secretary-3974384?utm_source=rss&utm_medium=rss&utm_campaign=white-house-tips-nicki-minaj-as-next-press-secretary",
     "https://www.rollingstone.com/music/music-news/foo-fighters-jimmy-kimmel-window-taylor-hawkins-1235648487/",
-    "https://stereogum.com/2515697/karly-hartzman-debuts-new-song-and-covers-neil-young-at-roy-cooper-rally/news/"
+    "https://stereogum.com/2515697/karly-hartzman-debuts-new-song-and-covers-neil-young-at-roy-cooper-rally/news/",
+    "https://www.rollingstone.com/music/music-news/metallica-kirk-hammett-edgar-allen-poe-the-raven-1235648680/",
+    "https://stereogum.com/2515714/factory-floor-announce-first-new-album-in-10-years-one-trip-hear-two-songs/music/",
+    "https://www.intermedia.ru/news/407721",
+    "https://pitchfork.com/story/neil-young-really-wants-trump-to-stop-playing-rockin-in-the-free-world/"
   ],
   "releases": [
     "1.0.6",
@@ -748,5 +748,5 @@
   "featCta": 35,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 3,
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
