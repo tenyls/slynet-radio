@@ -160,10 +160,6 @@
     "0ae51e4d-6c87-467f-b630-85548b428310"
   ],
   "news": [
-    "https://pitchfork.com/story/brooklyn-street-named-after-late-babys-all-right-co-founder-billy-jones/",
-    "https://stereogum.com/2515077/munas-gets-so-hot-tour-bus-catches-fire-in-burbank/news/",
-    "https://www.billboard.com/culture/product-recommendations/zac-brown-band-red-rocks-concerts-livestream-watch-online-1236362803/",
-    "https://www.billboard.com/music/chart-beat/ella-langley-choosin-texas-ties-most-weeks-streaming-songs-1236363079/",
     "https://www.billboard.com/video/regional-mexican-dominates-2026-latin-music-awards/",
     "https://www.billboard.com/video/creativity-to-international-expansion-grupo-frontera-study/",
     "https://www.billboard.com/pro/mariah-carey-wins-dismissal-brother-defamation-lawsuit/",
@@ -559,7 +555,11 @@
     "https://www.intermedia.ru/news/407593",
     "https://www.intermedia.ru/news/407656",
     "https://pitchfork.com/story/dead-mans-bones-unveil-first-new-song-in-17-years/",
-    "https://www.nme.com/news/music/sophia-stel-2027-uk-europe-north-america-tour-dates-buy-tickets-3974318?utm_source=rss&utm_medium=rss&utm_campaign=sophia-stel-2027-uk-europe-north-america-tour-dates-buy-tickets"
+    "https://www.nme.com/news/music/sophia-stel-2027-uk-europe-north-america-tour-dates-buy-tickets-3974318?utm_source=rss&utm_medium=rss&utm_campaign=sophia-stel-2027-uk-europe-north-america-tour-dates-buy-tickets",
+    "https://www.intermedia.ru/news/407691",
+    "https://pitchfork.com/story/jay-z-confirmed-for-super-bowl-2027-halftime-show/",
+    "https://www.rollingstone.com/music/music-news/jay-z-headline-2027-super-bowl-halftime-show-1235648064/",
+    "https://www.rollingstone.com/music/music-news/neil-young-sues-trump-pac-rockin-in-the-free-world-rally-1235648258/"
   ],
   "releases": [
     "1.0.6",
@@ -729,6 +729,5 @@
   "featCta": 32,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 2,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
