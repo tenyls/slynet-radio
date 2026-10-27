@@ -165,10 +165,6 @@
     "ex-record-record"
   ],
   "news": [
-    "https://www.billboard.com/video/omar-al-joulani-presents-hans-schafer-executive-of-the-year/",
-    "https://www.intermedia.ru/news/407548",
-    "https://www.intermedia.ru/news/407546",
-    "https://www.billboard.com/video/george-prajin-regional-mexican-albums-label-of-the-year/",
     "https://www.billboard.com/video/ozuna-presents-alex-gallardo-with-latin-airplay-label-award/",
     "https://www.intermedia.ru/news/407549",
     "https://www.intermedia.ru/news/407541",
@@ -564,7 +560,11 @@
     "https://www.intermedia.ru/news/407708",
     "https://www.intermedia.ru/news/407706",
     "https://www.intermedia.ru/news/407705",
-    "https://www.intermedia.ru/news/407704"
+    "https://www.intermedia.ru/news/407704",
+    "https://stereogum.com/2515664/dead-mans-bones-share-lost-in-the-night-first-new-music-in-17-years/music/",
+    "https://stereogum.com/2515598/back-to-black-turns-20/reviews/the-anniversary/",
+    "https://www.intermedia.ru/news/407700",
+    "https://www.intermedia.ru/news/407692"
   ],
   "releases": [
     "1.0.6",
@@ -739,6 +739,5 @@
   "featCta": 34,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 2,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
