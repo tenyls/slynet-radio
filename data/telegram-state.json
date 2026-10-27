@@ -162,10 +162,6 @@
     "ex-record-chil"
   ],
   "news": [
-    "https://www.billboard.com/pro/black-music-action-coalition-statement-music-layoffs/",
-    "https://www.intermedia.ru/news/407458",
-    "https://www.billboard.com/lists/muna-tour-bus-catches-fire/",
-    "https://www.billboard.com/lists/82world-la-festival-2026-best-moments/",
     "https://www.billboard.com/music/concerts/pitch-music-arts-2027-lineup-1236363410/",
     "https://www.intermedia.ru/news/407513",
     "https://www.intermedia.ru/news/407538",
@@ -561,7 +557,11 @@
     "https://www.intermedia.ru/news/407696",
     "https://pitchfork.com/story/sufjan-stevens-makes-first-live-appearance-in-over-eight-years/",
     "https://www.rollingstone.com/music/music-news/taylor-swift-nashville-songwriters-hall-of-fame-speech-1235648096/",
-    "https://www.rollingstone.com/music/music-news/taylor-swift-inducted-nashville-songwriters-hall-of-fame-1235648093/"
+    "https://www.rollingstone.com/music/music-news/taylor-swift-inducted-nashville-songwriters-hall-of-fame-1235648093/",
+    "https://www.intermedia.ru/news/407693",
+    "https://www.intermedia.ru/news/407699",
+    "https://www.intermedia.ru/news/407698",
+    "https://www.intermedia.ru/news/407697"
   ],
   "releases": [
     "1.0.6",
@@ -733,6 +733,5 @@
   "featCta": 33,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 2,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
