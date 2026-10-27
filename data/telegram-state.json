@@ -161,7 +161,8 @@
     "3cca606d-6b4f-4644-8139-5d11fb897500",
     "ex-record-chil",
     "51895bd4-f369-11e8-a471-52543be04c81",
-    "12300aac-86c0-41ea-9a72-eba52a2c114d"
+    "12300aac-86c0-41ea-9a72-eba52a2c114d",
+    "ex-record-record"
   ],
   "news": [
     "https://www.billboard.com/video/omar-al-joulani-presents-hans-schafer-executive-of-the-year/",
@@ -738,6 +739,5 @@
   "featCta": 34,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 2,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
