@@ -169,10 +169,6 @@
     "4a17b7fa-42a0-4c32-bdc6-dc1c59066c96"
   ],
   "news": [
-    "https://www.nme.com/news/music/the-rolling-stones-surprise-release-breezy-new-single-who-you-callin-crazy-3973619?utm_source=rss&utm_medium=rss&utm_campaign=the-rolling-stones-surprise-release-breezy-new-single-who-you-callin-crazy",
-    "https://www.billboard.com/pro/believe-licensing-agreement-spotify-ai-remixing/",
-    "https://www.intermedia.ru/news/407557",
-    "https://www.billboard.com/video/brazil-on-the-rise-sound-scale-future-of-brazilian-music/",
     "https://www.billboard.com/photos/latin-power-players-2026-best-photos-fuerza-regida-ozuna-1236363508/",
     "https://www.intermedia.ru/news/407561",
     "https://www.billboard.com/video/latin-musics-independent-revolution-billboard/",
@@ -568,7 +564,11 @@
     "https://www.intermedia.ru/news/407714",
     "https://pitchfork.com/story/listen-to-mj-lenderman-cover-lambchops-weakened/",
     "https://stereogum.com/2515638/the-healing-power-of-horses-announce-new-ep-8725-hear-xstick_xstick/music/",
-    "https://stereogum.com/2515688/lambchops-new-songs-get-covered-on-demoed-ep-hear-mj-lendermans-weakened/music/"
+    "https://stereogum.com/2515688/lambchops-new-songs-get-covered-on-demoed-ep-hear-mj-lendermans-weakened/music/",
+    "https://stereogum.com/2515707/hum-announce-2027-tour/news/",
+    "https://www.nme.com/news/music/white-house-tips-nicki-minaj-as-next-press-secretary-3974384?utm_source=rss&utm_medium=rss&utm_campaign=white-house-tips-nicki-minaj-as-next-press-secretary",
+    "https://www.rollingstone.com/music/music-news/foo-fighters-jimmy-kimmel-window-taylor-hawkins-1235648487/",
+    "https://stereogum.com/2515697/karly-hartzman-debuts-new-song-and-covers-neil-young-at-roy-cooper-rally/news/"
   ],
   "releases": [
     "1.0.6",
@@ -747,6 +747,5 @@
   "featCta": 35,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 2,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
