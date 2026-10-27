@@ -164,10 +164,6 @@
     "12300aac-86c0-41ea-9a72-eba52a2c114d"
   ],
   "news": [
-    "https://www.billboard.com/music/music-news/swae-lee-australian-tour-2027-same-difference-1236363395/",
-    "https://www.intermedia.ru/news/407536",
-    "https://www.nme.com/news/music/has-sam-fender-shared-the-locations-of-his-2027-uk-stadium-tour-3973564?utm_source=rss&utm_medium=rss&utm_campaign=has-sam-fender-shared-the-locations-of-his-2027-uk-stadium-tour",
-    "https://www.billboard.com/video/jop-from-fuerza-regida-accepts-publisher-of-the-year-award/",
     "https://www.billboard.com/video/omar-al-joulani-presents-hans-schafer-executive-of-the-year/",
     "https://www.intermedia.ru/news/407548",
     "https://www.intermedia.ru/news/407546",
@@ -563,7 +559,11 @@
     "https://www.intermedia.ru/news/407701",
     "https://www.intermedia.ru/news/407694",
     "https://www.nme.com/news/music/watch-macklemore-hozier-kneecap-free-palestine-show-in-dublin-3974333?utm_source=rss&utm_medium=rss&utm_campaign=watch-macklemore-hozier-kneecap-free-palestine-show-in-dublin",
-    "https://www.intermedia.ru/news/407703"
+    "https://www.intermedia.ru/news/407703",
+    "https://www.intermedia.ru/news/407708",
+    "https://www.intermedia.ru/news/407706",
+    "https://www.intermedia.ru/news/407705",
+    "https://www.intermedia.ru/news/407704"
   ],
   "releases": [
     "1.0.6",
@@ -737,6 +737,5 @@
   "featCta": 33,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 2,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
