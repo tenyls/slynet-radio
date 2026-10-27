@@ -167,10 +167,6 @@
     "598c4d0e-6b06-43fb-bff4-717c591213a9"
   ],
   "news": [
-    "https://www.nme.com/news/music/lily-allens-polka-dot-butt-plug-is-now-for-sale-in-her-new-line-of-sex-toys-3973581?utm_source=rss&utm_medium=rss&utm_campaign=lily-allens-polka-dot-butt-plug-is-now-for-sale-in-her-new-line-of-sex-toys",
-    "https://www.nme.com/news/gaming-news/league-of-legends-k-pop-virtual-group-k-da-members-madison-beer-3973607?utm_source=rss&utm_medium=rss&utm_campaign=league-of-legends-k-pop-virtual-group-k-da-members-madison-beer",
-    "https://www.billboard.com/pro/cd-baby-molly-neuman-evolution-indie-music-90s-now/",
-    "https://www.billboard.com/pro/harvey-mason-jr-paley-los-angeles-board-of-governors/",
     "https://www.billboard.com/music/pop/lady-gaga-hints-new-music-dont-worry-1236363425/",
     "https://www.intermedia.ru/news/407544",
     "https://stereogum.com/2515100/claire-rousay-zander-raymond-announce-new-album-something-good-hear-cant-we-have-both/music/",
@@ -566,7 +562,11 @@
     "https://stereogum.com/2515679/neil-young-sues-trump-pac-over-rockin-in-the-free-world/news/",
     "https://www.nme.com/news/music/kings-of-leon-announce-uk-european-exclusive-london-show-buy-tickets-3974370?utm_source=rss&utm_medium=rss&utm_campaign=kings-of-leon-announce-uk-european-exclusive-london-show-buy-tickets",
     "https://www.rollingstone.com/music/music-news/ryan-gosling-dead-mans-bones-new-song-lost-in-the-night-1235648447/",
-    "https://www.intermedia.ru/news/407702"
+    "https://www.intermedia.ru/news/407702",
+    "https://www.rollingstone.com/music/music-news/kiss-end-of-the-road-tour-documentary-trailer-1235648469/",
+    "https://stereogum.com/2515615/mia-joy-announces-new-album-star-echo-heavy-dove-hear-wings-of-desire/music/",
+    "https://stereogum.com/2515683/macklemore-kicks-off-free-palestine-tour-with-hozier-kneecap-ed-sheerans-backing-band/news/",
+    "https://pitchfork.com/story/shelved-david-bowie-concert-film-revived-for-immersive-live-show/"
   ],
   "releases": [
     "1.0.6",
@@ -743,6 +743,5 @@
   "featCta": 34,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 2,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
