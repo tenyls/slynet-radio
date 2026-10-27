@@ -161,10 +161,6 @@
     "3cca606d-6b4f-4644-8139-5d11fb897500"
   ],
   "news": [
-    "https://www.billboard.com/video/regional-mexican-dominates-2026-latin-music-awards/",
-    "https://www.billboard.com/video/creativity-to-international-expansion-grupo-frontera-study/",
-    "https://www.billboard.com/pro/mariah-carey-wins-dismissal-brother-defamation-lawsuit/",
-    "https://stereogum.com/2515085/dominic-fike-shares-new-single-pangea-earns-first-top-10-hit-with-8-year-old-babydoll/music/",
     "https://www.billboard.com/pro/black-music-action-coalition-statement-music-layoffs/",
     "https://www.intermedia.ru/news/407458",
     "https://www.billboard.com/lists/muna-tour-bus-catches-fire/",
@@ -560,7 +556,11 @@
     "https://www.intermedia.ru/news/407691",
     "https://pitchfork.com/story/jay-z-confirmed-for-super-bowl-2027-halftime-show/",
     "https://www.rollingstone.com/music/music-news/jay-z-headline-2027-super-bowl-halftime-show-1235648064/",
-    "https://www.rollingstone.com/music/music-news/neil-young-sues-trump-pac-rockin-in-the-free-world-rally-1235648258/"
+    "https://www.rollingstone.com/music/music-news/neil-young-sues-trump-pac-rockin-in-the-free-world-rally-1235648258/",
+    "https://www.intermedia.ru/news/407696",
+    "https://pitchfork.com/story/sufjan-stevens-makes-first-live-appearance-in-over-eight-years/",
+    "https://www.rollingstone.com/music/music-news/taylor-swift-nashville-songwriters-hall-of-fame-speech-1235648096/",
+    "https://www.rollingstone.com/music/music-news/taylor-swift-inducted-nashville-songwriters-hall-of-fame-1235648093/"
   ],
   "releases": [
     "1.0.6",
@@ -731,6 +731,5 @@
   "featCta": 33,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 2,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
