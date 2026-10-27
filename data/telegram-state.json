@@ -168,7 +168,8 @@
     "ex-record-recordclubshow",
     "4a17b7fa-42a0-4c32-bdc6-dc1c59066c96",
     "cf0ab710-020b-4e3f-99af-2bf059466d36",
-    "ex-record-pump"
+    "ex-record-pump",
+    "2a526572-4230-4b22-9e47-79383973ee0e"
   ],
   "news": [
     "https://www.rollingstone.com/music/music-news/spotify-removes-50-million-spam-songs-1235645433/",
@@ -753,6 +754,5 @@
   "featCta": 36,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 3,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
