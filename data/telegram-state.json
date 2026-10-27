@@ -172,10 +172,6 @@
     "2a526572-4230-4b22-9e47-79383973ee0e"
   ],
   "news": [
-    "https://www.rollingstone.com/music/music-news/spotify-removes-50-million-spam-songs-1235645433/",
-    "https://www.billboard.com/lists/dominic-fike-ashe-bruno-mars-chart-highlights-oct-24-2026/",
-    "https://www.billboard.com/music/rb-hip-hop/kim-kardashian-north-west-halloween-costume-2026-1236363913/",
-    "https://www.billboard.com/music/country/little-big-town-hardy-nashvilles-big-bash-new-years-eve-1236363848/",
     "https://www.billboard.com/video/ryan-castro-baby-rasta-and-gringo-evolution-of-reggaeton-hit/",
     "https://www.intermedia.ru/news/407567",
     "https://www.billboard.com/music/features/caribbean-up-and-comer-october-2026-umpa-saint-lucia-1236363973/",
@@ -571,7 +567,11 @@
     "https://stereogum.com/2515698/taylor-swift-nashville-songwriters-hall-of-fame-induction/news/",
     "https://stereogum.com/2515731/titus-andronicus-eric-harm-announces-debut-solo-album-produced-by-patrick-stickles/music/",
     "https://pitchfork.com/story/8-new-albums-you-should-listen-to-now-diiv-queens-of-the-stone-age/",
-    "https://www.rollingstone.com/music/music-news/beyonce-super-bowl-halftime-show-flashback-1235648558/"
+    "https://www.rollingstone.com/music/music-news/beyonce-super-bowl-halftime-show-flashback-1235648558/",
+    "https://pitchfork.com/story/brakence-sets-2027-north-american-tour/",
+    "https://www.billboard.com/pro/my-chemical-romance-drop-dallas-cowboys-cheerleader-outfits/",
+    "https://stereogum.com/2515261/album-of-the-week-diiv-zirp/reviews/album-of-the-week/",
+    "https://www.billboard.com/music/rb-hip-hop/jay-z-super-bowl-halftime-show-poll-which-songs-should-play-1236369127/"
   ],
   "releases": [
     "1.0.6",
@@ -754,6 +754,5 @@
   "featCta": 36,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 3,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
