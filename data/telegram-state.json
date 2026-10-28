@@ -183,7 +183,8 @@
     "ex-record-trap",
     "33fcdf94-5605-49bb-8e34-206f38c335dc",
     "730d9f95-57a3-4eec-94a2-ed270baa64c8",
-    "ex-record-chillhouse"
+    "ex-record-chillhouse",
+    "649018d6-9239-4f28-9f9a-ae3f1732379f"
   ],
   "news": [
     "https://www.rollingstone.com/music/music-news/douglas-dulgarian-they-are-gutting-a-body-of-water-gofundme-1235645945/",
@@ -781,5 +782,5 @@
   "featCta": 39,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 1,
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
