@@ -184,10 +184,6 @@
     "33fcdf94-5605-49bb-8e34-206f38c335dc"
   ],
   "news": [
-    "https://www.billboard.com/lists/2027-grammy-ballot-genre-bridging-albums/",
-    "https://www.billboard.com/pro/ozuna-empire-publishing-deal/",
-    "https://www.rollingstone.com/music/music-news/beck-in-the-night-zoolander-tonight-show-1235645901/",
-    "https://stereogum.com/2515194/wendy-eisenberg-releases-surprise-new-companion-album-wweennddyy-eeiisseennbbeerrgg/music/",
     "https://www.intermedia.ru/news/407585",
     "https://stereogum.com/2515212/clap-your-hands-say-yeah-announce-new-album-burned-hear-fever-of-the-mind/music/",
     "https://pitchfork.com/story/clap-your-hands-say-yeah-launch-new-album-burned-2027-tour/",
@@ -583,7 +579,11 @@
     "https://www.intermedia.ru/news/407745",
     "https://stereogum.com/2515804/tindersticks-announce-new-album-dog-roses-hear-loving-leaving/music/",
     "https://www.billboard.com/culture/tv-film/harry-shum-johnson-spooky-dance-britney-spears-toxic-dwts-watch-1236369531/",
-    "https://www.billboard.com/pro/electronic-label-westwood-recordings-signs-jv-monstercat/"
+    "https://www.billboard.com/pro/electronic-label-westwood-recordings-signs-jv-monstercat/",
+    "https://stereogum.com/2515789/kilby-block-party-announces-2027-lineup/news/",
+    "https://www.intermedia.ru/news/407751",
+    "https://www.billboard.com/music/rb-hip-hop/roger-goodell-jay-z-wanted-super-bowl-halftime-show-1236369541/",
+    "https://www.billboard.com/music/pop/jennifer-lopez-proof-of-love-single-bonus-track-love-vinyl-1236369580/"
   ],
   "releases": [
     "1.0.6",
@@ -777,6 +777,5 @@
   "featCta": 38,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 3,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
