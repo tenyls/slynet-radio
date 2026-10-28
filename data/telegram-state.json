@@ -181,10 +181,6 @@
     "edbb4c24-20ff-49a9-889e-7faeaa98c2cd"
   ],
   "news": [
-    "https://pitchfork.com/story/bicep-reveal-first-album-in-five-years-drop-three-new-songs/",
-    "https://stereogum.com/2515176/ibex-clone-announce-new-album-gravity-hear-the-title-track/music/",
-    "https://www.intermedia.ru/news/407572",
-    "https://www.intermedia.ru/news/407578",
     "https://www.nme.com/news/music/hayley-williams-defends-fontaines-dcs-dopamine-chamber-multi-faceted-stylistically-versatile-3973727?utm_source=rss&utm_medium=rss&utm_campaign=hayley-williams-defends-fontaines-dcs-dopamine-chamber-multi-faceted-stylistically-versatile",
     "https://www.intermedia.ru/news/407581",
     "https://www.billboard.com/music/rock/gram-parsons-tribute-emmylou-harris-elvis-costello-rock-hall-1236364344/",
@@ -580,7 +576,11 @@
     "https://www.billboard.com/music/concerts/sam-fender-ticket-presale-newcastle-bot-attack-1236369500/",
     "https://www.billboard.com/music/pop/kevin-jonas-accidentally-sent-picture-penis-group-chat-1236369498/",
     "https://www.intermedia.ru/news/407738",
-    "https://www.nme.com/news/film/robert-del-naja-massive-attack-life-support-film-soundtrack-kneecap-paul-weller-3974434?utm_source=rss&utm_medium=rss&utm_campaign=robert-del-naja-massive-attack-life-support-film-soundtrack-kneecap-paul-weller"
+    "https://www.nme.com/news/film/robert-del-naja-massive-attack-life-support-film-soundtrack-kneecap-paul-weller-3974434?utm_source=rss&utm_medium=rss&utm_campaign=robert-del-naja-massive-attack-life-support-film-soundtrack-kneecap-paul-weller",
+    "https://www.intermedia.ru/news/407741",
+    "https://www.billboard.com/music/rock/kiss-two-part-end-of-the-road-documentary-final-tour-trailer-1236369517/",
+    "https://www.billboard.com/video/ezekiel-lewis-epic-records-finding-new-stars-on-the-record/",
+    "https://www.intermedia.ru/news/407735"
   ],
   "releases": [
     "1.0.6",
@@ -771,6 +771,5 @@
   "featCta": 38,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 3,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
