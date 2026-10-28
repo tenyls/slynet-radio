@@ -180,7 +180,8 @@
     "ex-record-deep",
     "edbb4c24-20ff-49a9-889e-7faeaa98c2cd",
     "2b501db4-e4b6-4106-9670-9875536f70f1",
-    "ex-record-trap"
+    "ex-record-trap",
+    "33fcdf94-5605-49bb-8e34-206f38c335dc"
   ],
   "news": [
     "https://www.billboard.com/lists/2027-grammy-ballot-genre-bridging-albums/",
@@ -776,6 +777,5 @@
   "featCta": 38,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 3,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
