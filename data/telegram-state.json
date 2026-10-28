@@ -192,10 +192,6 @@
     "ex-nightride-horrorsynth"
   ],
   "news": [
-    "https://pitchfork.com/story/watch-fontaines-dc-perform-on-jools-holland/",
-    "https://pitchfork.com/story/ben-folds-five-announce-first-tour-since-2013/",
-    "https://pitchfork.com/story/yung-miami-announces-debut-solo-album-watch-dis-features/",
-    "https://stereogum.com/2515225/david-murray-year-one/columns/ugly-beauty/",
     "https://stereogum.com/2515282/dowsers-dogwood-three-forks-of-cheat/music/",
     "https://consequence.net/2026/10/mxpx-new-album-single-panic-attack/",
     "https://pitchfork.com/story/chvrches-announce-first-album-in-six-years-and-2027-tour/",
@@ -591,7 +587,11 @@
     "https://www.billboard.com/music/rb-hip-hop/megan-thee-stallion-hottieween-trailer-1236369868/",
     "https://www.billboard.com/music/country/miranda-lambert-songwriting-ross-golan-1236369881/",
     "https://www.billboard.com/pro/film-producer-kathleen-kennedy-2028-summer-olympics/",
-    "https://consequence.net/2026/10/the-chats-new-album-half-cut/"
+    "https://consequence.net/2026/10/the-chats-new-album-half-cut/",
+    "https://www.billboard.com/pro/stevie-nicks-honor-larry-mestel-2026-city-of-hope-gala/",
+    "https://www.billboard.com/music/music-news/rihanna-product-asap-rocky-stealing-from-her-1236369916/",
+    "https://www.rollingstone.com/music/music-news/beach-boys-pull-out-john-stamos-california-sound-1235649359/",
+    "https://stereogum.com/2515840/jim-james-announces-memoir/news/"
   ],
   "releases": [
     "1.0.6",
@@ -791,6 +791,5 @@
   "featCta": 40,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 1,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
