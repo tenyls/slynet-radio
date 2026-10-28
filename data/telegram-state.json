@@ -177,7 +177,8 @@
     "ex-record-mf",
     "d95c1da9-838c-4684-a009-44fc73608279",
     "3af3be8d-da3e-4051-a604-d5958f410732",
-    "ex-record-deep"
+    "ex-record-deep",
+    "edbb4c24-20ff-49a9-889e-7faeaa98c2cd"
   ],
   "news": [
     "https://pitchfork.com/story/bicep-reveal-first-album-in-five-years-drop-three-new-songs/",
@@ -770,6 +771,5 @@
   "featCta": 38,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 3,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
