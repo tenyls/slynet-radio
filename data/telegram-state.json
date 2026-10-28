@@ -178,10 +178,6 @@
     "d95c1da9-838c-4684-a009-44fc73608279"
   ],
   "news": [
-    "https://www.intermedia.ru/news/407459",
-    "https://www.intermedia.ru/news/407500",
-    "https://www.intermedia.ru/news/407570",
-    "https://www.billboard.com/culture/tv-film/beck-sacha-baron-cohen-tonight-show-performance-watch-1236364237/",
     "https://www.billboard.com/pro/apra-amcos-reports-record-high-revenue/",
     "https://www.billboard.com/music/rock/powderfinger-pledges-encore-dates-reunion-tour-sells-out-1236364224/",
     "https://www.intermedia.ru/news/407571",
@@ -577,7 +573,11 @@
     "https://www.intermedia.ru/news/407725",
     "https://www.billboard.com/pro/zara-larsson-smashes-venue-record-nz-spark-arena/",
     "https://www.billboard.com/pro/billboard-latin-music-awards-2026-ratings-hit/",
-    "https://www.billboard.com/media/podcasts/2027-best-new-artist-grammy-race-discussion-pop-shop-podcast-1236369387/"
+    "https://www.billboard.com/media/podcasts/2027-best-new-artist-grammy-race-discussion-pop-shop-podcast-1236369387/",
+    "https://www.intermedia.ru/news/407730",
+    "https://www.nme.com/news/music/check-out-chvrches-tender-single-overthinker-3974410?utm_source=rss&utm_medium=rss&utm_campaign=check-out-chvrches-tender-single-overthinker",
+    "https://www.intermedia.ru/news/407728",
+    "https://www.intermedia.ru/news/407729"
   ],
   "releases": [
     "1.0.6",
@@ -765,6 +765,5 @@
   "featCta": 37,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 3,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
