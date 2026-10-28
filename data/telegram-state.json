@@ -182,10 +182,6 @@
     "2b501db4-e4b6-4106-9670-9875536f70f1"
   ],
   "news": [
-    "https://www.nme.com/news/music/hayley-williams-defends-fontaines-dcs-dopamine-chamber-multi-faceted-stylistically-versatile-3973727?utm_source=rss&utm_medium=rss&utm_campaign=hayley-williams-defends-fontaines-dcs-dopamine-chamber-multi-faceted-stylistically-versatile",
-    "https://www.intermedia.ru/news/407581",
-    "https://www.billboard.com/music/rock/gram-parsons-tribute-emmylou-harris-elvis-costello-rock-hall-1236364344/",
-    "https://www.intermedia.ru/news/407580",
     "https://www.billboard.com/music/pop/lisa-playstation-spot-tarantino-watch-1236364319/",
     "https://www.billboard.com/music/country/jordan-davis-mess-makin-tracks-1236364137/",
     "https://www.intermedia.ru/news/407577",
@@ -581,7 +577,11 @@
     "https://www.intermedia.ru/news/407741",
     "https://www.billboard.com/music/rock/kiss-two-part-end-of-the-road-documentary-final-tour-trailer-1236369517/",
     "https://www.billboard.com/video/ezekiel-lewis-epic-records-finding-new-stars-on-the-record/",
-    "https://www.intermedia.ru/news/407735"
+    "https://www.intermedia.ru/news/407735",
+    "https://www.billboard.com/pro/distiller-records-speedy-wunderground-labels-partnership/",
+    "https://www.intermedia.ru/news/407743",
+    "https://stereogum.com/2515798/pivot-gang-location/music/",
+    "https://www.billboard.com/pro/yahritza-y-su-esencia-double-p-management-roster/"
   ],
   "releases": [
     "1.0.6",
@@ -773,6 +773,5 @@
   "featCta": 38,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 3,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
