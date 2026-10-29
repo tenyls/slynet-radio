@@ -241,7 +241,7 @@ export const FullScreenPlayer: React.FC<FullScreenPlayerProps> = ({ isFavorite, 
         }`}
       >
         <span className="w-10 h-10 rounded-lg overflow-hidden bg-zinc-800 shrink-0 flex items-center justify-center">
-          <StationLogo favicon={st.favicon} name={st.name} textClass="text-xs" />
+          <StationLogo favicon={st.favicon} homepage={st.homepage} name={st.name} textClass="text-xs" />
         </span>
         <span className="min-w-0 flex-1">
           <span className="block text-sm font-semibold text-white truncate">{st.name}</span>

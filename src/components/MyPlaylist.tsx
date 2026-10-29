@@ -193,7 +193,7 @@ export const MyPlaylist: React.FC<{ onGoFavorites: () => void }> = ({ onGoFavori
                     >
                       <button onClick={() => (active ? togglePlayPause() : playStation(st, list))} className="flex items-center gap-3 flex-1 min-w-0 text-left">
                         <span className="w-10 h-10 rounded-lg overflow-hidden shrink-0">
-                          <StationLogo favicon={st.favicon} name={st.name} textClass="text-xs" />
+                          <StationLogo favicon={st.favicon} homepage={st.homepage} name={st.name} textClass="text-xs" />
                         </span>
                         <span className="flex-1 min-w-0 text-sm font-semibold text-white truncate">{st.name}</span>
                         {active && isPlaying ? <Pause className="w-4 h-4 text-emerald-300 shrink-0" /> : <Play className="w-4 h-4 text-zinc-500 shrink-0" />}

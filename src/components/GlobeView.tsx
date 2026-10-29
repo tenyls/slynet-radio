@@ -205,7 +205,7 @@ export const GlobeView: React.FC = () => {
                     className={`w-full flex items-center gap-3 p-2 rounded-xl text-left ${active ? 'bg-emerald-500/15' : 'hover:bg-zinc-900'}`}
                   >
                     <span className="w-10 h-10 rounded-lg overflow-hidden shrink-0">
-                      <StationLogo favicon={st.favicon} name={st.name} textClass="text-xs" />
+                      <StationLogo favicon={st.favicon} homepage={st.homepage} name={st.name} textClass="text-xs" />
                     </span>
                     <span className="flex-1 min-w-0">
                       <span className="block text-sm font-semibold text-white truncate">{st.name}</span>

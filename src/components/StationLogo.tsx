@@ -28,26 +28,50 @@ export function initials(name: string) {
   return (pick[0]?.[0] || '?').toUpperCase() + (pick[1]?.[0] || pick[0]?.[1] || '').toUpperCase();
 }
 
-/** Логотип станции: картинка, а если её нет или она не грузится — цветной значок с буквами */
-export const StationLogo: React.FC<{ favicon?: string; name: string; className?: string; textClass?: string }> = ({
+/** Значок сайта станции (если в каталоге нет логотипа) — сервис значков Google по домену сайта */
+export function siteIconUrl(homepage?: string): string {
+  try {
+    if (!homepage || !/^https?:\/\//.test(homepage)) return '';
+    const host = new URL(homepage).hostname.replace(/^www\./, '');
+    if (!host || /^(\d+\.){3}\d+$/.test(host) || host === 'localhost') return '';
+    return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(host)}&sz=128`;
+  } catch {
+    return '';
+  }
+}
+
+/**
+ * Логотип станции: 1) логотип из каталога; 2) если его нет или он не грузится — значок сайта станции
+ * (берём, только если он крупный: мелкий «глобус по умолчанию» не показываем); 3) цветной значок с буквами.
+ */
+export const StationLogo: React.FC<{ favicon?: string; homepage?: string; name: string; className?: string; textClass?: string }> = ({
   favicon,
+  homepage,
   name,
   className = 'w-full h-full',
   textClass = 'text-sm',
 }) => {
-  const [failed, setFailed] = useState(false);
   // На https-странице http-картинки блокируются — пробуем https-версию
-  const src = favicon && /^https?:\/\//.test(favicon) ? favicon.replace(/^http:\/\//, 'https://') : '';
+  const primary = favicon && /^https?:\/\//.test(favicon) ? favicon.replace(/^http:\/\//, 'https://') : '';
+  const sources = [primary, siteIconUrl(homepage)].filter(Boolean);
+  const [step, setStep] = useState(0);
+  const src = sources[step];
 
-  if (src && !failed) {
+  if (src) {
+    const isSiteIcon = src !== primary;
     return (
       <img
+        key={src}
         src={src}
         alt=""
         loading="lazy"
         referrerPolicy="no-referrer"
-        onError={() => setFailed(true)}
-        className={`${className} object-cover`}
+        onError={() => setStep((n) => n + 1)}
+        onLoad={(e) => {
+          // Сервис значков отдаёт маленький серый глобус, если у сайта нет иконки, — такой не нужен
+          if (isSiteIcon && e.currentTarget.naturalWidth < 48) setStep((n) => n + 1);
+        }}
+        className={`${className} ${isSiteIcon ? 'object-contain bg-white p-[12%]' : 'object-cover'}`}
       />
     );
   }

@@ -176,7 +176,7 @@ export const SharedPlaylistModal: React.FC<{ data: SharedPlaylist; onClose: () =
               <div key={st.stationuuid} className={`flex items-center gap-3 p-2 rounded-xl border ${active ? 'bg-emerald-500/15 border-emerald-500/40' : 'bg-zinc-950/60 border-zinc-800'}`}>
                 <button onClick={() => (active ? togglePlayPause() : playStation(st, stations))} className="flex items-center gap-3 flex-1 min-w-0 text-left">
                   <span className="w-10 h-10 rounded-lg overflow-hidden shrink-0">
-                    <StationLogo favicon={st.favicon} name={st.name} textClass="text-xs" />
+                    <StationLogo favicon={st.favicon} homepage={st.homepage} name={st.name} textClass="text-xs" />
                   </span>
                   <span className="min-w-0">
                     <span className="block text-sm font-semibold text-white truncate">{st.name}</span>

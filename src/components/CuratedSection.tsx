@@ -36,7 +36,7 @@ export const CuratedSection: React.FC = () => {
             <span className="absolute left-4 bottom-4 flex items-center">
               {l.stations.slice(0, 4).map((st, i) => (
                 <span key={st.stationuuid} className="w-8 h-8 rounded-lg overflow-hidden border-2 border-white/70 bg-zinc-900" style={{ marginLeft: i ? -8 : 0 }}>
-                  <StationLogo favicon={st.favicon} name={st.name} textClass="text-[9px]" />
+                  <StationLogo favicon={st.favicon} homepage={st.homepage} name={st.name} textClass="text-[9px]" />
                 </span>
               ))}
               <span className="ml-2 text-[11px] font-bold text-white/90">{l.stations.length} станций</span>

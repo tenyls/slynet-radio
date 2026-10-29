@@ -111,7 +111,7 @@ export const BottomPlayer: React.FC<BottomPlayerProps> = ({
             {/* Station Icon / Cover - Spins ONLY when isPlaying is true */}
             <div className={`relative w-12 h-12 rounded-xl overflow-hidden bg-zinc-900 border border-zinc-800 shrink-0 shadow-md ${isPlaying ? 'shadow-[0_0_15px_rgba(16,185,129,0.4)] border-emerald-500/50' : ''}`}>
               {currentStation ? (
-                <StationLogo key={currentStation.stationuuid} favicon={currentStation.favicon} name={currentStation.name || 'Радио'} />
+                <StationLogo key={currentStation.stationuuid} favicon={currentStation.favicon} homepage={currentStation.homepage} name={currentStation.name || 'Радио'} />
               ) : (
                 <StationFallbackIcon name="SlyNet Radio" className="w-full h-full p-2" />
               )}

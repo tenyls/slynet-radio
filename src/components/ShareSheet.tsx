@@ -91,13 +91,13 @@ export const ShareSheet: React.FC = () => {
         <div className="flex items-center gap-3 p-3 rounded-2xl bg-gradient-to-r from-emerald-500/15 to-cyan-500/10 border border-emerald-500/30 mb-4">
           {subject.kind === 'station' ? (
             <span className="w-14 h-14 rounded-xl overflow-hidden shrink-0">
-              <StationLogo favicon={subject.station.favicon} name={subject.station.name} textClass="text-sm" />
+              <StationLogo favicon={subject.station.favicon} homepage={subject.station.homepage} name={subject.station.name} textClass="text-sm" />
             </span>
           ) : (
             <span className="relative w-14 h-14 shrink-0">
               {subject.stations.slice(0, 3).map((st, i) => (
                 <span key={st.stationuuid} className="absolute w-10 h-10 rounded-lg overflow-hidden border-2 border-zinc-900" style={{ left: i * 7, top: i * 7 }}>
-                  <StationLogo favicon={st.favicon} name={st.name} textClass="text-[10px]" />
+                  <StationLogo favicon={st.favicon} homepage={st.homepage} name={st.name} textClass="text-[10px]" />
                 </span>
               ))}
             </span>

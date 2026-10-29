@@ -59,7 +59,7 @@ export const SimilarStations: React.FC<{ station: Station; onPlay: (s: Station, 
         {list.map((s) => (
           <button key={s.stationuuid} onClick={() => onPlay(s, list)} className="shrink-0 w-[72px] text-left active:scale-95" title={s.name}>
             <span className="block w-[72px] h-[72px] rounded-2xl overflow-hidden border border-zinc-800">
-              <StationLogo favicon={s.favicon} name={s.name} textClass="text-sm" />
+              <StationLogo favicon={s.favicon} homepage={s.homepage} name={s.name} textClass="text-sm" />
             </span>
             <span className="block mt-1 text-[10px] leading-tight text-zinc-300 line-clamp-2">{s.name}</span>
           </button>

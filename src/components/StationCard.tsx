@@ -53,6 +53,7 @@ export const StationCard: React.FC<StationCardProps> = ({
       <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-zinc-950/80 mb-2.5 flex items-center justify-center">
         <StationLogo
           favicon={station?.favicon}
+          homepage={station?.homepage}
           name={station?.name || 'Радио'}
           textClass="text-3xl"
           className={`w-full h-full transition-transform duration-300 group-hover:scale-105 ${isActivelyPlaying ? 'scale-105' : ''}`}

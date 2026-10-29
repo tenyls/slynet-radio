@@ -43,7 +43,7 @@ export const StationRow: React.FC<StationRowProps> = ({ station, isCurrent, isPl
       </button>
 
       <span className="flex w-10 h-10 sm:w-9 sm:h-9 rounded-lg overflow-hidden bg-zinc-950 items-center justify-center shrink-0">
-        <StationLogo favicon={station.favicon} name={station.name} textClass="text-xs" />
+        <StationLogo favicon={station.favicon} homepage={station.homepage} name={station.name} textClass="text-xs" />
       </span>
 
       <div className="min-w-0 flex-1">
