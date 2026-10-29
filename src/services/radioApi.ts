@@ -1,3 +1,4 @@
+import { isBlockedSource } from '../constants/streamPolicy';
 import { Station } from '../types/radio';
 
 const SERVERS = [
@@ -201,6 +202,7 @@ export function deduplicateStations(stations: Station[]): Station[] {
     if (!st || !st.stationuuid) continue;
     if (!st.isCustom && !isPlayableHere(st)) continue;
     if (!st.isCustom && !isFamilySafe(st)) continue;
+    if (isBlockedSource(st)) continue; // станция запретила сторонние приложения
     if (!st.isCustom && isRadioCountryHidden(st.countrycode)) continue;
     if (isStationQuarantined(st.stationuuid)) continue;
     if (isGloballyDead(st.stationuuid)) continue;

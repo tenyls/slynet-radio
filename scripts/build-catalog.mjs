@@ -141,10 +141,22 @@ const slim = (s) => ({
   clickcount: s.clickcount || 0,
 });
 
+// Станции, запретившие сторонние приложения, — не берём никуда (data/stream-policy.json)
+const BLOCKED_HOSTS = JSON.parse(await fs.readFile(path.join(ROOT, 'data', 'stream-policy.json'), 'utf8').catch(() => '{}')).blockedHosts?.map((h) => h.host.toLowerCase()) || [];
+const blockedSource = (s) =>
+  [s.url, s.url_resolved, s.homepage].some((u) => {
+    try {
+      const h = new URL(u).hostname.toLowerCase();
+      return BLOCKED_HOSTS.some((b) => h === b || h.endsWith('.' + b));
+    } catch {
+      return false;
+    }
+  });
+
 async function searchRB(params) {
   const q = new URLSearchParams({ hidebroken: 'true', is_https: 'true', order: 'clickcount', reverse: 'true', limit: '100', ...params });
   const list = await rb(`/json/stations/search?${q}`);
-  return (Array.isArray(list) ? list : []).filter((s) => (s.url_resolved || s.url || '').startsWith('https://') && familySafe(s));
+  return (Array.isArray(list) ? list : []).filter((s) => (s.url_resolved || s.url || '').startsWith('https://') && familySafe(s) && !blockedSource(s));
 }
 
 async function searchLaut(query) {
@@ -461,7 +473,8 @@ async function recordGroup() {
 
 async function buildExclusive() {
   const groups = [...STATIC_GROUPS];
-  for (const [name, fn] of [['SomaFM', somaGroup], ['Record', recordGroup]]) {
+  // SomaFM убран: станция запрещает сторонние приложения (data/stream-policy.json)
+  for (const [name, fn] of [['Record', recordGroup]]) {
     try {
       groups.push(await fn());
     } catch (e) {
@@ -503,7 +516,7 @@ async function buildGeo() {
   if (!all) throw new Error('Radio Browser недоступен');
   const groups = new Map();
   for (const s of all) {
-    if (!familySafe(s)) continue;
+    if (!familySafe(s) || blockedSource(s)) continue;
     const lat = Number(s.geo_lat), lon = Number(s.geo_long);
     if (!Number.isFinite(lat) || !Number.isFinite(lon) || (lat === 0 && lon === 0) || Math.abs(lat) > 85) continue;
     const cc = String(s.countrycode || '').toUpperCase();
@@ -641,7 +654,7 @@ const safe = async (name, fn, fallback) => {
 
 const catalog = {
   generatedAt: new Date().toISOString(),
-  sources: ['Radio Browser (radio-browser.info)', 'laut.fm', 'iptv-org (открытая база телеканалов)', 'Free-TV/IPTV', 'SomaFM', 'Radio Paradise', 'Radio France (FIP)', 'SRG SSR (Radio Swiss)', 'KEXP', 'NTS', 'Nightride FM', 'Radio Record'],
+  sources: ['Radio Browser (radio-browser.info)', 'laut.fm', 'iptv-org (открытая база телеканалов)', 'Free-TV/IPTV', 'Radio Paradise', 'Radio France (FIP)', 'SRG SSR (Radio Swiss)', 'KEXP', 'NTS', 'Nightride FM', 'Radio Record'],
   artists: await safe('артисты', buildArtists, prev.artists || {}),
   series: await safe('серии', buildSeries, prev.series || []),
   tv: await safe('ТВ', buildTv, prev.tv || []),

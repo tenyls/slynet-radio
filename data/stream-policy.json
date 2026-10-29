@@ -1,0 +1,10 @@
+{
+  "_comment": "Станции, которые сами запретили использовать свои потоки в сторонних приложениях. Их не показываем нигде (сайт, приложения, каталог). Источник для каждой — в поле reason.",
+  "blockedHosts": [
+    {
+      "host": "somafm.com",
+      "name": "SomaFM",
+      "reason": "https://somafm.com/contact/tos.html — «We can't grant permission for third-party SomaFM clients or applications, even noncommercial ones»"
+    }
+  ]
+}
