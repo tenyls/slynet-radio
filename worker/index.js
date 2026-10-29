@@ -47,7 +47,7 @@ export default {
     const url = new URL(request.url);
     const p = url.pathname.replace(/\/+$/, '') || '/';
     try {
-      if (p === '/' || p === '/health') return json({ ok: true, service: 'slynet-api', kv: !!env.DB, publish: !!env.GITHUB_TOKEN, telegram: !!env.TELEGRAM_BOT_TOKEN, windy: !!env.WINDY_API_KEY, vk: !!env.VK_CLIENT_ID, share: true, playlists: true, probe: true, version: '2026-10-29a' });
+      if (p === '/' || p === '/health') return json({ ok: true, service: 'slynet-api', kv: !!env.DB, publish: !!env.GITHUB_TOKEN, telegram: !!env.TELEGRAM_BOT_TOKEN, windy: !!env.WINDY_API_KEY, vk: !!env.VK_CLIENT_ID, share: true, playlists: true, probe: true, version: '2026-10-29b' });
       if (p === '/s') return sharePage(url);
       if (p === '/meta') return await handleMeta(url, json, ctx);
       if (p === '/webcams') return await handleWebcams(url, env, json, ctx);
@@ -311,7 +311,7 @@ async function handleProbe(url, json, ctx) {
 }
 
 // ---------- Красивые превью ссылок «Поделиться» (Telegram, ВК, WhatsApp читают эти теги) ----------
-const SITE_URL = 'https://tenyls.github.io/slynet-radio/';
+const SITE_URL = 'https://slynet-radio.pages.dev/';
 function sharePage(url) {
   const q = url.searchParams;
   const h = String(q.get('h') || '');

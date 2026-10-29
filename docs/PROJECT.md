@@ -9,12 +9,13 @@
 - Зеркало: https://slynet-radio.pages.dev (Cloudflare Pages, отдельный аккаунт slynet.radio@…; публикуется из `deploy.yml` вместе с GitHub Pages — секреты CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID)
 - Сервер: Cloudflare Worker `slynet-api` → https://slynet-api.tenylse.workers.dev (код: `worker/index.js`; KV `DB`).
   Деплой сервера — **вручную владельцем**: Cloudflare → Workers & Pages → slynet-api → Edit code → вставить весь файл → Deploy.
-  Проверка версии: `/health` (сейчас `version: 2026-10-29a`, `share/playlists/probe: true`).
+  Проверка версии: `/health` (сейчас `version: 2026-10-29b`, `share/playlists/probe: true`).
 - Telegram-канал @SlyNetRadio + стена ВК (vk.com/clubslynet) — автопостинг ботом.
 
 ## Правила владельца (важно)
 - Только легальные официальные потоки, никакого пиратства. ТВ-раздел есть только на сайте и в APK с сайта (не в сторах).
 - **ТВ нигде не упоминать в рекламе, постерах и постах.**
+- **В рекламе, постерах, QR-кодах и подписях постов — только адрес https://slynet-radio.pages.dev/** (старый tenyls.github.io/slynet-radio продолжает работать; на нём остаются служебные вещи: обновления приложения, каталог для приложений, политика конфиденциальности в магазинах).
 - Все посты в Telegram — **без звука** (`SILENT = true` в боте).
 - Каждое обновление — сразу пост в канал с «хук»-текстом и своим постером (`public/releases.json` → поля `post`, `image`; запуск: workflow `telegram.yml`, mode=`release`).
 - ВК: документы/бизнес-верификацию VK ID не проходит — только ключ сообщества. Картинки в ВК пока не работают (сбой ВК), посты идут текстом.

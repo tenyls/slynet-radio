@@ -11,7 +11,8 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const STATE_FILE = path.join(ROOT, 'data', 'telegram-state.json');
-const SITE = 'https://tenyls.github.io/slynet-radio/';
+// Адрес сайта в постах, кнопках и рекламе (зеркало Cloudflare; старый tenyls.github.io/slynet-radio тоже работает)
+const SITE = 'https://slynet-radio.pages.dev/';
 const BANNER = SITE + 'telegram-card.png';
 const TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const CHANNEL = process.env.TELEGRAM_CHANNEL;

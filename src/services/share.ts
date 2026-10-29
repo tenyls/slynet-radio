@@ -29,7 +29,7 @@ const withPreview = (siteUrl: string, title: string, desc: string, img = '') => 
   return `${previewBase}/s?${q}`;
 };
 
-export const PUBLIC_SITE = 'https://tenyls.github.io/slynet-radio/';
+export const PUBLIC_SITE = 'https://slynet-radio.pages.dev/';
 
 // ---------- base64url для UTF-8 ----------
 const toB64 = (s: string) => {

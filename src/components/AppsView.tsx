@@ -7,7 +7,7 @@ const REPO = 'https://github.com/tenyls/slynet-radio';
 const APK_PHONE = `${REPO}/releases/download/android-latest/SlyNetRadio.apk`;
 // Одно универсальное приложение для телефонов, планшетов и Android TV
 const APK_TV = APK_PHONE;
-const SITE = 'https://tenyls.github.io/slynet-radio/';
+const SITE = 'https://slynet-radio.pages.dev/';
 
 interface Versions {
   apk?: string;
@@ -224,7 +224,7 @@ export const AppsView: React.FC = () => {
         </div>
         <ol className="grid sm:grid-cols-2 gap-4">
           <Step n={1} icon={<Compass className="w-4 h-4" />}>
-            Откройте <b className="text-white">tenyls.github.io/slynet-radio</b> именно в <b className="text-white">Safari</b>.
+            Откройте <b className="text-white">slynet-radio.pages.dev</b> именно в <b className="text-white">Safari</b>.
           </Step>
           <Step n={2} icon={<Share className="w-4 h-4" />}>
             Нажмите кнопку <b className="text-white">«Поделиться»</b> — квадрат со стрелкой вверх (внизу на iPhone, вверху на iPad).
