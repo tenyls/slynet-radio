@@ -79,8 +79,11 @@ const LINK_RE =
   /listen|stream|player|\bapps?\b|webradio|internet-?radio|terms|conditions|legal|faq|help|nutzungsbedingungen|agb|hören|hoeren|empfang|empfangen|слуша|плеер|поток|приложен|соглашен|правила|écouter|ecouter|conditions-generales|ascolta|escuchar|oir/i;
 
 const S = '[^.!?\\n]{0,90}';
-const APPWORD = '(third[- ]party|apps?|applications?|players?|clients?|directories|aggregators?|Drittanbieter|Apps?|Player|Anwendungen|сторонн\\p{L}*|приложени\\p{L}*|плеер\\p{L}*|агрегатор\\p{L}*|applications? tierces?|lecteurs?)';
-const STREAMWORD = '(streams?|feeds?|Streams?|Stream-?URLs?|Streamadressen?|поток\\p{L}*|трансляци\\p{L}*|flux)';
+// Слова целиком (иначе «knapp» находит «app»)
+const APPWORD = '(?<![\\p{L}])(third[- ]party|apps?|applications?|players?|clients?|directories|aggregators?|Drittanbieter\\p{L}*|Anwendungen|сторонн\\p{L}*|приложени\\p{L}*|плеер\\p{L}*|агрегатор\\p{L}*|applications? tierces?|lecteurs?)(?![\\p{L}])';
+const STREAMWORD = '(?<![\\p{L}])(streams?|feeds?|Stream-?URLs?|Streamadressen?|Livestreams?|поток\\p{L}*|трансляци\\p{L}*|flux)(?![\\p{L}])';
+// Запрет засчитываем, только если речь именно о потоках или о сторонних приложениях
+const ABOUT_STREAMS = new RegExp(STREAMWORD + '|(?<![\\p{L}])(re-?stream|re-?broadcast|retransmi|embed|third[- ]party|Drittanbieter|сторонн)', 'iu');
 const NEG = [
   new RegExp(`(can'?t|cannot|can not|won'?t|do not|don'?t|not)${S}(grant|permit|allow|authori[sz]e|approv)${S}${APPWORD}`, 'iu'),
   new RegExp(`${APPWORD}${S}(not (permitted|allowed|authori[sz]ed)|prohibited|forbidden|without (our )?(prior |explicit )?(written )?(permission|consent|authori[sz]ation))`, 'iu'),
@@ -154,7 +157,7 @@ async function scanSite(site) {
   for (const p of pages) {
     const txt = textOf(p.html);
     for (const s of sentences(txt)) {
-      if (NEG.some((re) => re.test(s))) neg.push({ url: p.url, text: s.slice(0, 300) });
+      if (NEG.some((re) => re.test(s)) && ABOUT_STREAMS.test(s)) neg.push({ url: p.url, text: s.slice(0, 300) });
       else if (POS.some((re) => re.test(s))) pos.push({ url: p.url, text: s.slice(0, 300) });
     }
     if (STREAM_URL_RE.test(p.html) && PLAYER_RE.test(txt)) {
