@@ -14,6 +14,25 @@ const STATE_FILE = path.join(ROOT, 'data', 'telegram-state.json');
 // Адрес сайта в постах, кнопках и рекламе (зеркало Cloudflare; старый tenyls.github.io/slynet-radio тоже работает)
 const SITE = 'https://slynet-radio.pages.dev/';
 const BANNER = SITE + 'telegram-card.png';
+
+// ---------- RuStore ----------
+// До одобрения модерацией RuStore в рекламе не упоминаем. Одобрили → в data/stores.json "rustore": true.
+const RUSTORE_APP = 'https://www.rustore.ru/catalog/app/com.slynet.radio.rustore'; // наше приложение
+const RUSTORE_GET = 'https://www.rustore.ru/download'; // скачать сам RuStore на телефон
+const RUSTORE_TV = 'https://www.rustore.ru/tv'; // RuStore для Android TV и приставок
+let STORES = null;
+async function stores() {
+  if (!STORES) STORES = JSON.parse(await fs.readFile(path.join(ROOT, 'data', 'stores.json'), 'utf8').catch(() => '{}'));
+  return STORES;
+}
+const rustoreLive = async () => !!(await stores()).rustore;
+/** Строка для рекламных постов: наше приложение в RuStore + ссылка, где взять сам RuStore */
+const rustoreLine = (tv = false) =>
+  `\n\n📥 <b>RuStore:</b> <a href="${RUSTORE_APP}">SlyNet Radio</a> · нет RuStore? <a href="${tv ? RUSTORE_TV : RUSTORE_GET}">${tv ? 'установить на Android TV' : 'скачать RuStore'}</a>`;
+const rustoreButtons = (tv = false) => [
+  [{ text: '📥 SlyNet Radio в RuStore', url: RUSTORE_APP }],
+  [{ text: tv ? '📺 RuStore для Android TV' : '⬇️ Нет RuStore? Скачать', url: tv ? RUSTORE_TV : RUSTORE_GET }],
+];
 const TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const CHANNEL = process.env.TELEGRAM_CHANNEL;
 const UA = 'SlyNetRadio-TelegramBot/1.0 (+https://github.com/tenyls/slynet-radio)';
@@ -857,8 +876,11 @@ const PROMOS = [
 ];
 async function postPromo(state) {
   const i = (state.promoIndex || 0) % PROMOS.length;
-  await postPhotoOrText({ photo: BANNER, caption: await withFooter(PROMOS[i]), buttons: { inline_keyboard: [[{ text: '📱 Скачать / установить', url: SITE + '#apps' }], [{ text: '▶️ Слушать сейчас', url: SITE }]] } });
-  await vkPost(PROMOS[i], SITE + '#apps');
+  const live = await rustoreLive();
+  const text = PROMOS[i] + (live ? rustoreLine() : '');
+  const kb = [[{ text: '📱 Скачать / установить', url: SITE + '#apps' }], [{ text: '▶️ Слушать сейчас', url: SITE }]];
+  await postPhotoOrText({ photo: BANNER, caption: await withFooter(text), buttons: { inline_keyboard: live ? [...rustoreButtons(), ...kb] : kb } });
+  await vkPost(text, SITE + '#apps');
   state.promoIndex = i + 1;
   log('опубликовано напоминание о приложениях');
 }
@@ -875,8 +897,14 @@ const FEATS = [
   { id: 'playlist', name: 'Мой плейлист', poster: 'all', link: '', btn: '🎧 Собрать плейлист', facts: 'Нажимаешь ♥ у любимых станций — и они собираются в «Мой плейлист» на главной. Можно войти и синхронизировать избранное между телефоном и компьютером.' },
   { id: 'search', name: 'Поиск и фильтры', poster: 'all', link: '', btn: '🔍 Найти станцию', facts: 'Поиск по названию станции и фильтры рядом со списком: страна, жанр, название. Вид — плиткой или списком.' },
   { id: 'country', name: 'Радио вашей страны', poster: 'radiocam', link: '', btn: '📻 Моя страна', facts: 'Кнопка «Моя страна» сама определяет, где вы, и показывает местные станции. Более 50 000 радиостанций из почти всех стран мира.' },
-  { id: 'android', name: 'Приложение для Android', poster: 'all', link: '#apps', btn: '🤖 Скачать для Android', facts: 'Приложение для Android (APK с нашего сайта, раздел «Mobile Apps»): радио играет при выключенном экране, управление с экрана блокировки, обновления приходят сами. Есть версия для Android TV. В Google Play — скоро.' },
-  { id: 'iphone', name: 'SlyNet на iPhone и iPad', poster: 'all', link: '#apps', btn: '🍏 Как установить на iPhone', facts: 'На iPhone и iPad: открыть сайт в Safari → «Поделиться» → «На экран „Домой“» — и SlyNet Radio работает как приложение. В App Store — скоро.' },
+  { id: 'android', name: 'Приложение для Android', poster: 'all', link: '#apps', btn: '🤖 Скачать для Android', rustore: true, facts: 'Приложение для Android (APK с нашего сайта, раздел «Mobile Apps»): радио играет при выключенном экране, управление с экрана блокировки, эквалайзер на 10 полос и мощный бас, обновления приходят сами. Работает и на Android TV.' },
+  { id: 'iphone', name: 'SlyNet на iPhone и iPad', poster: 'iphone', link: '#apps', btn: '🍏 Как установить на iPhone', facts: 'На iPhone и iPad ничего не нужно скачивать из App Store: открыть сайт в Safari → «Поделиться» → «На экран „Домой“» — и SlyNet Radio работает как приложение, бесплатно. На экране блокировки — обложка песни, которая сейчас играет.' },
+  { id: 'bass', name: 'Супер-бас и эквалайзер', poster: 'bass', link: '#apps', btn: '🎛 Скачать для Android', rustore: true, facts: 'В Android-приложении SlyNet Radio: эквалайзер на 10 полос, 10 готовых настроек («Мощный бас», «Танцевальная», «В машине», «Ночью тихо» и другие) и усиление басов до +12 дБ без перегруза. Звук меняется сразу, на любой станции.' },
+  { id: 'viz', name: 'Визуализация музыки', poster: 'viz', link: '', btn: '🌈 Включить радио', facts: 'В плеере на обложке — живая визуализация музыки. В Android-приложении это настоящий спектр звука (столбики двигаются в такт песне), на сайте и iPhone — плавная анимация в такт эфиру.' },
+  { id: 'tracks', name: 'Треки из эфира', poster: 'tracks', link: '', btn: '🎵 Открыть SlyNet', facts: 'Раздел «Треки из эфира» (Ещё → История) сам сохраняет песни, которые звучали в эфире, если станция передаёт название. Есть поиск по истории и кнопки: открыть песню в YouTube, Яндекс Музыке, Spotify или Apple Music.' },
+  { id: 'car', name: 'В дороге без обрывов', poster: 'car', link: '#apps', btn: '🚗 Скачать для Android', rustore: true, facts: 'Режим «За рулём» с крупными кнопками и часами, поддержка Android Auto. В Android-приложении — защита от обрывов: запас эфира до 12 секунд и автоматическое переподключение, если связь пропала (тоннель, трасса, метро).' },
+  { id: 'rustore', name: 'SlyNet Radio в RuStore', poster: 'rustore', link: '', btn: '', need: 'rustore', facts: 'Приложение SlyNet Radio теперь есть в RuStore: установка и обновления в один тап, для телефонов и планшетов на Android. Если RuStore ещё нет — его можно скачать с официального сайта rustore.ru.' },
+  { id: 'bigscreen', name: 'Радио на Android TV', poster: 'bigscreen', link: '', btn: '', need: 'rustore', tv: true, facts: 'SlyNet Radio работает на Android TV и смарт-приставках: управление пультом, крупный интерфейс, тысячи радиостанций на большом экране. Устанавливается из RuStore для Android TV.' },
   { id: 'telegram', name: 'Радио прямо в Telegram', poster: 'all', link: 'tg', btn: '💬 Открыть в Telegram', facts: 'Наш бот открывает SlyNet Radio прямо внутри Telegram — кнопка «🎧 Слушать» в чате с ботом. Ничего устанавливать не нужно.' },
   { id: 'tools', name: 'Таймер сна, будильник и режим «За рулём»', poster: 'all', link: '', btn: '⏰ Попробовать', facts: 'В плеере есть таймер сна (радио само выключится), будильник с любимой станцией и режим «За рулём» с крупными кнопками.' },
   { id: 'quality', name: 'Слабый интернет — не проблема', poster: 'record', link: '', btn: '📶 Слушать', facts: 'Качество звука подстраивается под интернет: на слабой связи станция переключается на лёгкий поток и не прерывается. Можно выбрать режим «экономия трафика».' },
@@ -900,7 +928,9 @@ const CTAS = [
   'Сохраните пост, чтобы не потерять.',
   'Расскажите в комментариях, что слушаете вы.',
 ];
-const NO_TV = /телевид|телеканал|\bТВ\b|\bTV\b|iptv|сериал|фильм/i;
+const NO_TV_RE = /телевид|телеканал|\bТВ\b|\bTV\b|iptv|сериал|фильм/i;
+// «Android TV» — это устройство (можно), а телеканалы и ТВ-трансляции в рекламе не упоминаем никогда
+const NO_TV = { test: (t) => NO_TV_RE.test(String(t).replace(/Android\s*TV/gi, '')) };
 const cleanHtml = (t) => String(t).replace(/<(?!\/?(b|i)>)[^>]*>/g, '').replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').trim();
 const featLink = (f) => (f.link === 'tg' ? (BOT_USERNAME ? `https://t.me/${BOT_USERNAME}?startapp` : SITE) : SITE + (f.link || ''));
 const promoImg = async (name) => fs.readFile(path.join(PROMO_DIR, name + '.jpg')).catch(() => null);
@@ -908,15 +938,17 @@ const promoImg = async (name) => fs.readFile(path.join(PROMO_DIR, name + '.jpg')
 async function postFeature(state) {
   await footer(); // узнаём имя бота для ссылок
   const recent = state.featRecent || [];
-  const pool = FEATS.filter((f) => !recent.includes(f.id));
-  const f = (pool.length ? pool : FEATS)[Math.floor(Math.random() * (pool.length || FEATS.length))];
+  const live = await rustoreLive();
+  const avail = FEATS.filter((f) => f.need !== 'rustore' || live);
+  const pool = avail.filter((f) => !recent.includes(f.id));
+  const f = (pool.length ? pool : avail)[Math.floor(Math.random() * (pool.length || avail.length))];
   const si = (state.featStyle || 0) % STYLES.length;
   const cta = CTAS[(state.featCta || 0) % CTAS.length];
   let text = await ai(
     'Ты ведёшь Telegram-канал SlyNet Radio (бесплатное легальное радио со всего мира: сайт, Android, iPhone, Telegram). ' +
       'Пиши по-русски, живо и дружелюбно, как будто общаешься с подписчиками, 350–650 символов, 2–4 уместных эмодзи. ' +
       'Первая строка — цепляющий заголовок в <b>…</b>. Разметка: только <b> и <i>, без Markdown, без ссылок и хэштегов. ' +
-      'Пиши ТОЛЬКО о том, что дано в фактах, ничего не выдумывай. Никогда не упоминай телевидение, ТВ, телеканалы, фильмы и сериалы. ' +
+      'Пиши ТОЛЬКО о том, что дано в фактах, ничего не выдумывай. Никогда не упоминай телевидение, телеканалы, фильмы и сериалы (Android TV как устройство упоминать можно, только если оно есть в фактах). ' +
       'В конце — один призыв к действию.',
     `Возможность: ${f.name}.\nФакты: ${f.facts}\nПодача: ${STYLES[si]}\nПризыв в конце: ${cta}`,
     500
@@ -925,12 +957,16 @@ async function postFeature(state) {
   if (!text || text.length < 120 || NO_TV.test(text)) {
     text = `<b>${['А вы знаете? 🤔', 'Совет дня 💡', 'Мало кто знает 👀', 'Попробуйте сегодня ✨'][si % 4]} ${f.name}</b>\n\n${f.facts}\n\n${cta}`;
   }
-  const link = featLink(f);
+  // Ссылки RuStore — в постах про RuStore/Android TV и в рекламе Android-приложения (когда оно уже в RuStore)
+  const withStore = live && (f.need === 'rustore' || f.rustore);
+  if (withStore) text += rustoreLine(!!f.tv);
+  const link = f.need === 'rustore' ? RUSTORE_APP : featLink(f);
   const img = await promoImg(f.poster);
+  const kb = f.need === 'rustore' ? rustoreButtons(!!f.tv) : [[{ text: f.btn, url: link }], ...(withStore ? rustoreButtons() : [[{ text: '📱 Приложения', url: SITE + '#apps' }]])];
   await postPhotoOrText({
     photo: img || BANNER,
     caption: await withFooter(text),
-    buttons: { inline_keyboard: [[{ text: f.btn, url: link }], [{ text: '📱 Приложения', url: SITE + '#apps' }]] },
+    buttons: { inline_keyboard: kb },
     silent: true,
   });
   await vkPost(text, link.startsWith(SITE) ? link : SITE, img);
@@ -941,20 +977,21 @@ async function postFeature(state) {
 }
 
 const SHOWCASES = [
-  `🎧 <b>SlyNet Radio — весь мир музыки в одном месте</b>\n\nБесплатно, без регистрации, только официальные потоки:\n\n📻 <b>50 000+ радиостанций</b> со всего мира\n🌍 <b>Глобус радио</b> — крутите Землю и слушайте любой уголок мира\n🔥 <b>Radio Record</b> — 117 официальных каналов\n⭐ <b>Эксклюзив</b> — Radio Paradise, FIP, KEXP, NTS и другие\n🎵 <b>Жанры и настроения</b> — от джаза до транса\n📷 <b>Веб-камеры мира</b> в прямом эфире\n🎧 <b>Мой плейлист</b> из избранного\n⏰ Таймер сна, будильник, режим «За рулём»\n📱 Android, iPhone, iPad и прямо в Telegram\n\n👇 Перешлите друзьям — пусть тоже слушают бесплатно!`,
+  `🎧 <b>SlyNet Radio — весь мир музыки в одном месте</b>\n\nБесплатно, без регистрации, только официальные потоки:\n\n📻 <b>50 000+ радиостанций</b> со всего мира\n🌍 <b>Глобус радио</b> — крутите Землю и слушайте любой уголок мира\n🔥 <b>Radio Record</b> — 117 официальных каналов\n⭐ <b>Эксклюзив</b> — Radio Paradise, FIP, KEXP, NTS и другие\n🎵 <b>Жанры и настроения</b> — от джаза до транса\n📷 <b>Веб-камеры мира</b> в прямом эфире\n🎧 <b>Мой плейлист</b> из избранного\n🎛 <b>Супер-бас и эквалайзер</b> в Android-приложении\n⏰ Таймер сна, будильник, режим «За рулём»\n📱 Android, iPhone, iPad и прямо в Telegram\n\n👇 Перешлите друзьям — пусть тоже слушают бесплатно!`,
   `🌍 <b>Радио со всего мира — в кармане</b>\n\nЧто умеет SlyNet Radio:\n\n• 50 000+ станций: ваша страна в один клик\n• 3D-глобус: нажали на город — играет его радио\n• Radio Record: 117 каналов танцевальной музыки\n• Эксклюзивные станции мира в высоком качестве\n• Веб-камеры городов, гор и пляжей\n• Плейлист из любимых станций, история, поиск\n• Таймер сна и будильник с любимой станцией\n• Играет при выключенном экране (Android)\n\n💚 Бесплатно, легально, без регистрации.\n📤 Поделитесь постом — это лучшая поддержка проекта!`,
   `📻 <b>Одно приложение — тысячи эфиров</b>\n\nSlyNet Radio — это:\n\n✅ 50 000+ легальных радиостанций\n✅ Глобус радио и веб-камеры мира\n✅ Radio Record и эксклюзивы SlyNet\n✅ Жанры, настроения, умный поиск\n✅ Мой плейлист и «Продолжить слушать»\n✅ Таймер сна, будильник, режим «За рулём»\n✅ Сайт, Android, iPhone/iPad и Telegram\n\nВсё бесплатно и без регистрации.\n🔁 Отправьте этот пост другу или в свой канал!`,
 ];
 async function postShowcase(state) {
   await footer();
   const i = (state.showIndex || 0) % SHOWCASES.length;
-  const text = SHOWCASES[i];
+  const live = await rustoreLive();
+  const text = SHOWCASES[i] + (live ? rustoreLine() : '');
   const img = await promoImg(['all', 'radiocam', 'all'][i] || 'all');
   const share = `https://t.me/share/url?url=${encodeURIComponent(SITE)}&text=${encodeURIComponent('SlyNet Radio — 50 000+ радиостанций со всего мира бесплатно 🎧')}`;
   await postPhotoOrText({
     photo: img || BANNER,
     caption: await withFooter(text),
-    buttons: { inline_keyboard: [[{ text: '▶️ Слушать бесплатно', url: SITE }], [{ text: '📱 Приложения', url: SITE + '#apps' }, { text: '📤 Поделиться', url: share }]] },
+    buttons: { inline_keyboard: [[{ text: '▶️ Слушать бесплатно', url: SITE }], ...(live ? [[{ text: '📥 SlyNet Radio в RuStore', url: RUSTORE_APP }]] : []), [{ text: '📱 Приложения', url: SITE + '#apps' }, { text: '📤 Поделиться', url: share }]] },
   });
   await vkPost(text, SITE, img);
   state.showIndex = i + 1;
@@ -972,18 +1009,25 @@ async function setup() {
 
 // ---------- запуск ----------
 // Расписание приходит из GitHub (строка cron), по ней понимаем, что публиковать
+// Один пост в час, с 07 до 22 по Берлину (зимой UTC+1, летом UTC+2) — 16 постов в день:
+// станции ×5 (с «станцией дня»), новости ×3, «фишки» с постерами ×4, веб-камеры ×3, большой рекламный пост ×1.
+// В воскресенье вечером вместо станции — вопрос подписчикам.
+const HOURLY = {
+  6: 'day', 7: 'news', 8: 'feature', 9: 'station', 10: 'webcam', 11: 'feature', 12: 'news', 13: 'station',
+  14: 'feature', 15: 'webcam', 16: 'showcase', 17: 'news', 18: 'station', 19: 'feature', 20: 'webcam', 21: 'station',
+};
 function autoMode() {
-  const cron = process.env.SCHEDULE || '';
-  if (cron.startsWith('50 18')) return 'ask';
-  if (cron.startsWith('45 16')) return 'showcase';
-  if (cron.startsWith('50 ')) return 'feature';
-  if (cron.startsWith('20 ')) return 'news';
-  if (cron.startsWith('35 ')) return 'webcam';
-  if (cron.startsWith('5 5 ')) return 'day';
-  return 'station';
+  const now = new Date();
+  const h = now.getUTCHours();
+  if (now.getUTCDay() === 0 && h === 18) return 'ask';
+  return HOURLY[h] || 'none';
 }
 
 const mode = (process.argv[2] || 'auto') === 'auto' ? autoMode() : process.argv[2];
+if (mode === 'none') {
+  log('в этот час пост не запланирован');
+  process.exit(0);
+}
 if (mode === 'vkflush') {
   const st = await loadState();
   await vkFlush(st);

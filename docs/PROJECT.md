@@ -26,7 +26,7 @@
 - Автообновление приложения без APK: `deploy.yml` собирает `app/bundle-<id>.zip` + `version.json` (Capgo updater). Новый APK нужен только при изменении нативных частей.
 - Роботы (GitHub Actions):
   - `catalog.yml` — ежедневно: `public/catalog.json` (эксклюзивы, подборки `curated`, ночная проверка мёртвых `dead`, ТВ), `public/geo.json` (глобус).
-  - `telegram.yml` — посты: :05 станция, :20 новости музыки (Gemini, по-русски), :35 веб-камера, :50 «А вы знаете?» (7,11,15,19 UTC), 16:45 UTC большой рекламный пост, вс — вопрос. Ночью тихо.
+  - `telegram.yml` — один пост в час, 07–22 по Берлину (16 в день; расписание по часам — `HOURLY` в `scripts/telegram-post.mjs`): станции ×5, новости ×3, «фишки» с постерами ×4 (`public/promo/*.jpg`), веб-камеры ×3, большой рекламный пост ×1, вс вечером — вопрос. RuStore в рекламе — только после одобрения: `data/stores.json` → `"rustore": true` (тогда в рекламу добавляются ссылки на приложение в RuStore и «нет RuStore? скачать: rustore.ru/download», для Android TV — rustore.ru/tv).
 - Секреты GitHub (имена): ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS, TELEGRAM_BOT_TOKEN, TELEGRAM_CHANNEL, GEMINI_API_KEY, VK_TOKEN, VK_GROUP_ID. Cloudflare: ADMIN_PASSWORD, TOKEN_SECRET, GITHUB_TOKEN, WINDY_API_KEY.
 - Коммиты: автор `Claude <noreply@anthropic.com>`; перед push — `git pull --rebase` (боты коммитят каждый час). Ожидание CI — циклом `until … do sleep; done`.
 
