@@ -20,6 +20,9 @@ const CONCURRENCY = Number(process.env.CONCURRENCY || 16);
 const UA = 'SlyNetRadioPermissionScanner/1.0 (+https://slynet-radio.pages.dev/; checks stream usage terms)';
 const RB = ['https://de1.api.radio-browser.info', 'https://fi1.api.radio-browser.info', 'https://de2.api.radio-browser.info'];
 const log = (...a) => console.log(new Date().toISOString().slice(11, 19), ...a);
+// Сбой одного сайта (обрыв соединения и т. п.) не должен останавливать весь обход
+process.on('unhandledRejection', (e) => log('пропущена ошибка:', String(e?.message || e).slice(0, 200)));
+process.on('uncaughtException', (e) => log('пропущена ошибка:', String(e?.message || e).slice(0, 200)));
 
 async function fetchText(url, ms = 12000, max = 1_500_000) {
   const ctl = new AbortController();
@@ -27,7 +30,10 @@ async function fetchText(url, ms = 12000, max = 1_500_000) {
   try {
     const r = await fetch(url, { headers: { 'User-Agent': UA, Accept: 'text/html,text/plain;q=0.9,*/*;q=0.5' }, redirect: 'follow', signal: ctl.signal });
     const ct = r.headers.get('content-type') || '';
-    if (!r.ok || !/text|html|xml|json/i.test(ct)) return { ok: false, status: r.status, url: r.url };
+    if (!r.ok || !/text|html|xml|json/i.test(ct)) {
+      r.body?.cancel().catch(() => {});
+      return { ok: false, status: r.status, url: r.url };
+    }
     const buf = await r.arrayBuffer();
     return { ok: true, status: r.status, url: r.url, text: new TextDecoder('utf-8').decode(buf.slice(0, max)) };
   } catch (e) {
