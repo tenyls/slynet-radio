@@ -1,0 +1,2566 @@
+{
+ "generatedAt": "2026-10-29T23:07:01.987Z",
+ "stationsChecked": 300,
+ "sitesChecked": 212,
+ "counts": {
+  "yes": 0,
+  "no": 4,
+  "player-links": 28,
+  "unknown": 143,
+  "unreachable": 33,
+  "robots": 4
+ },
+ "results": [
+  {
+   "domain": "rtl.fr",
+   "home": "https://www.rtl.fr/",
+   "stations": [
+    "RTL"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 7
+  },
+  {
+   "domain": "francetvinfo.fr",
+   "home": "https://www.francetvinfo.fr/",
+   "stations": [
+    "France Info"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 7
+  },
+  {
+   "domain": "armisa.it",
+   "home": "https://armisa.it/",
+   "stations": [
+    "Radio Armisa"
+   ],
+   "stationCount": 1,
+   "status": "unreachable",
+   "evidence": []
+  },
+  {
+   "domain": "europe1.fr",
+   "home": "https://www.europe1.fr/",
+   "stations": [
+    "Europe 1"
+   ],
+   "stationCount": 1,
+   "status": "unreachable",
+   "evidence": []
+  },
+  {
+   "domain": "rmc.bfmtv.com",
+   "home": "https://rmc.bfmtv.com/",
+   "stations": [
+    "RMC FR",
+    "RMC"
+   ],
+   "stationCount": 2,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 2
+  },
+  {
+   "domain": "bbc.co.uk",
+   "home": "https://www.bbc.co.uk/programmes/w172xzjgf6lxp7y",
+   "stations": [
+    "BBC World Service",
+    "BBC Radio 4 (128k)",
+    "BBC Radio 1",
+    "BBC Radio 2 (128k)",
+    "BBC Radio 6 Music"
+   ],
+   "stationCount": 6,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 5
+  },
+  {
+   "domain": "walmradio.com",
+   "home": "https://walmradio.com/classic",
+   "stations": [
+    "Classic Vinyl HD",
+    "Adroit Jazz Underground",
+    "Christmas Vinyl HD",
+    "WALM - Old Time Radio",
+    "WALM 2 HD"
+   ],
+   "stationCount": 7,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "anon.radio.fm",
+   "home": "https://anon.radio.fm/",
+   "stations": [
+    "Anon.FM"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "mangoradio.de",
+   "home": "https://mangoradio.de/",
+   "stations": [
+    "MANGORADIO"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "nostalgie.fr",
+   "home": "https://www.nostalgie.fr/",
+   "stations": [
+    "Nostalgie HQ"
+   ],
+   "stationCount": 1,
+   "status": "unreachable",
+   "evidence": []
+  },
+  {
+   "domain": "radiofrance.fr",
+   "home": "https://www.radiofrance.fr/franceinter",
+   "stations": [
+    "France Inter"
+   ],
+   "stationCount": 1,
+   "status": "player-links",
+   "evidence": [
+    {
+     "url": "https://www.radiofrance.fr/ecouter-musique/classique",
+     "text": "Du contrepoint sacré de Cererols à la poésie intime de Dowland, Clément Rochefort réunit onze jalons emblématiques du répertoire baroque"
+    }
+   ]
+  },
+  {
+   "domain": "101smoothjazz.com",
+   "home": "http://101smoothjazz.com/",
+   "stations": [
+    "101 SMOOTH JAZZ"
+   ],
+   "stationCount": 1,
+   "status": "player-links",
+   "evidence": [
+    {
+     "url": "http://101smoothjazz.com/",
+     "text": "101 Smooth Jazz Internet Radio"
+    }
+   ]
+  },
+  {
+   "domain": "deutschlandfunk.de",
+   "home": "https://www.deutschlandfunk.de/",
+   "stations": [
+    "Deutschlandfunk | DLF | MP3 128k",
+    "Deutschlandfunk | DLF | AAC 192k",
+    "Deutschlandfunk | DLF | OPUS 24k"
+   ],
+   "stationCount": 3,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 6
+  },
+  {
+   "domain": "radioparadise.com",
+   "home": "https://radioparadise.com/",
+   "stations": [
+    "Radio Paradise Main Mix (EU) 320k AAC"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "funradio.fr",
+   "home": "https://www.funradio.fr/",
+   "stations": [
+    "FUN Radio"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 7
+  },
+  {
+   "domain": "swr3.de",
+   "home": "https://swr3.de/",
+   "stations": [
+    "SWR3"
+   ],
+   "stationCount": 1,
+   "status": "player-links",
+   "evidence": [
+    {
+     "url": "https://www.swr3.de/musik/webradio/index.html",
+     "text": "Ihr wollt SWR3 direkt über einen externen Player oder ein Internetradio abrufen? Hier findet ihr alle Infos"
+    },
+    {
+     "url": "https://www.swr3.de/empfang/index.html",
+     "text": "Jetzt gehe in Apple Music (ehemals iTunes ) auf „Ablage“ › „Mediathek“ › „Playlist importieren“ und wählen aus dem entsprechenden Ordner die eben heruntergeladene Datei SWR-Radio_v6"
+    }
+   ]
+  },
+  {
+   "domain": "rfm.fr",
+   "home": "http://www.rfm.fr/",
+   "stations": [
+    "RFM"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 3
+  },
+  {
+   "domain": "play.cadenaser.com",
+   "home": "http://play.cadenaser.com/",
+   "stations": [
+    "Cadena SER España"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 2
+  },
+  {
+   "domain": "nrj.fr",
+   "home": "https://www.nrj.fr/webradios/mur-des-radios/nrj-hits",
+   "stations": [
+    "Nrj Hits",
+    "NRJ Paris"
+   ],
+   "stationCount": 2,
+   "status": "unreachable",
+   "evidence": []
+  },
+  {
+   "domain": "skyrock.fm",
+   "home": "https://skyrock.fm/",
+   "stations": [
+    "Skyrock",
+    "Skyrock Klassics"
+   ],
+   "stationCount": 2,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "esradio.libertaddigital.com",
+   "home": "http://esradio.libertaddigital.com/",
+   "stations": [
+    "esRadio"
+   ],
+   "stationCount": 1,
+   "status": "player-links",
+   "evidence": [
+    {
+     "url": "https://esradio.libertaddigital.com/",
+     "text": "iTunes"
+    }
+   ]
+  },
+  {
+   "domain": "ifeng.com",
+   "home": "https://www.ifeng.com/",
+   "stations": [
+    "凤凰卫视资讯台",
+    "凤凰卫视中文台"
+   ],
+   "stationCount": 2,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "heart.co.uk",
+   "home": "https://www.heart.co.uk/80s",
+   "stations": [
+    "Heart 80s",
+    "Heart London 106.2 [MP3]",
+    "Heart 90s",
+    "Heart Dance"
+   ],
+   "stationCount": 4,
+   "status": "player-links",
+   "evidence": [
+    {
+     "url": "https://www.heart.co.uk/80s/",
+     "text": "Download 'Sugar' on iTunes"
+    },
+    {
+     "url": "https://www.heart.co.uk/radio/how-to-listen/",
+     "text": "Download 'The Man Who Can't Be Moved' on iTunes"
+    },
+    {
+     "url": "https://www.heart.co.uk/terms-conditions/",
+     "text": "Download 'Dangerous' on iTunes"
+    }
+   ]
+  },
+  {
+   "domain": "dancewave.online",
+   "home": "https://dancewave.online/",
+   "stations": [
+    "Dance Wave!"
+   ],
+   "stationCount": 1,
+   "status": "player-links",
+   "evidence": [
+    {
+     "url": "https://dancewave.online/",
+     "text": "If your player supports the OGG/Vorbis format, it is recommended to listen to this"
+    },
+    {
+     "url": "https://dancewave.online/listen/",
+     "text": "Winamp"
+    }
+   ]
+  },
+  {
+   "domain": "80s80s.de",
+   "home": "https://www.80s80s.de/streams/80s80s",
+   "stations": [
+    "80s80s Radio",
+    "80s80s"
+   ],
+   "stationCount": 2,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 7
+  },
+  {
+   "domain": "radio24.ilsole24ore.com",
+   "home": "https://www.radio24.ilsole24ore.com/",
+   "stations": [
+    "Radio 24 il sole 24 ore"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 2
+  },
+  {
+   "domain": "radio1.rai.it",
+   "home": "http://www.radio1.rai.it",
+   "stations": [
+    "Rai Radio 1"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 2
+  },
+  {
+   "domain": "cctv.com",
+   "home": "https://www.cctv.com/",
+   "stations": [
+    "CCTV-13新闻伴音"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "los40.com",
+   "home": "https://los40.com/",
+   "stations": [
+    "LOS 40 Principales España",
+    "Los 40 Urban",
+    "Los 40 Dance"
+   ],
+   "stationCount": 3,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 4
+  },
+  {
+   "domain": "cope.es",
+   "home": "https://www.cope.es/directos/cope-mas-sevilla",
+   "stations": [
+    "COPE + Sevilla",
+    "Cope Madrid FM",
+    "COPE Cartagena"
+   ],
+   "stationCount": 3,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 4
+  },
+  {
+   "domain": "gaanepurane.my-free.website",
+   "home": "https://gaanepurane.my-free.website/",
+   "stations": [
+    "Bollywood Gaane Purane"
+   ],
+   "stationCount": 1,
+   "status": "unreachable",
+   "evidence": []
+  },
+  {
+   "domain": "lbc.co.uk",
+   "home": "https://www.lbc.co.uk/",
+   "stations": [
+    "LBC UK"
+   ],
+   "stationCount": 1,
+   "status": "player-links",
+   "evidence": [
+    {
+     "url": "https://www.lbc.co.uk/article/getting-started-DWyqT6_2/",
+     "text": "How To Listen to LBC On Sonos"
+    }
+   ]
+  },
+  {
+   "domain": "n12.radiojar.com",
+   "home": "http://n12.radiojar.com/8s5u5tpdtwzuv?listening-from-radio-garden=1620219571863&rj-tok=AAABeTyl2zYARSWbLVnrEOlqGw&rj-ttl=5",
+   "stations": [
+    "إذاعة القرآن الكريم من القاهرة"
+   ],
+   "stationCount": 1,
+   "status": "unreachable",
+   "evidence": []
+  },
+  {
+   "domain": "rmf.fm",
+   "home": "https://www.rmf.fm/",
+   "stations": [
+    "RMF FM",
+    "RMF FM"
+   ],
+   "stationCount": 2,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "arabeskfm.biz",
+   "home": "http://www.arabeskfm.biz/",
+   "stations": [
+    "Arabesk FM"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "powerapp.com.tr",
+   "home": "https://www.powerapp.com.tr/powerpop/",
+   "stations": [
+    "Power POP"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "cadena100.es",
+   "home": "http://www.cadena100.es/",
+   "stations": [
+    "Cadena 100"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 3
+  },
+  {
+   "domain": "einslive.de",
+   "home": "https://einslive.de/",
+   "stations": [
+    "1LIVE",
+    "1LIVE"
+   ],
+   "stationCount": 2,
+   "status": "player-links",
+   "evidence": [
+    {
+     "url": "https://www1.wdr.de/radio/1live/musik/1live-streams/index.html",
+     "text": "Von Kiew auf die Tomorrowland Mainstage: Miss Monique muss man einfach auf dem Schirm haben, wenn es um Progressive House und Melodic Techno geht"
+    }
+   ]
+  },
+  {
+   "domain": "capitalfm.com",
+   "home": "https://www.capitalfm.com/",
+   "stations": [
+    " CAPITAL - The UK's No.1 Hit Music Station",
+    "Capital FM London"
+   ],
+   "stationCount": 2,
+   "status": "player-links",
+   "evidence": [
+    {
+     "url": "https://www.capitalfm.com/",
+     "text": "Download 'Undressed' on iTunes"
+    },
+    {
+     "url": "https://www.capitalfm.com/radio/ad-free-listening-capital-plus/",
+     "text": "Download 'Joy' on iTunes"
+    },
+    {
+     "url": "https://www.capitalfm.com/how-to-listen/all-the-ways-you-can-listen-to-capital-chill/",
+     "text": "Download 'Light It Up' on iTunes"
+    }
+   ]
+  },
+  {
+   "domain": "deejay.it",
+   "home": "https://www.deejay.it/",
+   "stations": [
+    "Radio Deejay"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 4
+  },
+  {
+   "domain": "cnn.com",
+   "home": "https://www.cnn.com/",
+   "stations": [
+    "CNN"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 2
+  },
+  {
+   "domain": "radioitalia.it",
+   "home": "https://www.radioitalia.it/",
+   "stations": [
+    "Radio Italia Solo Musica Italiana"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "radio1.nl",
+   "home": "http://www.radio1.nl/",
+   "stations": [
+    "NPO Radio 1",
+    "NPO Radio 1"
+   ],
+   "stationCount": 2,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 2
+  },
+  {
+   "domain": "radio.foxnews.com",
+   "home": "https://radio.foxnews.com/",
+   "stations": [
+    "Fox News Radio"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 5
+  },
+  {
+   "domain": "cnr.cn",
+   "home": "http://www.cnr.cn/",
+   "stations": [
+    "CNR-1 中国之声",
+    "CNR-2 经济之声",
+    "CNR-3 音乐之声"
+   ],
+   "stationCount": 3,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "classicfm.com",
+   "home": "http://www.classicfm.com/",
+   "stations": [
+    "Classic FM UK"
+   ],
+   "stationCount": 1,
+   "status": "player-links",
+   "evidence": [
+    {
+     "url": "https://www.classicfm.com/faq/",
+     "text": "Download ''Una furtiva lagrima'' on iTunes"
+    },
+    {
+     "url": "https://www.classicfm.com/radio/how-to-listen/getting-started/",
+     "text": "1 in E minor Opus 11 (2)' on iTunes"
+    },
+    {
+     "url": "https://www.classicfm.com/terms-conditions/",
+     "text": "' on iTunes"
+    }
+   ]
+  },
+  {
+   "domain": "damarturkfm.com",
+   "home": "https://www.damarturkfm.com/",
+   "stations": [
+    "DAMAR TURK FM"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "hj0758.cn",
+   "home": "http://www.hj0758.cn/",
+   "stations": [
+    "怀集音乐之声"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "virginradioturkiye.com",
+   "home": "http://www.virginradioturkiye.com/",
+   "stations": [
+    "Virgin Radio Türkiye"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "live.radyositesihazir.com",
+   "home": "https://live.radyositesihazir.com/8032/stream",
+   "stations": [
+    "KRAL TÜRK FM"
+   ],
+   "stationCount": 1,
+   "status": "unreachable",
+   "evidence": []
+  },
+  {
+   "domain": "538.nl",
+   "home": "https://www.538.nl/",
+   "stations": [
+    "Radio 538"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 2
+  },
+  {
+   "domain": "kiisfm.iheart.com",
+   "home": "https://kiisfm.iheart.com/",
+   "stations": [
+    "102.7 KIIS FM"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 2
+  },
+  {
+   "domain": "arradiokerala.blogspot.com",
+   "home": "https://arradiokerala.blogspot.com/",
+   "stations": [
+    "AR RADIO"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "kisskiss.it",
+   "home": "http://www.kisskiss.it/",
+   "stations": [
+    "Radio Kiss Kiss"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 3
+  },
+  {
+   "domain": "jazzradio.fr",
+   "home": "http://www.jazzradio.fr/radio/webradio/3/blues",
+   "stations": [
+    "Jazz Radio Blues",
+    "Jazz Radio"
+   ],
+   "stationCount": 2,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 7
+  },
+  {
+   "domain": "radio.es",
+   "home": "https://www.radio.es/s/onda-cero-madrid",
+   "stations": [
+    "ONDA CERO (España)"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 4
+  },
+  {
+   "domain": "rireetchansons.fr",
+   "home": "https://www.rireetchansons.fr/",
+   "stations": [
+    "Rire et Chansons",
+    "Rire et Chansons Sketches"
+   ],
+   "stationCount": 2,
+   "status": "unreachable",
+   "evidence": []
+  },
+  {
+   "domain": "bayern3.de",
+   "home": "https://www.bayern3.de/",
+   "stations": [
+    "Bayern 3"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "somafm.com",
+   "home": "https://somafm.com/groovesalad/",
+   "stations": [
+    "SomaFM Groove Salad (128k MP3)",
+    "SomaFM Secret Agent (128k MP3)",
+    "SomaFM Indie Pop Rocks! (128k AAC)"
+   ],
+   "stationCount": 3,
+   "status": "no",
+   "evidence": [
+    {
+     "url": "https://somafm.com/contact/tos.html",
+     "text": "We can't grant permission for third-party SomaFM clients or applications, even noncommercial ones."
+    },
+    {
+     "url": "https://somafm.com/contact/tos.html",
+     "text": "Our music licensing agreements don't permit us to authorize third-party uses of our streams, branding, artwork, or metadata in standalone applications."
+    },
+    {
+     "url": "https://somafm.com/contact/tos.html",
+     "text": "As a result, we're not approving new third-party clients."
+    }
+   ]
+  },
+  {
+   "domain": "977music.com",
+   "home": "http://www.977music.com/",
+   "stations": [
+    ".977 80s",
+    ".977 Country",
+    ".977 Hitz"
+   ],
+   "stationCount": 3,
+   "status": "unreachable",
+   "evidence": []
+  },
+  {
+   "domain": "mirchi.in",
+   "home": "http://mirchi.in/",
+   "stations": [
+    "Mirchi Top 20",
+    "Mirchi Love"
+   ],
+   "stationCount": 2,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "radiozet.pl",
+   "home": "https://www.radiozet.pl/",
+   "stations": [
+    "Radio Zet"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "www1.wdr.de",
+   "home": "https://www1.wdr.de/radio/wdr5/",
+   "stations": [
+    "WDR 5",
+    "WDR4"
+   ],
+   "stationCount": 2,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 2
+  },
+  {
+   "domain": "rm.fm",
+   "home": "https://rm.fm/breakz/team",
+   "stations": [
+    "# TOP 100 CLUB CHARTS - DANCE & DJ MIX RADIO - 24 HOURS NON-STOP MUSIC @ TikTok Hits, Ibiza House, Sunset Lounge, Melodic Music, EDM, Deep House, Dance Music, Techno & Hypertechno, Rave Charts, Top 40 Charts, Latin, Reggaeton Music, Moombahton, Urban Hits, HipHop, Party & Clubbing Radio, Trending Chartmusic, R&B, Urban, Mixtape - & LIVE DJ SET ",
+    "# TOP 100 DJ CHARTS - DJ REMIX & CHARTS RADIO @ TikTok Charts, Electronic Music, EDM, House, Deep House, Dance Music, Techno & Hypertechno, Top40, Latin Charts, Reggaeton, Urban, HipHop, Club & Party Radio - & LIVE DJ SETS "
+   ],
+   "stationCount": 2,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "franceculture.fr",
+   "home": "https://www.franceculture.fr/",
+   "stations": [
+    "France Culture"
+   ],
+   "stationCount": 1,
+   "status": "player-links",
+   "evidence": [
+    {
+     "url": "https://www.radiofrance.fr/ecouter-musique/classique",
+     "text": "Du contrepoint sacré de Cererols à la poésie intime de Dowland, Clément Rochefort réunit onze jalons emblématiques du répertoire baroque"
+    }
+   ]
+  },
+  {
+   "domain": "fip.fr",
+   "home": "https://www.fip.fr/",
+   "stations": [
+    "FIP"
+   ],
+   "stationCount": 1,
+   "status": "player-links",
+   "evidence": [
+    {
+     "url": "https://www.radiofrance.fr/ecouter-musique/classique",
+     "text": "Du contrepoint sacré de Cererols à la poésie intime de Dowland, Clément Rochefort réunit onze jalons emblématiques du répertoire baroque"
+    }
+   ]
+  },
+  {
+   "domain": "rtl.it",
+   "home": "https://www.rtl.it/",
+   "stations": [
+    "RTL 102.5"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 3
+  },
+  {
+   "domain": "radio357.pl",
+   "home": "https://radio357.pl/",
+   "stations": [
+    "Radio 357"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 2
+  },
+  {
+   "domain": "europe2.fr",
+   "home": "https://www.europe2.fr/",
+   "stations": [
+    "Europe 2"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 3
+  },
+  {
+   "domain": "rockfm.ru",
+   "home": "http://www.rockfm.ru/",
+   "stations": [
+    "ROCK FM"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 4
+  },
+  {
+   "domain": "105.net",
+   "home": "http://www.105.net/",
+   "stations": [
+    "Radio 105 Network",
+    "Radio 105"
+   ],
+   "stationCount": 2,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 6
+  },
+  {
+   "domain": "kralmuzik.com.tr",
+   "home": "https://www.kralmuzik.com.tr/radyo/kral-fm#",
+   "stations": [
+    "KRAL FM"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "europaplus.ru",
+   "home": "http://www.europaplus.ru/",
+   "stations": [
+    "Europa Plus"
+   ],
+   "stationCount": 1,
+   "status": "player-links",
+   "evidence": [
+    {
+     "url": "https://europaplus.ru/app",
+     "text": "Слушай любимое радио где угодно и когда угодно с новым официальным приложением Европы Плюс! Никаких регистраций, подписок и рекламы — просто скачивай и включай плеер в один клик"
+    }
+   ]
+  },
+  {
+   "domain": "hitfm.ua",
+   "home": "http://www.hitfm.ua/",
+   "stations": [
+    "Hit FM (UKraine) - 128kb/s"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 2
+  },
+  {
+   "domain": "radiodimensionemix.torontocast.stream",
+   "home": "https://radiodimensionemix.torontocast.stream/",
+   "stations": [
+    " # RdMix Classic Rock 70s 80s 90s"
+   ],
+   "stationCount": 1,
+   "status": "player-links",
+   "evidence": [
+    {
+     "url": "https://radiodimensionemix.torontocast.stream/tag/app/",
+     "text": "Categories: Info Tags: android &#183; app &#183; apple &#183; internetradio &#183; ipad &#183; iphone &#183; onlineradio &#183; radioapp &#183; smartphone &#183; tablet"
+    },
+    {
+     "url": "https://radiodimensionemix.torontocast.stream/tag/internetradio/",
+     "text": "internetradio Archivi - Radio Dimensione Mix"
+    }
+   ]
+  },
+  {
+   "domain": "slowturk.com.tr",
+   "home": "https://www.slowturk.com.tr/",
+   "stations": [
+    "Slow Turk"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "mediamax.app",
+   "home": "https://www.mediamax.app/kameme-fm",
+   "stations": [
+    "Kameme FM"
+   ],
+   "stationCount": 1,
+   "status": "unreachable",
+   "evidence": []
+  },
+  {
+   "domain": "kissfm.es",
+   "home": "https://www.kissfm.es/",
+   "stations": [
+    "KISS FM"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 5
+  },
+  {
+   "domain": "nporadio2.nl",
+   "home": "http://www.nporadio2.nl/",
+   "stations": [
+    "NPO Radio 2",
+    "NPO 2"
+   ],
+   "stationCount": 2,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 2
+  },
+  {
+   "domain": "radyo7.com",
+   "home": "http://www.radyo7.com/",
+   "stations": [
+    "Radyo 7"
+   ],
+   "stationCount": 1,
+   "status": "player-links",
+   "evidence": [
+    {
+     "url": "https://www.radyo7.com/",
+     "text": "(Winamp)"
+    }
+   ]
+  },
+  {
+   "domain": "rfi.fr",
+   "home": "https://www.rfi.fr/cn/",
+   "stations": [
+    "新闻联播",
+    "RFI Afrique",
+    "RFI Monde",
+    "RFI-Chinese"
+   ],
+   "stationCount": 4,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "rac1.cat",
+   "home": "https://www.rac1.cat/",
+   "stations": [
+    "RAC1"
+   ],
+   "stationCount": 1,
+   "status": "player-links",
+   "evidence": [
+    {
+     "url": "https://www.rac1.cat/",
+     "text": "Detingut el menor de 17 anys que va crear el canal 'Blocus Vlc' i que incitava a saquejar comerços"
+    }
+   ]
+  },
+  {
+   "domain": "relax-fm.ru",
+   "home": "https://relax-fm.ru/",
+   "stations": [
+    " Relax FM Chillout"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 5
+  },
+  {
+   "domain": "rockantenne.de",
+   "home": "http://www.rockantenne.de/",
+   "stations": [
+    "Rock Antenne",
+    "Rock Antenne - Heavy Metal",
+    " \tROCKANTENNE Alternative (mp3)"
+   ],
+   "stationCount": 3,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 7
+  },
+  {
+   "domain": "ambientsleepingpill.com",
+   "home": "http://ambientsleepingpill.com/",
+   "stations": [
+    "Ambient Sleeping Pill"
+   ],
+   "stationCount": 1,
+   "status": "player-links",
+   "evidence": [
+    {
+     "url": "https://ambientsleepingpill.com/stream-links",
+     "text": "Ambient Sleeping Pill - Internet Radio for Sleep, Meditation & Relaxation"
+    }
+   ]
+  },
+  {
+   "domain": "rtve.es",
+   "home": "https://www.rtve.es/play/radio/radio-5/",
+   "stations": [
+    "Radio Nacional de España - Radio 5 Todo noticias",
+    "RNE Radio Nacional"
+   ],
+   "stationCount": 2,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 5
+  },
+  {
+   "domain": "oe3.orf.at",
+   "home": "http://oe3.orf.at/",
+   "stations": [
+    "ORF Hitradio Ö3 | HQ"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 2
+  },
+  {
+   "domain": "sonora.id",
+   "home": "https://www.sonora.id/",
+   "stations": [
+    "Sonora FM 92 Jakarta"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "reyfm.de",
+   "home": "https://www.reyfm.de/",
+   "stations": [
+    "REYFM - #original"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "npr.org",
+   "home": "https://www.npr.org/2016/04/05/472557877/npr-program-stream",
+   "stations": [
+    "NPR 24 Hour Program Stream"
+   ],
+   "stationCount": 1,
+   "status": "unreachable",
+   "evidence": []
+  },
+  {
+   "domain": "radioindia.in",
+   "home": "https://www.radioindia.in/radio-retro-bollywood-90s",
+   "stations": [
+    "RADIO BOLLYWOOD 90s"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 2
+  },
+  {
+   "domain": "iranintl.com",
+   "home": "https://www.iranintl.com/",
+   "stations": [
+    "Iran International (HTTPS stream)",
+    "iraninternational"
+   ],
+   "stationCount": 2,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "181.fm",
+   "home": "http://www.181.fm/",
+   "stations": [
+    "181.FM - Old School HipHop/RnB"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "franceinfo.fr",
+   "home": "https://www.franceinfo.fr/",
+   "stations": [
+    "France Info"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 7
+  },
+  {
+   "domain": "antena1.com.br",
+   "home": "https://www.antena1.com.br/",
+   "stations": [
+    "Rádio Antena 1 94.7 FM"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 4
+  },
+  {
+   "domain": "convoynetwork.com",
+   "home": "http://convoynetwork.com/",
+   "stations": [
+    "Convoy en vivo"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "zeno.fm",
+   "home": "https://zeno.fm/radio/100-best-ibiza-deep-house-/",
+   "stations": [
+    " #100 BEST IBIZA DEEP HOUSE",
+    " 50s 60s RETRO HITS",
+    "Goldy Evergreen",
+    "MY RADIO DJ",
+    "OM Kalthom أم كلثوم"
+   ],
+   "stationCount": 6,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "bigfmindia.com",
+   "home": "https://bigfmindia.com/",
+   "stations": [
+    "BIG 92.7 FM"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "yourclassical.org",
+   "home": "http://www.yourclassical.org/",
+   "stations": [
+    "Your Classical - Relax"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 7
+  },
+  {
+   "domain": "hitsofbollywood.com",
+   "home": "http://www.hitsofbollywood.com/",
+   "stations": [
+    "Rafi hit songs",
+    "Hits Of Bollywood"
+   ],
+   "stationCount": 2,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 2
+  },
+  {
+   "domain": "rtl2.fr",
+   "home": "http://www.rtl2.fr/",
+   "stations": [
+    "RTL2"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 7
+  },
+  {
+   "domain": "mygoldmusic.co.uk",
+   "home": "https://www.mygoldmusic.co.uk/",
+   "stations": [
+    "Gold"
+   ],
+   "stationCount": 1,
+   "status": "player-links",
+   "evidence": [
+    {
+     "url": "https://www.goldradio.com/",
+     "text": "Download 'Killing Me Softly' on iTunes"
+    },
+    {
+     "url": "https://www.goldradio.com/faq/",
+     "text": "If you live outside of these areas talk to your retailer about a wi-fi or internet radio device instead of a DAB radio"
+    },
+    {
+     "url": "https://www.goldradio.com/radio/how-to-listen/getting-started/",
+     "text": "Listen to Gold on smart speakers: Sonos"
+    }
+   ]
+  },
+  {
+   "domain": "navahang.com",
+   "home": "https://www.navahang.com/",
+   "stations": [
+    " Radio Navahang"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 2
+  },
+  {
+   "domain": "ajmide.com",
+   "home": "http://www.ajmide.com/",
+   "stations": [
+    "国际新闻"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "cadenadial.com",
+   "home": "https://www.cadenadial.com/",
+   "stations": [
+    "Cadena Dial"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 2
+  },
+  {
+   "domain": "metrofm.com.tr",
+   "home": "https://metrofm.com.tr/",
+   "stations": [
+    "Metro FM"
+   ],
+   "stationCount": 1,
+   "status": "unreachable",
+   "evidence": []
+  },
+  {
+   "domain": "bcc.com.tw",
+   "home": "https://www.bcc.com.tw/",
+   "stations": [
+    "中廣新聞網"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "retroradio.hu",
+   "home": "http://www.retroradio.hu/",
+   "stations": [
+    "Retro Rádió"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "superradio.cc",
+   "home": "https://superradio.cc/",
+   "stations": [
+    "CCTV-13 新闻（伴音）"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 2
+  },
+  {
+   "domain": "eurodance90.fr",
+   "home": "https://eurodance90.fr/",
+   "stations": [
+    "EuroDance 90 radio"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "talksport.com",
+   "home": "https://talksport.com/",
+   "stations": [
+    "talkSPORT"
+   ],
+   "stationCount": 1,
+   "status": "robots",
+   "evidence": []
+  },
+  {
+   "domain": "radiovanya.ru",
+   "home": "http://www.radiovanya.ru/",
+   "stations": [
+    "РАДИО ВАНЯ"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 2
+  },
+  {
+   "domain": "radioshanson.ru",
+   "home": "https://radioshanson.ru/",
+   "stations": [
+    "Шансон без цензуры"
+   ],
+   "stationCount": 1,
+   "status": "player-links",
+   "evidence": [
+    {
+     "url": "https://radioshanson.ru/",
+     "text": "png\",\"Ios\",\"ios\",\"https://itunes"
+    },
+    {
+     "url": "https://radioshanson.ru/terms",
+     "text": "условием перепечатки является наличие прямой гиперссылки на страницу, с которой осуществлена перепечатка материала, либо встраиваемого элемента (html кода видеоплеера)"
+    }
+   ]
+  },
+  {
+   "domain": "radiofarda.com",
+   "home": "https://www.radiofarda.com/",
+   "stations": [
+    "ایران‎  Radio Liberty (Iran) (official stream)"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "franceinter.fr",
+   "home": "https://www.franceinter.fr/",
+   "stations": [
+    "France Inter"
+   ],
+   "stationCount": 1,
+   "status": "player-links",
+   "evidence": [
+    {
+     "url": "https://www.radiofrance.fr/ecouter-musique/classique",
+     "text": "Du contrepoint sacré de Cererols à la poésie intime de Dowland, Clément Rochefort réunit onze jalons emblématiques du répertoire baroque"
+    }
+   ]
+  },
+  {
+   "domain": "m.weibo.cn",
+   "home": "https://m.weibo.cn/u/2022851417",
+   "stations": [
+    "清晨音乐台"
+   ],
+   "stationCount": 1,
+   "status": "robots",
+   "evidence": []
+  },
+  {
+   "domain": "alemfm.com",
+   "home": "https://www.alemfm.com/",
+   "stations": [
+    "Alem FM"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "mosaiquefm.net",
+   "home": "http://www.mosaiquefm.net/ar/",
+   "stations": [
+    "Mosaique FM"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "radioeins.de",
+   "home": "http://www.radioeins.de/",
+   "stations": [
+    "Radio Eins"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 7
+  },
+  {
+   "domain": "live.powerapp.com.tr",
+   "home": "https://live.powerapp.com.tr/powerturk/abr/powerturk/128/playlist.m3u8",
+   "stations": [
+    "POWER TÜRK FM"
+   ],
+   "stationCount": 1,
+   "status": "unreachable",
+   "evidence": []
+  },
+  {
+   "domain": "play.los40.com",
+   "home": "https://play.los40.com/emisora/los40_classic/",
+   "stations": [
+    "LOS40 Classic"
+   ],
+   "stationCount": 1,
+   "status": "unreachable",
+   "evidence": []
+  },
+  {
+   "domain": "shaivam.org",
+   "home": "https://shaivam.org/",
+   "stations": [
+    "Shaiva Lahari"
+   ],
+   "stationCount": 1,
+   "status": "unreachable",
+   "evidence": []
+  },
+  {
+   "domain": "z100.iheart.com",
+   "home": "https://z100.iheart.com/",
+   "stations": [
+    "Z100 - New York's #1 Hit Music Station WHTZ"
+   ],
+   "stationCount": 1,
+   "status": "player-links",
+   "evidence": [
+    {
+     "url": "https://z100.iheart.com/apps/",
+     "text": "Sonos"
+    }
+   ]
+  },
+  {
+   "domain": "shahimsha.com",
+   "home": "https://shahimsha.com/",
+   "stations": [
+    "Shahimsha Online radio"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "radioclassique.fr",
+   "home": "https://www.radioclassique.fr/",
+   "stations": [
+    "Radio Classique"
+   ],
+   "stationCount": 1,
+   "status": "player-links",
+   "evidence": [
+    {
+     "url": "https://www.radioclassique.fr/comment-ecouter-radio-classique-frequence-appli/",
+     "text": "sur Itunes"
+    }
+   ]
+  },
+  {
+   "domain": "radiovesti.ru",
+   "home": "http://radiovesti.ru/",
+   "stations": [
+    "Вести ФМ (Vesti FM)"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 3
+  },
+  {
+   "domain": "hardrockradiofm.weebly.com",
+   "home": "https://hardrockradiofm.weebly.com/",
+   "stations": [
+    "\tHard Rock Radio FM"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "fm4.orf.at",
+   "home": "https://fm4.orf.at/",
+   "stations": [
+    "FM4 | ORF | HQ"
+   ],
+   "stationCount": 1,
+   "status": "player-links",
+   "evidence": [
+    {
+     "url": "https://fm4.orf.at/story/frequenzen-streams100",
+     "text": "Du willst Radio FM4 über dein Badezimmerradio, im Auto, mit Internetradio oder einem externen Player empfangen? Hier findest du alle Frequenzen und Streams, die zu Radio FM4 führen"
+    }
+   ]
+  },
+  {
+   "domain": "hi.fnf.fm",
+   "home": "http://hi.fnf.fm/?m=1",
+   "stations": [
+    "Fnf.Fm Hindi"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "radio.gov.taipei",
+   "home": "http://www.radio.gov.taipei/",
+   "stations": [
+    "臺北電台"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 2
+  },
+  {
+   "domain": "sudradio.fr",
+   "home": "https://www.sudradio.fr/",
+   "stations": [
+    "Sud Radio"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 7
+  },
+  {
+   "domain": "m.qingting.fm",
+   "home": "https://m.qingting.fm/",
+   "stations": [
+    "华语金曲500首"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 3
+  },
+  {
+   "domain": "thebig80sstation.com",
+   "home": "http://www.thebig80sstation.com/",
+   "stations": [
+    "The Big 80s Station"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "br.de",
+   "home": "https://www.br.de/radio/br24/index.html",
+   "stations": [
+    "BR24",
+    "Bayern 1 Oberbayern"
+   ],
+   "stationCount": 2,
+   "status": "player-links",
+   "evidence": [
+    {
+     "url": "https://www.br.de/radio/br24/service/sendefrequenzen/index.html",
+     "text": "Webradio im eigenen Player starten:"
+    },
+    {
+     "url": "https://www.br.de/unternehmen/inhalt/technik/index.html",
+     "text": "Internetradio"
+    }
+   ]
+  },
+  {
+   "domain": "qingting.fm",
+   "home": "https://www.qingting.fm/radios/5022308",
+   "stations": [
+    "500首华语经典",
+    "两广之声音乐台"
+   ],
+   "stationCount": 2,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 2
+  },
+  {
+   "domain": "retrofm.ru",
+   "home": "http://retrofm.ru/",
+   "stations": [
+    "Ретро FM"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "nova.fr",
+   "home": "http://www.nova.fr/radionova/radio-nova",
+   "stations": [
+    "Radio Nova"
+   ],
+   "stationCount": 1,
+   "status": "unreachable",
+   "evidence": []
+  },
+  {
+   "domain": "centpourcent.com",
+   "home": "http://www.centpourcent.com/",
+   "stations": [
+    "100% Radio 80"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 7
+  },
+  {
+   "domain": "smoothradio.com",
+   "home": "http://www.smoothradio.com/",
+   "stations": [
+    "Smooth Radio"
+   ],
+   "stationCount": 1,
+   "status": "player-links",
+   "evidence": [
+    {
+     "url": "https://www.smoothradio.com/",
+     "text": "Download 'It Must Have Been Love' on iTunes"
+    },
+    {
+     "url": "https://www.smoothradio.com/help/",
+     "text": "Download 'Goodbye To Love' on iTunes"
+    },
+    {
+     "url": "https://www.smoothradio.com/radio/how-to-listen/",
+     "text": "Download 'Emotion' on iTunes"
+    }
+   ]
+  },
+  {
+   "domain": "nius.de",
+   "home": "https://www.nius.de/",
+   "stations": [
+    "NIUS"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 3
+  },
+  {
+   "domain": "0nlineradio.com",
+   "home": "https://0nlineradio.com/",
+   "stations": [
+    "IBIZA CHILLOUT LOUNGE - Ambient, Deep House, Balearic, Smooth Jazz, Acoustic, Chill House, Lo-Fi, Chillwave, Dream Pop, Electro, Tropical House, Sunset Chill, Café del Mar, Soft Electronica, Slow House, Ambient, Relax, Easy Listening, Beach Vibes, Summer"
+   ],
+   "stationCount": 1,
+   "status": "unreachable",
+   "evidence": []
+  },
+  {
+   "domain": "canliradyodinle.fm",
+   "home": "https://www.canliradyodinle.fm/radyo-turkulerle-turkiye-dinle.html",
+   "stations": [
+    "Türkülerle Türkiye"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 2
+  },
+  {
+   "domain": "newsradio.cri.cn",
+   "home": "https://newsradio.cri.cn/",
+   "stations": [
+    "CRI环球资迅广播"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "msnbc.com",
+   "home": "https://www.msnbc.com/",
+   "stations": [
+    "MSNBC"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 7
+  },
+  {
+   "domain": "90s90s.de",
+   "home": "https://www.90s90s.de/radios/hiphop-rap",
+   "stations": [
+    "90s90s HipHop & Rap",
+    "90s90s Hits"
+   ],
+   "stationCount": 2,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 4
+  },
+  {
+   "domain": "radio3.rai.it",
+   "home": "http://www.radio3.rai.it/",
+   "stations": [
+    "Rai Radio 3"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 2
+  },
+  {
+   "domain": "rti.org.tw",
+   "home": "https://www.rti.org.tw/",
+   "stations": [
+    "中央廣播電台"
+   ],
+   "stationCount": 1,
+   "status": "unreachable",
+   "evidence": []
+  },
+  {
+   "domain": "inforadio.de",
+   "home": "http://www.inforadio.de/",
+   "stations": [
+    "Inforadio"
+   ],
+   "stationCount": 1,
+   "status": "no",
+   "evidence": [
+    {
+     "url": "https://www.inforadio.de/",
+     "text": "Am Berliner Hauptbahnhof und knapp 40 weiteren Stationen war Alkohol trinken bereits seit mehreren Wochen verboten."
+    }
+   ]
+  },
+  {
+   "domain": "plus.rm.fm",
+   "home": "https://plus.rm.fm/",
+   "stations": [
+    "0R - MUSIC FOR SLEEP || Sleep, Relax, Calm, Meditation, Nature, Ambient, Soft Music, Piano, Deep Sleep, Peaceful, Chill, Background, Slow, Gentle, Instrumental"
+   ],
+   "stationCount": 1,
+   "status": "unreachable",
+   "evidence": []
+  },
+  {
+   "domain": "rockfm.fm",
+   "home": "http://www.rockfm.fm/",
+   "stations": [
+    "Rock FM"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 2
+  },
+  {
+   "domain": "ndr.de",
+   "home": "https://www.ndr.de/info/",
+   "stations": [
+    "NDR Info (Niedersachsen)",
+    "NDR 2"
+   ],
+   "stationCount": 2,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 5
+  },
+  {
+   "domain": "asiafm.net",
+   "home": "http://www.asiafm.net/index.php#page1",
+   "stations": [
+    "AsiaFM高清音乐台"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "havinfm.com",
+   "home": "http://havinfm.com/",
+   "stations": [
+    "Havin FM"
+   ],
+   "stationCount": 1,
+   "status": "unreachable",
+   "evidence": []
+  },
+  {
+   "domain": "phantomsw.com",
+   "home": "http://www.phantomsw.com/",
+   "stations": [
+    "إذاعة محمود خليل الحصري",
+    " إذاعة مشاري العفاسي"
+   ],
+   "stationCount": 2,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "aovivo.radiomixfm.com.br",
+   "home": "https://aovivo.radiomixfm.com.br/",
+   "stations": [
+    "Rádio Mix 106.3 FM"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "radioswissjazz.ch",
+   "home": "http://www.radioswissjazz.ch/",
+   "stations": [
+    "Radio Swiss Jazz"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 4
+  },
+  {
+   "domain": "qmusic.nl",
+   "home": "https://qmusic.nl/live",
+   "stations": [
+    "Qmusic"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "superfm.com.tr",
+   "home": "https://superfm.com.tr/",
+   "stations": [
+    "Super Fm"
+   ],
+   "stationCount": 1,
+   "status": "unreachable",
+   "evidence": []
+  },
+  {
+   "domain": "radiomontecarlo.net",
+   "home": "http://www.radiomontecarlo.net/",
+   "stations": [
+    "RMC Radio Monte Carlo"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 4
+  },
+  {
+   "domain": "9090.fm",
+   "home": "http://www.9090.fm/",
+   "stations": [
+    "Radio 9090 90.9"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "spokoinoeradio.ru",
+   "home": "http://spokoinoeradio.ru/",
+   "stations": [
+    "Спокойное радио"
+   ],
+   "stationCount": 1,
+   "status": "unreachable",
+   "evidence": []
+  },
+  {
+   "domain": "chantefrance.com",
+   "home": "http://www.chantefrance.com/",
+   "stations": [
+    "Chante France 80's"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 2
+  },
+  {
+   "domain": "virginradio.it",
+   "home": "http://www.virginradio.it/",
+   "stations": [
+    "Virgin Radio Italia",
+    "Virgin Radio Classic Rock"
+   ],
+   "stationCount": 2,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 6
+  },
+  {
+   "domain": "eskarock.pl",
+   "home": "https://www.eskarock.pl/",
+   "stations": [
+    "ESKA ROCK"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "americascountry.us",
+   "home": "https://americascountry.us/",
+   "stations": [
+    "America's Country"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "dfm.ru",
+   "home": "https://dfm.ru/",
+   "stations": [
+    "DFM Дискач 90-х",
+    "DFM RUSSIAN DANCE"
+   ],
+   "stationCount": 2,
+   "status": "no",
+   "evidence": [
+    {
+     "url": "https://dfm.ru/page/license-agreement",
+     "text": "Администратор также оставляет за собой одностороннее право удалить с Сайта материалы и/или информацию, не запрещенные напрямую условиями Соглашения, однако признанные Администратором несоответствующими политике Администратора в отношении содержания материалов и/или информации, либо неоднозначными, в"
+    }
+   ]
+  },
+  {
+   "domain": "desizoneradio.com",
+   "home": "https://www.desizoneradio.com/",
+   "stations": [
+    "Nostalgic Bollywood 90s"
+   ],
+   "stationCount": 1,
+   "status": "unreachable",
+   "evidence": []
+  },
+  {
+   "domain": "radiomaria.cd",
+   "home": "http://www.radiomaria.cd/",
+   "stations": [
+    "RADIO MARIA DEM.REP. CONGO"
+   ],
+   "stationCount": 1,
+   "status": "unreachable",
+   "evidence": []
+  },
+  {
+   "domain": "coolfm.ng",
+   "home": "http://www.coolfm.ng/",
+   "stations": [
+    "Cool FM: Lagos"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 3
+  },
+  {
+   "domain": "radio2.rai.it",
+   "home": "http://www.radio2.rai.it/",
+   "stations": [
+    "Rai Radio 2"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 2
+  },
+  {
+   "domain": "radiohotstar.com",
+   "home": "https://radiohotstar.com/",
+   "stations": [
+    "Radio Hotstar"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "radio10.nl",
+   "home": "https://www.radio10.nl/",
+   "stations": [
+    "Radio 10"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "thetimes.co.uk",
+   "home": "https://www.thetimes.co.uk/radio",
+   "stations": [
+    "Times Radio"
+   ],
+   "stationCount": 1,
+   "status": "robots",
+   "evidence": []
+  },
+  {
+   "domain": "newsonair.com",
+   "home": "https://newsonair.com/live/",
+   "stations": [
+    "Raagam AIR 24*7"
+   ],
+   "stationCount": 1,
+   "status": "unreachable",
+   "evidence": []
+  },
+  {
+   "domain": "arrow.nl",
+   "home": "https://www.arrow.nl/",
+   "stations": [
+    "\tArrow Classic Rock"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "ouifm.fr",
+   "home": "https://www.ouifm.fr/",
+   "stations": [
+    "OUI FM"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 5
+  },
+  {
+   "domain": "lofi247.com",
+   "home": "https://lofi247.com/",
+   "stations": [
+    "Lofi 24/7"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "radioibiza.it",
+   "home": "http://www.radioibiza.it/",
+   "stations": [
+    "Radio Ibiza"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 4
+  },
+  {
+   "domain": "radiosuitenetwork.torontocast.stream",
+   "home": "https://radiosuitenetwork.torontocast.stream/airport-lounge-radio/",
+   "stations": [
+    "AIRPORT LOUNGE RADIO",
+    "A MISSISSIPPI BLUES"
+   ],
+   "stationCount": 2,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "radiomaria.bi",
+   "home": "http://www.radiomaria.bi/",
+   "stations": [
+    "RADIO MARIA BURUNDI"
+   ],
+   "stationCount": 1,
+   "status": "unreachable",
+   "evidence": []
+  },
+  {
+   "domain": "bigfm.de",
+   "home": "https://www.bigfm.de/",
+   "stations": [
+    "bigFM Deutschland"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 4
+  },
+  {
+   "domain": "friskyradio.com",
+   "home": "https://www.friskyradio.com/",
+   "stations": [
+    "Frisky"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "deutschlandfunkkultur.de",
+   "home": "https://www.deutschlandfunkkultur.de/",
+   "stations": [
+    "Deutschlandfunk Kultur | DLF | MP3 128k"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "bigrradio.com",
+   "home": "http://www.bigrradio.com/",
+   "stations": [
+    "Big R Radio - 80s Metal FM"
+   ],
+   "stationCount": 1,
+   "status": "no",
+   "evidence": [
+    {
+     "url": "https://www.bigrradio.com/terms/",
+     "text": "Please don't record, rebroadcast, re-stream, play our streams in a business as background music for customers, or put our streams in another app, site or player without our written permission."
+    }
+   ]
+  },
+  {
+   "domain": "playerservices.streamtheworld.com",
+   "home": "https://playerservices.streamtheworld.com/api/livestream-redirect/JOY_TURK_SC?/",
+   "stations": [
+    "JOY TÜRK TURKEY"
+   ],
+   "stationCount": 1,
+   "status": "unreachable",
+   "evidence": []
+  },
+  {
+   "domain": "stream.zeno.fm",
+   "home": "https://stream.zeno.fm/9vrahqqfuuhvv",
+   "stations": [
+    "فيروز"
+   ],
+   "stationCount": 1,
+   "status": "robots",
+   "evidence": []
+  },
+  {
+   "domain": "nogoumfm.net",
+   "home": "https://www.nogoumfm.net/live-radio-stream/",
+   "stations": [
+    "Nogoum FM"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "voa-ingest.akamaized.net",
+   "home": "https://voa-ingest.akamaized.net/",
+   "stations": [
+    "美国之音"
+   ],
+   "stationCount": 1,
+   "status": "unreachable",
+   "evidence": []
+  },
+  {
+   "domain": "radyofenomen.com",
+   "home": "https://www.radyofenomen.com/",
+   "stations": [
+    "Radyo Fenomen"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "funky.radio",
+   "home": "https://funky.radio/",
+   "stations": [
+    "FUNKY RADIO - Only Funk Music (60's 70's)"
+   ],
+   "stationCount": 1,
+   "status": "unreachable",
+   "evidence": []
+  },
+  {
+   "domain": "beatsradio.ca",
+   "home": "https://beatsradio.ca/",
+   "stations": [
+    "Beats Radio"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "la100.cienradios.com",
+   "home": "https://la100.cienradios.com/",
+   "stations": [
+    "La 100 - 99.9 FM - Grupo Clarín - Buenos Aires, Argentina"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "antenne.de",
+   "home": "http://www.antenne.de/programm/empfang/antenne-bayern-hoeren-internet",
+   "stations": [
+    "Antenne Bayern"
+   ],
+   "stationCount": 1,
+   "status": "unreachable",
+   "evidence": []
+  },
+  {
+   "domain": "sputnikimages.com",
+   "home": "https://sputnikimages.com/",
+   "stations": [
+    "Спутник"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 2
+  },
+  {
+   "domain": "oldie-antenne.de",
+   "home": "https://www.oldie-antenne.de/",
+   "stations": [
+    "OLDIE ANTENNE"
+   ],
+   "stationCount": 1,
+   "status": "player-links",
+   "evidence": [
+    {
+     "url": "https://www.oldie-antenne.de/programm/so-hoert-ihr-uns/internet-radio",
+     "text": "80er 90er OLDIE ANTENNE Internetradio | 80er 90er OLDIE ANTENNE"
+    }
+   ]
+  },
+  {
+   "domain": "bossajazzbrasil.com",
+   "home": "https://bossajazzbrasil.com/",
+   "stations": [
+    "Bossa Jazz Brasil"
+   ],
+   "stationCount": 1,
+   "status": "player-links",
+   "evidence": [
+    {
+     "url": "https://bossajazzbrasil.com/",
+     "text": "I live between Switzerland and Panama and in both places, I always have it on SONOS, throughout the house"
+    }
+   ]
+  },
+  {
+   "domain": "breakz.fm",
+   "home": "https://breakz.fm/",
+   "stations": [
+    "_DEEJAY REMIXE_ Your Radio for finest House, EDM, Electro, Dance, Mashup, Hypertechno, Techno, Bootleg, Charts, Top40, Chillout, Lounge, HipHop, Urban & Latin Party DJ Remixes!",
+    " - DJ & CLUB CHARTS ---> Club Classics, Festival-Hits, Remixes, Single Charts, Mashups, DJ Sets, Club Edits, Dancefloor, Underground, Nightlife, Party Anthems, Ibiza, Miami, Clubbing, Festival, Remix, Mashup, DJ, EDM,  RAVE, Dance, Urban, Latin, Beachclub, Lounge"
+   ],
+   "stationCount": 2,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "elshinta.com",
+   "home": "https://elshinta.com/live/radio",
+   "stations": [
+    "Elshinta FM Jakarta"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "lux.fm",
+   "home": "https://lux.fm/",
+   "stations": [
+    "Люкс FМ 103.1"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 3
+  },
+  {
+   "domain": "kp.ru",
+   "home": "https://www.kp.ru/radio",
+   "stations": [
+    "Радио «Комсомольская Правда» | КП Россия"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 2
+  },
+  {
+   "domain": "fm891.net",
+   "home": "https://www.fm891.net/",
+   "stations": [
+    "Fm891线上音乐台"
+   ],
+   "stationCount": 1,
+   "status": "unreachable",
+   "evidence": []
+  },
+  {
+   "domain": "news98.com.tw",
+   "home": "https://www.news98.com.tw/",
+   "stations": [
+    "九八新聞台"
+   ],
+   "stationCount": 1,
+   "status": "unreachable",
+   "evidence": []
+  },
+  {
+   "domain": "band.uol.com.br",
+   "home": "https://www.band.uol.com.br/radios/bandnews-fm/sao-paulo",
+   "stations": [
+    "bandnews fm sp"
+   ],
+   "stationCount": 1,
+   "status": "unreachable",
+   "evidence": []
+  },
+  {
+   "domain": "hellorayo.co.uk",
+   "home": "https://www.hellorayo.co.uk/kisstory",
+   "stations": [
+    " KISSTORY: Non-Stop Old Skool & Anthems"
+   ],
+   "stationCount": 1,
+   "status": "player-links",
+   "evidence": [
+    {
+     "url": "https://www.hellorayo.co.uk/kisstory",
+     "text": "com/559859956\",\"is_featured\":false,\"showId\":18586,\"title\":\"KISS Dance at Tomorrowland\",\"description\":\"Mixes and highlights direct from one of the most iconic dance music festivals in the world"
+    }
+   ]
+  },
+  {
+   "domain": "radiocaroline.co.uk",
+   "home": "http://www.radiocaroline.co.uk/",
+   "stations": [
+    "Radio Caroline"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "novoeradio.by",
+   "home": "https://novoeradio.by/",
+   "stations": [
+    "Новое радио"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "0nradio.com",
+   "home": "http://www.0nradio.com/",
+   "stations": [
+    "- 0 N - Classic Rock on Radio"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "dancemusic.ro",
+   "home": "http://www.dancemusic.ro/",
+   "stations": [
+    "Deep House Radio - Bucharest Romania"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "rtp.pt",
+   "home": "https://www.rtp.pt/play/direto/antena1",
+   "stations": [
+    "Antena 1 (Portugal)"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 2
+  },
+  {
+   "domain": "soloviev.live",
+   "home": "http://soloviev.live/",
+   "stations": [
+    "Соловьёв LIVE"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "joe.nl",
+   "home": "https://joe.nl/",
+   "stations": [
+    "JOE"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 1
+  },
+  {
+   "domain": "kissfm.ua",
+   "home": "https://www.kissfm.ua/",
+   "stations": [
+    "Kiss FM 106.5"
+   ],
+   "stationCount": 1,
+   "status": "unknown",
+   "evidence": [],
+   "pagesChecked": 2
+  }
+ ]
+}
