@@ -4,7 +4,20 @@
  */
 import policy from '../../data/stream-policy.json';
 
-const HOSTS: string[] = (policy.blockedHosts || []).map((h: { host: string }) => h.host.toLowerCase());
+export interface BlockedStation {
+  host: string;
+  name: string;
+  reason: string;
+}
+/** Полный список (для админки) */
+export const BLOCKED_STATIONS: BlockedStation[] = policy.blockedHosts || [];
+let HOSTS: string[] = BLOCKED_STATIONS.map((h) => h.host.toLowerCase());
+
+/** Владелец вернул часть станций в админке (Видимость → «Станции, запретившие…») */
+export function setAllowedStreamHosts(allowed: string[]) {
+  const ok = new Set((allowed || []).map((h) => h.toLowerCase()));
+  HOSTS = BLOCKED_STATIONS.map((h) => h.host.toLowerCase()).filter((h) => !ok.has(h));
+}
 
 const hostOf = (u?: string) => {
   try {

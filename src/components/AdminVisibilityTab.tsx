@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { SlyNetSettings } from '../types/radio';
 import { COUNTRIES } from '../constants/countries';
 import { TOGGLABLE_SECTIONS, CountryScope } from '../utils/visibility';
+import { BLOCKED_STATIONS } from '../constants/streamPolicy';
 
 interface Props {
   settings: SlyNetSettings;
@@ -97,6 +98,46 @@ export const AdminVisibilityTab: React.FC<Props> = ({ settings, onChange }) => {
               {m === 'grid' ? '▦ Плитка' : '☰ Список'}
             </button>
           ))}
+        </div>
+      </section>
+
+      {/* Станции, которые сами запретили сторонние приложения */}
+      <section className="p-4 rounded-2xl bg-zinc-950/60 border border-zinc-800">
+        <h3 className="text-sm font-bold text-white mb-1">🚫 Станции, запретившие сторонние приложения</h3>
+        <p className="text-xs text-zinc-400 mb-3">
+          На своих сайтах эти станции пишут, что их поток нельзя использовать в чужих приложениях и плеерах, поэтому мы их скрываем
+          (поиск, глобус, каталог). Если получите разрешение — включите станцию и нажмите «🚀 Опубликовать». Новые находки робота —
+          в отчёте docs/STREAM-PERMISSIONS.md.
+        </p>
+        <div className="space-y-2">
+          {BLOCKED_STATIONS.map((b) => {
+            const shown = (settings.allowedStreamHosts || []).includes(b.host);
+            const link = (b.reason.match(/https?:\/\/\S+/) || [])[0] || `https://${b.host}`;
+            return (
+              <div key={b.host} className="flex items-start justify-between gap-3 px-3 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800">
+                <div className="min-w-0">
+                  <div className={`text-sm font-semibold ${shown ? 'text-white' : 'text-zinc-400'}`}>
+                    {b.name} <span className="text-[11px] text-zinc-500 font-mono">{b.host}</span>
+                  </div>
+                  <div className="text-[11px] text-zinc-500 mt-0.5 line-clamp-2">{b.reason}</div>
+                  <a href={link} target="_blank" rel="noreferrer" className="text-[11px] text-cyan-400 underline">правила станции</a>
+                </div>
+                <button
+                  onClick={() => {
+                    const cur = settings.allowedStreamHosts || [];
+                    onChange({ allowedStreamHosts: shown ? cur.filter((h) => h !== b.host) : [...cur, b.host] });
+                  }}
+                  className="flex items-center gap-2 shrink-0"
+                  aria-label={shown ? 'Скрыть станцию' : 'Показать станцию'}
+                >
+                  <span className={`text-[11px] font-bold ${shown ? 'text-emerald-400' : 'text-rose-300'}`}>{shown ? 'Показана' : 'Скрыта'}</span>
+                  <span className={switchCls(shown)}>
+                    <span className={knob(shown)} />
+                  </span>
+                </button>
+              </div>
+            );
+          })}
         </div>
       </section>
 

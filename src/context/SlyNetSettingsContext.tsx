@@ -4,6 +4,7 @@ import { SlyNetSettings, ThemeId } from '../types/radio';
 import { isOwnerMode } from '../utils/owner';
 import { setApiBase } from '../services/apiService';
 import { setHiddenRadioCountries } from '../services/radioApi';
+import { setAllowedStreamHosts } from '../constants/streamPolicy';
 import { setDefaultViewMode } from '../hooks/useViewMode';
 
 /** Личные настройки посетителя (тема, язык) — хранятся только на его устройстве. */
@@ -26,6 +27,7 @@ export const SITE_FIELDS = [
   'apiUrl',
   'hiddenSections',
   'hiddenCountries',
+  'allowedStreamHosts',
   'defaultViewMode',
   'partners',
   'adminLock',
@@ -87,7 +89,7 @@ function readJson(key: string): any {
 export function sanitizeSiteContent(raw: any): SiteContent {
   const c: any = pick(raw, SITE_FIELDS as unknown as string[]);
   if (c.hiddenCountries && typeof c.hiddenCountries !== 'object') delete c.hiddenCountries;
-  for (const k of ['customLinks', 'customWebcams', 'customStations', 'customTvChannels', 'partners', 'hiddenSections']) {
+  for (const k of ['customLinks', 'customWebcams', 'customStations', 'customTvChannels', 'partners', 'hiddenSections', 'allowedStreamHosts']) {
     if (c[k] !== undefined && !Array.isArray(c[k])) delete c[k];
   }
   for (const k of ['apiUrl', 'adminLock', 'contactEmail', 'legalContact', 'appTitle', 'appSubtitle', 'customLogoUrl', 'telegramUrl', 'heroTitle', 'heroSubtitle', 'appVersion', 'versionChangelog', 'dmcaPolicy']) {
@@ -215,6 +217,7 @@ export const SlyNetSettingsProvider: React.FC<{ children: React.ReactNode }> = (
   if (!settings.customLogoUrl) settings.customLogoUrl = DEFAULT_SETTINGS.customLogoUrl;
   setApiBase(settings.apiUrl);
   setHiddenRadioCountries(settings.hiddenCountries?.radio || []);
+  setAllowedStreamHosts(settings.allowedStreamHosts || []);
   setDefaultViewMode(settings.defaultViewMode);
 
   // Тема

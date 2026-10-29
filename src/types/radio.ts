@@ -220,6 +220,7 @@ export interface SlyNetSettings {
   defaultViewMode?: 'grid' | 'list'; // вид станций по умолчанию для всех
   hiddenSections?: string[]; // скрытые разделы сайта (webcams, tv, moods, artists, history, pro)
   hiddenCountries?: { radio?: string[]; tv?: string[]; webcams?: string[] }; // скрытые страны по разделам
+  allowedStreamHosts?: string[]; // станции из data/stream-policy.json, которые владелец вернул вручную
   partners?: PartnerLink[]; // блок «Рекомендуем / Партнёры»
   adminLock?: string; // отпечаток пароля админки (если сервер не настроен)
   contactEmail?: string; // e-mail для связи (политика конфиденциальности, магазины)

@@ -142,7 +142,10 @@ const slim = (s) => ({
 });
 
 // Станции, запретившие сторонние приложения, — не берём никуда (data/stream-policy.json)
-const BLOCKED_HOSTS = JSON.parse(await fs.readFile(path.join(ROOT, 'data', 'stream-policy.json'), 'utf8').catch(() => '{}')).blockedHosts?.map((h) => h.host.toLowerCase()) || [];
+const ALLOWED_BACK = new Set((JSON.parse(await fs.readFile(path.join(ROOT, 'public', 'content.json'), 'utf8').catch(() => '{}')).allowedStreamHosts || []).map((h) => String(h).toLowerCase()));
+const BLOCKED_HOSTS = (JSON.parse(await fs.readFile(path.join(ROOT, 'data', 'stream-policy.json'), 'utf8').catch(() => '{}')).blockedHosts || [])
+  .map((h) => h.host.toLowerCase())
+  .filter((h) => !ALLOWED_BACK.has(h)); // владелец вернул в админке
 const blockedSource = (s) =>
   [s.url, s.url_resolved, s.homepage].some((u) => {
     try {
