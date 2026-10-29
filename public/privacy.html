@@ -29,15 +29,15 @@
     <img src="logo.png" alt="">
     <div>
       <h1>Политика конфиденциальности</h1>
-      <div class="muted">SlyNet Radio · сайт и мобильные приложения · действует с 17.10.2026</div>
+      <div class="muted">SlyNet Radio · сайт и мобильные приложения · обновлено 29.10.2026</div>
     </div>
   </header>
   <div class="lang"><a href="#ru">Русский</a><a href="#en">English</a><a href="./">← На сайт</a></div>
 
   <section id="ru">
     <div class="card">
-      <b>Коротко:</b> мы не собираем персональные данные. Нет регистрации, рекламы, аналитики и cookie для слежки.
-      Ваши избранные станции и настройки хранятся только на вашем устройстве.
+      <b>Коротко:</b> нет рекламы, аналитики и cookie для слежки. Регистрация не нужна: избранное и настройки хранятся на вашем устройстве.
+      Только если вы сами создадите аккаунт для синхронизации, на нашем сервере хранятся логин, защищённый пароль и ваше избранное/плейлисты.
     </div>
 
     <h2>1. Кто отвечает за сервис</h2>
@@ -49,7 +49,18 @@
       выбранная тема, язык и вид списка. Эти данные не передаются нам и удаляются при очистке данных сайта или удалении приложения.
       Перенос избранного по QR-коду или ссылке происходит напрямую между вашими устройствами: ссылка содержит только идентификаторы станций.</p>
 
-    <h2>3. Какие внешние сервисы участвуют</h2>
+    <h2>3. Аккаунт для синхронизации (по желанию)</h2>
+    <p>Если вы нажмёте «Вход и синхронизация» и создадите аккаунт, на нашем сервере (Cloudflare Workers, хранилище KV) хранятся:
+      придуманный вами логин, пароль в виде необратимого хэша (PBKDF2 с солью) и данные для синхронизации — избранные станции,
+      плейлисты и сохранённые треки. Мы не запрашиваем e-mail, имя, телефон или другие данные. Цель — перенос избранного между
+      вашими устройствами. Чтобы удалить аккаунт и его данные, напишите нам с указанием логина — удалим в течение 30 дней.</p>
+    <p>Для раздела «Моя страна» наш сервер определяет страну по IP-адресу (данные Cloudflare). Страна запоминается только на вашем
+      устройстве; IP-адреса мы не сохраняем, кроме кратковременных счётчиков защиты от подбора пароля (до 1 часа).</p>
+
+    <p>Если вы пишете нам через форму «Поддержка», сохраняются текст сообщения и то, что вы сами указали (имя, контакт для ответа).
+      Сообщение пересылается владельцу в Telegram и хранится на сервере не дольше 180 дней.</p>
+
+    <h2>4. Какие внешние сервисы участвуют</h2>
     <p>Чтобы радио заиграло, ваше устройство напрямую обращается к сервисам ниже. Они, как любой сервер в интернете,
       технически получают ваш IP-адрес. Мы не передаём им никаких других данных о вас.</p>
     <table>
@@ -63,30 +74,33 @@
       <tr><td>Cloudflare Workers (если включено)</td><td>Чтение названия песни из потока</td></tr>
     </table>
 
-    <h2>4. Голосовой поиск и микрофон</h2>
+    <h2>5. Голосовой поиск и микрофон</h2>
     <p>Микрофон используется только когда вы сами нажимаете кнопку голосового поиска. Распознавание речи выполняет ваш браузер
       или операционная система (например, Google в Chrome, Apple в Safari). Мы не получаем и не храним записи.</p>
 
-    <h2>5. Контент третьих лиц</h2>
+    <h2>6. Контент третьих лиц</h2>
     <p>SlyNet Radio — каталог открытых публичных трансляций. Мы не храним и не ретранслируем аудио и видео: эфир идёт напрямую
       с серверов вещателей. Права на эфир принадлежат их владельцам. Если вы правообладатель и хотите убрать трансляцию из каталога,
       напишите нам — мы удалим её в течение 72 часов.</p>
 
-    <h2>6. Дети</h2>
+    <h2>7. Дети</h2>
     <p>Сервис не предназначен специально для детей младше 13 лет и не собирает их данные. Станции с пометками «18+» скрываются.</p>
 
-    <h2>7. Ваши права (GDPR)</h2>
-    <p>Поскольку мы не храним ваших данных, удалить их можно самостоятельно: очистите данные сайта в браузере или удалите приложение.
+    <h2>8. Ваши права (GDPR)</h2>
+    <p>Данные на устройстве удаляются очисткой данных сайта или удалением приложения. Данные аккаунта синхронизации удалим по вашему запросу.
+      Вы вправе запросить доступ к ним, исправление или удаление.
       По любым вопросам о данных пишите нам. Вы также вправе обратиться в надзорный орган по защите данных.</p>
 
-    <h2>8. Изменения</h2>
+    <h2>9. Изменения</h2>
     <p>Если политика изменится, мы обновим эту страницу и дату вверху.</p>
   </section>
 
   <section id="en" style="margin-top:56px">
     <h1 style="font-size:22px">Privacy Policy (English)</h1>
-    <div class="card"><b>In short:</b> SlyNet Radio does not collect personal data. No accounts, no ads, no analytics, no tracking cookies.
-      Favourites and settings are stored only on your device (localStorage).</div>
+    <div class="card"><b>In short:</b> no ads, no analytics, no tracking cookies. No registration needed: favourites and settings are stored on your device.
+      Only if you create an optional sync account, our server stores your chosen login, a salted password hash (PBKDF2) and your favourites/playlists.
+      No e-mail or name is requested. To delete the account, contact us with your login (within 30 days). Your country for “My country” is derived
+      from your IP by our server and stored only on your device; IP addresses are not stored except short-lived anti-brute-force counters (up to 1 hour). Support form messages (text plus the name/contact you enter) are forwarded to the owner via Telegram and kept up to 180 days.</div>
     <p><b>Controller / contact:</b> <span class="contact"></span></p>
     <pre id="legal-en" class="card"></pre>
     <p><b>Third-party services</b> contacted directly by your device (they technically receive your IP address): GitHub Pages (hosting),
@@ -96,8 +110,8 @@
     <p><b>Microphone</b> is used only when you tap voice search; recognition is performed by your browser/OS. We receive no recordings.</p>
     <p><b>Third-party content:</b> we only list publicly available streams and do not host or rebroadcast media. Rights holders may request
       removal via the contact above; we act within 72 hours.</p>
-    <p><b>Children:</b> not directed to children under 13. <b>Your rights (GDPR):</b> data stays on your device; delete it by clearing site data
-      or uninstalling the app. You may contact a data protection authority.</p>
+    <p><b>Children:</b> not directed to children under 13. <b>Your rights (GDPR):</b> on-device data is deleted by clearing site data or uninstalling the app;
+      sync-account data is deleted on request. You may request access, correction or deletion. You may contact a data protection authority.</p>
   </section>
 </main>
 <script>
