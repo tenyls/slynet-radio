@@ -36,11 +36,16 @@ jobs:
       - name: Сохранить отчёт
         if: always()
         run: |
-          tail -n 60 /tmp/scan.log > data/permission-scan.log || true
-          git add data/permission-scan.log
+          set +e
+          tail -n 60 /tmp/scan.log > data/permission-scan.log
           git config user.name "slynet-permissions-bot"
           git config user.email "slynet-permissions-bot@users.noreply.github.com"
-          git add data/stream-permissions.json docs/STREAM-PERMISSIONS.md
-          git diff --cached --quiet && exit 0
-          git commit -m "Отчёт: что станции пишут о своих потоках"
-          for i in 1 2 3; do git pull --rebase -q origin main && git push && break; sleep 5; done
+          git add data/permission-scan.log data/stream-permissions.json docs/STREAM-PERMISSIONS.md
+          if git diff --cached --quiet; then echo "нечего сохранять"; exit 0; fi
+          out=$(git commit -q -m "Отчёт: что станции пишут о своих потоках" 2>&1) || echo "::error::commit: $(echo "$out" | tail -c 400 | tr '\n' ' ')"
+          for i in 1 2 3 4 5; do
+            out=$(git pull --rebase --autostash -q origin main 2>&1 && git push -q 2>&1) && { echo "сохранено"; exit 0; }
+            echo "::warning::push $i: $(echo "$out" | tail -c 400 | tr '\n' ' ')"
+            sleep 7
+          done
+          exit 1
