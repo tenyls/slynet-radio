@@ -95,6 +95,7 @@ function RadioApp() {
     setIsCarModeOpen,
     isEqualizerOpen,
     setIsEqualizerOpen,
+    nativeEngine,
     isRecorderOpen,
     setIsRecorderOpen,
     isAlarmOpen,
@@ -1121,7 +1122,7 @@ function RadioApp() {
       )}
 
       {/* Equalizer & Audio FX Modal */}
-      {isEqualizerOpen && FEATURES.equalizer && (
+      {isEqualizerOpen && nativeEngine && (
         <EqualizerModal onClose={() => setIsEqualizerOpen(false)} />
       )}
 

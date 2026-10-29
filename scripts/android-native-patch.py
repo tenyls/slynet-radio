@@ -60,11 +60,17 @@ if 'android:scheme="slynet"' not in s:
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="slynet" android:host="open" />
             </intent-filter>''', s, count=1)
+# Нативный плеер может играть и http-станции (их много), WebView по-прежнему только https
+if 'usesCleartextTraffic' not in s:
+    s = s.replace('<application', '<application\n        android:usesCleartextTraffic="true"', 1)
 man.write_text(s)
 
 g = app / 'build.gradle'
 gs = g.read_text()
 if 'androidx.media:media' not in gs:
     gs = re.sub(r'(dependencies\s*\{)', r'\1\n    implementation "androidx.media:media:1.7.0"', gs, count=1)
+# Нативный плеер радио (Media3/ExoPlayer): эквалайзер, визуализация, буфер, HLS
+if 'media3-exoplayer' not in gs:
+    gs = re.sub(r'(dependencies\s*\{)', r'\1\n    implementation "androidx.media3:media3-exoplayer:1.5.1"\n    implementation "androidx.media3:media3-exoplayer-hls:1.5.1"', gs, count=1)
 g.write_text(gs)
 print('Нативные части добавлены: виджет, будильник, Android Auto')

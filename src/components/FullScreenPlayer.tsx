@@ -6,6 +6,8 @@ import { findSimilar } from './SimilarStations';
 import { WeakNetToggle } from './QualityChip';
 import { StationLogo } from './StationLogo';
 import { FEATURES } from '../utils/platform';
+import { Visualizer } from './Visualizer';
+import { loadSound } from '../services/nativeAudio';
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAudio } from '../context/AudioPlayerContext';
 import { useSlyNetSettings } from '../context/SlyNetSettingsContext';
@@ -85,6 +87,7 @@ export const FullScreenPlayer: React.FC<FullScreenPlayerProps> = ({ isFavorite, 
     sleepTimerRemainingSec,
     setIsCarModeOpen,
     setIsEqualizerOpen,
+    nativeEngine,
     setIsRecorderOpen,
     setIsAlarmOpen,
     isRecording,
@@ -96,6 +99,13 @@ export const FullScreenPlayer: React.FC<FullScreenPlayerProps> = ({ isFavorite, 
 
   const [isSleepModalOpen, setIsSleepModalOpen] = useState(false);
   const [imageError, setImageError] = useState(false);
+  // Визуализация на обложке (Android с нативным плеером — настоящий спектр, иначе анимация «в такт»)
+  const [vizOn, setVizOn] = useState(() => loadSound().viz);
+  useEffect(() => {
+    const upd = () => setVizOn(loadSound().viz);
+    window.addEventListener('slynet_sound_changed', upd);
+    return () => window.removeEventListener('slynet_sound_changed', upd);
+  }, []);
   const [weather, setWeather] = useState<CityWeather | null>(null);
   const [artwork, setArtwork] = useState<string | null>(null);
   const [savedNotice, setSavedNotice] = useState<string | null>(null);
@@ -336,6 +346,14 @@ export const FullScreenPlayer: React.FC<FullScreenPlayerProps> = ({ isFavorite, 
               ) : (
                 <StationFallbackIcon name={currentStation.name} size="xl" className="!w-full !h-full rounded-3xl" />
               )}
+              {vizOn && (
+                <div
+                  className={`absolute inset-x-0 bottom-0 h-[42%] pointer-events-none transition-opacity duration-700 ${isPlaying ? 'opacity-100' : 'opacity-0'}`}
+                  style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.78), rgba(0,0,0,0.35) 60%, transparent)' }}
+                >
+                  <Visualizer className="absolute inset-x-3 bottom-1 h-[88%] w-[calc(100%-1.5rem)]" dense />
+                </div>
+              )}
               {isPlaying && (
                 <div className="absolute top-2.5 right-2.5 bg-black/70 backdrop-blur-md px-2 py-0.5 rounded-full flex items-center gap-1 border border-white/10">
                   <span className="w-1 h-2.5 bg-emerald-400 rounded-full animate-bounce" />
@@ -473,7 +491,7 @@ export const FullScreenPlayer: React.FC<FullScreenPlayerProps> = ({ isFavorite, 
 
           {/* Инструменты */}
           <div className="flex gap-1.5 mt-2 shrink-0">
-            {FEATURES.equalizer && (
+            {nativeEngine && (
             <button onClick={() => setIsEqualizerOpen(true)} className={`${toolBtn} ${toolIdle}`}>
               <Sliders className="w-4 h-4 text-emerald-400" />
               <span>Эквалайзер</span>

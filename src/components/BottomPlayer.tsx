@@ -53,6 +53,7 @@ export const BottomPlayer: React.FC<BottomPlayerProps> = ({
     sleepTimerRemainingSec,
     setIsCarModeOpen,
     setIsEqualizerOpen,
+    nativeEngine,
     setIsRecorderOpen,
     setIsAlarmOpen,
     isRecording,
@@ -256,7 +257,7 @@ export const BottomPlayer: React.FC<BottomPlayerProps> = ({
             ) : null}
 
             {/* Equalizer */}
-            {FEATURES.equalizer && (
+            {nativeEngine && (
             <button
               onClick={() => setIsEqualizerOpen(true)}
               title="Эквалайзер SlyNet PRO"

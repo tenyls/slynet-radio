@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
@@ -30,11 +31,40 @@ public class SlyNetNativePlugin extends Plugin {
     public void load() {
         instance = this;
         if (getActivity() != null) stash(getActivity().getIntent());
+        SlyNetPlayer.get(getContext()).setListener(new SlyNetPlayer.Listener() {
+            @Override
+            public void onState(String state, String message) {
+                JSObject o = new JSObject();
+                o.put("state", state);
+                o.put("message", message);
+                notifyListeners("player", o);
+            }
+
+            @Override
+            public void onTitle(String title) {
+                JSObject o = new JSObject();
+                o.put("title", title);
+                notifyListeners("playerTitle", o);
+            }
+
+            @Override
+            public void onViz(float[] bars) {
+                JSArray a = new JSArray();
+                for (float b : bars) a.put((Object) Double.valueOf(Math.round(b * 100) / 100.0));
+                JSObject o = new JSObject();
+                o.put("b", a);
+                notifyListeners("viz", o);
+            }
+        });
     }
 
     @Override
     protected void handleOnDestroy() {
         if (instance == this) instance = null;
+        // Приложение закрыли — без интерфейса нативный плеер не оставляем играть
+        SlyNetPlayer p = SlyNetPlayer.get(getContext());
+        p.setListener(null);
+        p.stop();
         prefs(getContext()).edit().putBoolean("np_playing", false).apply();
         NowPlayingWidget.updateAll(getContext());
         super.handleOnDestroy();
@@ -160,6 +190,75 @@ public class SlyNetNativePlugin extends Plugin {
                 } catch (Exception ignored) {}
             }
         }
+        call.resolve();
+    }
+
+    // ---------- Нативный плеер (Media3): звук, эквалайзер, визуализация, буфер ----------
+    /** Есть ли в этом APK нативный плеер и какие полосы у эквалайзера */
+    @PluginMethod
+    public void playerInfo(PluginCall call) {
+        JSArray f = new JSArray();
+        for (float x : SlyNetDsp.FREQS) f.put((int) x);
+        JSObject o = new JSObject();
+        o.put("version", 1);
+        o.put("bands", f);
+        call.resolve(o);
+    }
+
+    @PluginMethod
+    public void playerLoad(PluginCall call) {
+        SlyNetPlayer.get(getContext()).load(call.getString("url", ""));
+        call.resolve();
+    }
+
+    @PluginMethod
+    public void playerPlay(PluginCall call) {
+        SlyNetPlayer.get(getContext()).play();
+        call.resolve();
+    }
+
+    @PluginMethod
+    public void playerPause(PluginCall call) {
+        SlyNetPlayer.get(getContext()).pause();
+        call.resolve();
+    }
+
+    @PluginMethod
+    public void playerStop(PluginCall call) {
+        SlyNetPlayer.get(getContext()).stop();
+        call.resolve();
+    }
+
+    @PluginMethod
+    public void playerVolume(PluginCall call) {
+        Double v = call.getDouble("volume", 1.0);
+        SlyNetPlayer.get(getContext()).setVolume(v == null ? 1f : v.floatValue());
+        call.resolve();
+    }
+
+    /** {enabled, gains:[10 чисел, дБ −12…+12], bass: 0…12 дБ} */
+    @PluginMethod
+    public void playerEq(PluginCall call) {
+        JSArray a = call.getArray("gains", new JSArray());
+        float[] g = new float[SlyNetDsp.FREQS.length];
+        for (int i = 0; i < g.length && i < a.length(); i++) g[i] = (float) a.optDouble(i, 0);
+        Boolean en = call.getBoolean("enabled", false);
+        Double bass = call.getDouble("bass", 0.0);
+        SlyNetPlayer.get(getContext()).setEq(en != null && en, g, bass == null ? 0f : bass.floatValue());
+        call.resolve();
+    }
+
+    @PluginMethod
+    public void playerBuffer(PluginCall call) {
+        Integer ms = call.getInt("ms", 2500);
+        SlyNetPlayer.get(getContext()).setBuffer(ms == null ? 2500 : ms);
+        call.resolve();
+    }
+
+    @PluginMethod
+    public void playerViz(PluginCall call) {
+        Boolean on = call.getBoolean("enabled", false);
+        SlyNetPlayer.get(getContext()).setViz(on != null && on);
         call.resolve();
     }
 }

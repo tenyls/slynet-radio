@@ -2,6 +2,7 @@ import { isNativeApp } from '../utils/platform';
 import { pickStream, lowerStream, isWeakMode, QUALITY_EVENT } from '../services/streamQuality';
 import { loadCatalog } from '../services/catalogService';
 import { setStream, loadHls, preloadHlsIfNeeded } from '../services/hlsAudio';
+import { detectNativePlayer, NativeAudio, loadSound, applySound } from '../services/nativeAudio';
 import { probeStream, markGeoBlocked, clearGeoBlocked, myNetwork } from '../services/streamCheck';
 import { hasNative, nativeNowPlaying, nativeSetAlarm, nativeStopAlarm, nativeLaunchAction, onNative } from '../services/nativeBridge';
 
@@ -13,7 +14,7 @@ import { Station, EqualizerBand, RecordedTrack, PlayedTrackHistory, RadioAlarm, 
 import { registerStationClick } from '../services/radioApi';
 import { DEFAULT_EQ_BANDS, EQUALIZER_PRESETS } from '../constants/equalizer';
 import { quarantineStation } from '../services/quarantineService';
-import { fetchLiveTrackTitle, parseAndValidateTrack, liveFallbackLabel } from '../services/rdsService';
+import { fetchLiveTrackTitle, parseAndValidateTrack, liveFallbackLabel, cleanTrackTitle } from '../services/rdsService';
 import { fetchAlbumArtFromItunes } from '../services/itunesService';
 
 const HISTORY_KEY = 'slynet_play_history_v1';
@@ -33,6 +34,8 @@ interface AudioContextType {
   playlist: Station[];
   playStation: (station: Station, contextPlaylist?: Station[]) => void;
   togglePlayPause: () => void;
+  /** Android-приложение с нативным плеером: доступны эквалайзер, визуализация и буфер */
+  nativeEngine: boolean;
   playNext: () => void;
   playPrevious: () => void;
   setVolume: (vol: number) => void;
@@ -175,6 +178,8 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   });
   const [currentTrackTitle, setCurrentTrackTitle] = useState<string>('');
+  /** Играет нативный плеер Android (есть эквалайзер, визуализация, буфер) */
+  const [nativeEngine, setNativeEngine] = useState(false);
 
   // Alarm state
   const [alarm, setAlarmState] = useState<RadioAlarm>(() => {
@@ -237,7 +242,8 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   // Initialize Audio Element
   useEffect(() => {
-    const audio = new Audio();
+    // Плеер: обычный <audio>, а в Android-приложении с нативным плеером — NativeAudio (см. ниже)
+    let audio: HTMLAudioElement = new Audio();
     audio.preload = 'none';
     audioRef.current = audio;
 
@@ -320,11 +326,31 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       setIsLoading(false);
     };
 
-    audio.addEventListener('waiting', handleWaiting);
-    audio.addEventListener('playing', handlePlaying);
-    audio.addEventListener('pause', handlePause);
-    audio.addEventListener('error', handleError);
-    audio.addEventListener('canplay', handleCanPlay);
+    const attach = (el: HTMLAudioElement, on: boolean) => {
+      const f = on ? el.addEventListener.bind(el) : el.removeEventListener.bind(el);
+      f('waiting', handleWaiting);
+      f('playing', handlePlaying);
+      f('pause', handlePause);
+      f('error', handleError);
+      f('canplay', handleCanPlay);
+    };
+    attach(audio, true);
+
+    // Android-приложение с нативным плеером (Media3): http-станции, эквалайзер, визуализация, буфер.
+    // Старые APK без него продолжают играть через <audio>.
+    let disposed = false;
+    detectNativePlayer().then((bands) => {
+      if (disposed || !bands) return;
+      if (!audio.paused || streamUrlRef.current) return; // уже что-то играет — не перебиваем
+      const native = new NativeAudio() as unknown as HTMLAudioElement;
+      attach(audio, false);
+      audio.src = '';
+      audio = native;
+      audioRef.current = native;
+      attach(native, true);
+      applySound(loadSound(), false);
+      setNativeEngine(true);
+    });
 
     // Load saved EQ settings if any
     try {
@@ -339,13 +365,10 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     } catch {}
 
     return () => {
+      disposed = true;
       clearConnectTimeout();
       clearStallTimer();
-      audio.removeEventListener('waiting', handleWaiting);
-      audio.removeEventListener('playing', handlePlaying);
-      audio.removeEventListener('pause', handlePause);
-      audio.removeEventListener('error', handleError);
-      audio.removeEventListener('canplay', handleCanPlay);
+      attach(audio, false);
       audio.pause();
       audio.src = '';
     };
@@ -758,6 +781,24 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     []
   );
 
+  // Нативный плеер сам читает название песни из потока (ICY) — сразу, без опроса сервера
+  const nativeTitleAtRef = useRef(0);
+  useEffect(() => {
+    const onTitle = (e: Event) => {
+      const st = currentStationRef.current;
+      const t = cleanTrackTitle(String((e as CustomEvent).detail || ''), st?.name);
+      if (!st || !t) return;
+      nativeTitleAtRef.current = Date.now();
+      setCurrentTrackTitle((prev) => {
+        if (prev === t) return prev;
+        registerRecognizedSong(t, st);
+        return t;
+      });
+    };
+    window.addEventListener('slynet_native_title', onTitle);
+    return () => window.removeEventListener('slynet_native_title', onTitle);
+  }, [registerRecognizedSong]);
+
   // Честный RDS: опрос реального названия трека каждые 15 секунд
   const missesRef = useRef(0);
   useEffect(() => {
@@ -767,6 +808,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     missesRef.current = 0;
 
     const poll = async () => {
+      if (Date.now() - nativeTitleAtRef.current < 90000) return; // название уже приходит из потока
       try {
         const liveTitle = await fetchLiveTrackTitle(currentStation);
         if (cancelled) return;
@@ -1303,6 +1345,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         playlist,
         playStation,
         togglePlayPause,
+        nativeEngine,
         playNext,
         playPrevious,
         setVolume,

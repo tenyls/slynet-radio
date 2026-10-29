@@ -63,6 +63,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     sleepTimerRemainingSec,
     setIsCarModeOpen,
     setIsEqualizerOpen,
+    nativeEngine,
     setIsRecorderOpen,
     setIsAlarmOpen,
     isRecording,
@@ -237,7 +238,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <span className="text-[9px] font-medium">{t.carMode}</span>
           </button>
 
-          {FEATURES.equalizer && (
+          {nativeEngine && (
           <button
             onClick={() => setIsEqualizerOpen(true)}
             title="Эквалайзер SlyNet"
