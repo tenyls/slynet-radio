@@ -3,6 +3,7 @@ import { pickStream, lowerStream, isWeakMode, QUALITY_EVENT } from '../services/
 import { loadCatalog } from '../services/catalogService';
 import { setStream, loadHls, preloadHlsIfNeeded } from '../services/hlsAudio';
 import { detectNativePlayer, NativeAudio, loadSound, applySound } from '../services/nativeAudio';
+import { stationCard } from '../services/lockArtwork';
 import { probeStream, markGeoBlocked, clearGeoBlocked, myNetwork } from '../services/streamCheck';
 import { hasNative, nativeNowPlaying, nativeSetAlarm, nativeStopAlarm, nativeLaunchAction, onNative } from '../services/nativeBridge';
 
@@ -1279,6 +1280,27 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   // в браузере/на iPhone — через стандартный Media Session.
   const controlsRef = useRef({ playNext, playPrevious, resumeLive });
   controlsRef.current = { playNext, playPrevious, resumeLive };
+
+  // Красивая картинка для экрана блокировки: обложка песни (iTunes) или фирменная карточка станции
+  const [lockArt, setLockArt] = useState<{ src: string; sizes: string; type: string } | null>(null);
+  useEffect(() => {
+    const st = currentStation;
+    if (!st) return;
+    let cancelled = false;
+    const hasTrack = !!currentTrackTitle && currentTrackTitle !== st.name;
+    (async () => {
+      const art = hasTrack ? await fetchAlbumArtFromItunes(currentTrackTitle).catch(() => null) : null;
+      if (cancelled) return;
+      if (art) return setLockArt({ src: art, sizes: '600x600', type: 'image/jpeg' });
+      if (isNativeApp) return setLockArt(null); // в Android — логотип станции, как раньше
+      const card = await stationCard(st).catch(() => '');
+      if (!cancelled) setLockArt(card ? { src: card, sizes: '512x512', type: 'image/png' } : null);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [currentStation?.stationuuid, currentTrackTitle]);
+
   useEffect(() => {
     if (!currentStation) return;
     const tags = currentStation.tags ? currentStation.tags.split(',').slice(0, 2).join(', ') : 'Радио';
@@ -1288,9 +1310,10 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       artist: hasTrack ? currentStation.name : `${currentStation.country || 'Радио'} · ${tags}`,
       album: 'SlyNet Radio',
       artwork: [
-        currentStation.favicon && /^https:\/\//.test(currentStation.favicon)
+        lockArt ||
+        (currentStation.favicon && /^https:\/\//.test(currentStation.favicon)
           ? { src: currentStation.favicon, sizes: '512x512', type: 'image/png' }
-          : { src: 'https://tenyls.github.io/slynet-radio/icons/icon-512.png', sizes: '512x512', type: 'image/png' },
+          : { src: 'https://tenyls.github.io/slynet-radio/icons/icon-512.png', sizes: '512x512', type: 'image/png' }),
       ],
     };
     const state = isPlaying ? 'playing' : 'paused';
@@ -1329,7 +1352,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     } catch (e) {
       console.warn('MediaSession handler error:', e);
     }
-  }, [currentStation, isPlaying, currentTrackTitle]);
+  }, [currentStation, isPlaying, currentTrackTitle, lockArt]);
 
   const clearError = useCallback(() => setError(null), []);
 
