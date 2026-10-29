@@ -6,6 +6,7 @@
  * Включается только если в установленном APK есть нативный плеер (старые APK играют как раньше).
  */
 import { Capacitor, registerPlugin } from '@capacitor/core';
+import { DATA_BASE } from '../utils/platform';
 
 type State = 'playing' | 'paused' | 'buffering' | 'error' | 'idle';
 
@@ -34,13 +35,28 @@ export function detectNativePlayer(): Promise<number[] | null> {
       try {
         if (Capacitor.getPlatform() !== 'android' || !Capacitor.isPluginAvailable('SlyNetNative')) return null;
         const info = await P.playerInfo();
-        return info?.version >= 1 && Array.isArray(info.bands) ? info.bands : null;
+        if (!(info?.version >= 1 && Array.isArray(info.bands))) return null;
+        // Аварийный выключатель из админки (Видимость → «Нативный плеер Android»): все вернутся на старый плеер
+        if (await nativeSwitchedOff()) return null;
+        return info.bands;
       } catch {
         return null; // старый APK — метода нет
       }
     })();
   }
   return detected;
+}
+
+async function nativeSwitchedOff(): Promise<boolean> {
+  try {
+    const ctl = new AbortController();
+    const t = setTimeout(() => ctl.abort(), 4000);
+    const c = await fetch(`${DATA_BASE}content.json?t=${Date.now()}`, { cache: 'no-store', signal: ctl.signal }).then((r) => (r.ok ? r.json() : null));
+    clearTimeout(t);
+    return Array.isArray(c?.hiddenSections) && c.hiddenSections.includes('nativeplayer');
+  } catch {
+    return false; // нет сети / сайт недоступен — нативный плеер работает
+  }
 }
 
 /** Замена <audio>, управляющая нативным плеером */
