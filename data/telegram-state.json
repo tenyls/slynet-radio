@@ -199,10 +199,6 @@
     "841ec916-508c-4948-9c16-6208f1e5015c"
   ],
   "news": [
-    "https://www.billboard.com/lists/amy-winehouse-back-to-black-tribute-concert-best-moments/",
-    "https://www.billboard.com/pro/spotify-q3-earnings-report-subscriber-gains-revenue-growth/",
-    "https://www.billboard.com/music/rock/queens-of-the-stone-age-tonight-show-performance-watch-1236365591/",
-    "https://www.billboard.com/music/rock/talking-heads-coffee-table-book-new-feeling-details-1236365611/",
     "https://www.nme.com/news/music/watch-mark-ronson-salaam-remi-corinne-bailey-rae-jessie-reyez-and-more-celebrate-20-years-of-back-to-black-with-amy-winehouses-band-at-londons-roundhouse-3973831?utm_source=rss&utm_medium=rss&utm_campaign=watch-mark-ronson-salaam-remi-corinne-bailey-rae-jessie-reyez-and-more-celebrate-20-years-of-back-to-black-with-amy-winehouses-band-at-londons-roundhouse",
     "https://www.nme.com/news/music/noel-gallagher-to-appear-on-final-season-of-chicken-shop-date-3973817?utm_source=rss&utm_medium=rss&utm_campaign=noel-gallagher-to-appear-on-final-season-of-chicken-shop-date",
     "https://www.billboard.com/music/country/john-anderson-death-reaction-1236365421/",
@@ -598,7 +594,11 @@
     "https://www.intermedia.ru/news/407769",
     "https://www.intermedia.ru/news/407770",
     "https://www.nme.com/news/music/slipknots-eloy-casagrande-on-new-album-we-are-making-real-music-we-are-not-thinking-about-business-3974508?utm_source=rss&utm_medium=rss&utm_campaign=slipknots-eloy-casagrande-on-new-album-we-are-making-real-music-we-are-not-thinking-about-business",
-    "https://www.intermedia.ru/news/407767"
+    "https://www.intermedia.ru/news/407767",
+    "https://www.intermedia.ru/news/407771",
+    "https://www.intermedia.ru/news/407773",
+    "https://www.nme.com/news/gaming-news/justice-and-gesaffelstein-drop-new-grand-theft-auto-6-track-pusher-3974523?utm_source=rss&utm_medium=rss&utm_campaign=justice-and-gesaffelstein-drop-new-grand-theft-auto-6-track-pusher",
+    "https://www.nme.com/news/music/sam-fender-newcastle-ticket-sale-delayed-after-sophisticated-bot-attack-3974522?utm_source=rss&utm_medium=rss&utm_campaign=sam-fender-newcastle-ticket-sale-delayed-after-sophisticated-bot-attack"
   ],
   "releases": [
     "1.0.6",
@@ -804,6 +804,5 @@
   "featCta": 41,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 1,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
