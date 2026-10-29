@@ -8,6 +8,7 @@ import { AudioProvider, useAudio } from './context/AudioPlayerContext';
 import { useFavorites } from './hooks/useFavorites';
 import { useSlyNetSettings, SlyNetSettingsProvider } from './context/SlyNetSettingsContext';
 import { isSectionHidden, hiddenCountrySet } from './utils/visibility';
+import { FEATURES } from './utils/platform';
 import { ContinueListening } from './components/ContinueListening';
 import { ListFilters } from './components/ListFilters';
 import { loadCatalog } from './services/catalogService';
@@ -1120,7 +1121,7 @@ function RadioApp() {
       )}
 
       {/* Equalizer & Audio FX Modal */}
-      {isEqualizerOpen && (
+      {isEqualizerOpen && FEATURES.equalizer && (
         <EqualizerModal onClose={() => setIsEqualizerOpen(false)} />
       )}
 

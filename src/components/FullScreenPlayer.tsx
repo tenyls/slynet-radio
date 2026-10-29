@@ -473,10 +473,12 @@ export const FullScreenPlayer: React.FC<FullScreenPlayerProps> = ({ isFavorite, 
 
           {/* Инструменты */}
           <div className="flex gap-1.5 mt-2 shrink-0">
+            {FEATURES.equalizer && (
             <button onClick={() => setIsEqualizerOpen(true)} className={`${toolBtn} ${toolIdle}`}>
               <Sliders className="w-4 h-4 text-emerald-400" />
               <span>Эквалайзер</span>
             </button>
+            )}
             {FEATURES.recorder && (
             <button
               onClick={() => (isRecording ? stopRecording() : setIsRecorderOpen(true))}

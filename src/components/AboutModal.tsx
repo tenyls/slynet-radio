@@ -122,9 +122,9 @@ export const AboutModal: React.FC<AboutModalProps> = ({ onClose }) => {
               <div className="p-3 rounded-2xl bg-zinc-900/60 border border-zinc-800/80 flex items-start gap-3">
                 <Sliders className="w-5 h-5 text-lime-400 shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="text-xs font-bold text-white">Web Audio эквалайзер</h4>
+                  <h4 className="text-xs font-bold text-white">Максимальное качество звука</h4>
                   <p className="text-[11px] text-zinc-400 mt-0.5">
-                    5-полосная настройка частот, Bass Boost и 3D объемное звучание.
+                    Всегда берём самый качественный поток станции, а при плохой связи — режим «Слабый интернет».
                   </p>
                 </div>
               </div>

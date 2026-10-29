@@ -256,6 +256,7 @@ export const BottomPlayer: React.FC<BottomPlayerProps> = ({
             ) : null}
 
             {/* Equalizer */}
+            {FEATURES.equalizer && (
             <button
               onClick={() => setIsEqualizerOpen(true)}
               title="Эквалайзер SlyNet PRO"
@@ -263,6 +264,7 @@ export const BottomPlayer: React.FC<BottomPlayerProps> = ({
             >
               <Sliders className="w-4 h-4" />
             </button>
+            )}
 
             {/* Car Mode */}
             <button

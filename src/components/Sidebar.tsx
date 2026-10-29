@@ -237,6 +237,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <span className="text-[9px] font-medium">{t.carMode}</span>
           </button>
 
+          {FEATURES.equalizer && (
           <button
             onClick={() => setIsEqualizerOpen(true)}
             title="Эквалайзер SlyNet"
@@ -245,6 +246,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <Sliders className="w-4 h-4 text-emerald-400" />
             <span className="text-[9px] font-medium">{t.equalizer}</span>
           </button>
+          )}
 
           {FEATURES.recorder && (
           <button
