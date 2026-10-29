@@ -6,9 +6,10 @@
 ## Что это
 Бесплатное легальное интернет-радио со всего мира: сайт (PWA) + Android-приложение (+ Android TV, Android Auto).
 - Сайт: https://tenyls.github.io/slynet-radio/ (GitHub Pages, репозиторий `tenyls/slynet-radio`, открытый)
+- Зеркало: https://slynet-radio.pages.dev (Cloudflare Pages, отдельный аккаунт slynet.radio@…; публикуется из `deploy.yml` вместе с GitHub Pages — секреты CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID)
 - Сервер: Cloudflare Worker `slynet-api` → https://slynet-api.tenylse.workers.dev (код: `worker/index.js`; KV `DB`).
   Деплой сервера — **вручную владельцем**: Cloudflare → Workers & Pages → slynet-api → Edit code → вставить весь файл → Deploy.
-  Проверка версии: `/health` (сейчас `version: 2026-10-23b`, `share/playlists/probe: true`).
+  Проверка версии: `/health` (сейчас `version: 2026-10-29a`, `share/playlists/probe: true`).
 - Telegram-канал @SlyNetRadio + стена ВК (vk.com/clubslynet) — автопостинг ботом.
 
 ## Правила владельца (важно)
@@ -33,7 +34,6 @@
 **29.10.2026:** нативный плеер Android (Media3/ExoPlayer, `native/android/java/SlyNetPlayer.java` + `SlyNetDsp.java`, JS-переходник `src/services/nativeAudio.ts`): 10-полосный эквалайзер с пресетами и басами, визуализация по настоящему спектру (без микрофона), буфер 1–12 с, автопереподключение, http-станции, название песни из потока (ICY). Окно «Звук» (`EqualizerModal.tsx`) и кнопки показываются только при нативном плеере (`nativeEngine`). Старые APK — как раньше. Аварийный выключатель: Админка → Видимость → «Нативный плеер Android». Сайт/iPhone: анимация «в такт» на обложке (`Visualizer.tsx`), на экране блокировки — обложка песни (iTunes) или фирменная карточка станции (`lockArtwork.ts`). История: «Треки из эфира» с поиском (без слова Shazam). Логотипы: запасной значок сайта станции. APK с сайта — native 1.0.13 (нужна проверка на телефоне/ТВ владельцем, пост в канал — после проверки). Ветка `native-player` на GitHub влита, её можно удалить.
 
 ## План на потом (делать, когда владелец спросит «что ещё»)
-- Зеркало сайта на Cloudflare Pages с красивым адресом (GitHub-адрес остаётся).
 - Статистика в админке (регистрации, гости/вошедшие, страны, платформы, топ станций) — Cloudflare D1, без списков сырых IP (GDPR).
 - Таймер прослушивания («▶ 12:34 в эфире»).
 - Защита от обрывов: буфер 10–30 с (по-настоящему — нативный плеер в Android; настройкой).

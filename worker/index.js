@@ -25,7 +25,7 @@
  */
 
 const GITHUB_REPO = 'tenyls/slynet-radio';
-const ALLOWED_ORIGINS = ['https://tenyls.github.io', 'http://localhost:3000', 'http://localhost:4173', 'capacitor://localhost', 'https://localhost', 'http://localhost'];
+const ALLOWED_ORIGINS = ['https://tenyls.github.io', 'https://slynet-radio.pages.dev', 'http://localhost:3000', 'http://localhost:4173', 'capacitor://localhost', 'https://localhost', 'http://localhost'];
 const DAY = 86400;
 
 export default {
@@ -47,7 +47,7 @@ export default {
     const url = new URL(request.url);
     const p = url.pathname.replace(/\/+$/, '') || '/';
     try {
-      if (p === '/' || p === '/health') return json({ ok: true, service: 'slynet-api', kv: !!env.DB, publish: !!env.GITHUB_TOKEN, telegram: !!env.TELEGRAM_BOT_TOKEN, windy: !!env.WINDY_API_KEY, vk: !!env.VK_CLIENT_ID, share: true, playlists: true, probe: true, version: '2026-10-23b' });
+      if (p === '/' || p === '/health') return json({ ok: true, service: 'slynet-api', kv: !!env.DB, publish: !!env.GITHUB_TOKEN, telegram: !!env.TELEGRAM_BOT_TOKEN, windy: !!env.WINDY_API_KEY, vk: !!env.VK_CLIENT_ID, share: true, playlists: true, probe: true, version: '2026-10-29a' });
       if (p === '/s') return sharePage(url);
       if (p === '/meta') return await handleMeta(url, json, ctx);
       if (p === '/webcams') return await handleWebcams(url, env, json, ctx);
