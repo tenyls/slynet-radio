@@ -746,7 +746,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
               t.title.toLowerCase() === validated.title.toLowerCase()
             )
         );
-        const updated = [newTrack, ...filtered].slice(0, 100);
+        const updated = [newTrack, ...filtered].slice(0, 200); // сервер синхронизации хранит до 200
         try {
           localStorage.setItem(RECOGNIZED_TRACKS_KEY, JSON.stringify(updated));
         } catch {}

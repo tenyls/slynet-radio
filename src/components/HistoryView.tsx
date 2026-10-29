@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useAudio } from '../context/AudioPlayerContext';
 import { Station, RecognizedTrack, PlayedTrackHistory } from '../types/radio';
 import {
@@ -40,6 +40,12 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ onToggleFavorite, isFa
     return recognizedTracks.length > 0 ? 'shazam' : 'stations';
   });
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [query, setQuery] = useState('');
+  const shownTracks = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return recognizedTracks;
+    return recognizedTracks.filter((t) => `${t.artist} ${t.title} ${t.stationName}`.toLowerCase().includes(q));
+  }, [recognizedTracks, query]);
 
   const formatTime = (timestamp: number) => {
     const date = new Date(timestamp);
@@ -66,7 +72,7 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ onToggleFavorite, isFa
     let url = '';
     switch (service) {
       case 'youtube':
-        url = `https://music.youtube.com/search?q=${encoded}`;
+        url = `https://www.youtube.com/results?search_query=${encoded}`;
         break;
       case 'spotify':
         url = `https://open.spotify.com/search/${encoded}`;
@@ -88,10 +94,10 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ onToggleFavorite, isFa
         <div>
           <h2 className="text-xl sm:text-2xl font-extrabold text-white flex items-center gap-2.5">
             <Clock className="w-6 h-6 text-cyan-400" />
-            <span>Эфир, Shazam & История</span>
+            <span>Треки из эфира и история</span>
           </h2>
           <p className="text-xs sm:text-sm text-zinc-400">
-            Распознанные реальные песни из радиоэфиров и история прослушанных радиостанций
+            Песни, которые звучали в эфире у вас (если станция передаёт название), и история прослушанных станций
           </p>
         </div>
 
@@ -102,7 +108,7 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ onToggleFavorite, isFa
             className="px-4 py-2 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-red-500/40 text-xs font-semibold text-zinc-400 hover:text-red-400 flex items-center gap-2 self-start sm:self-auto transition-colors"
           >
             <Trash2 className="w-4 h-4" />
-            <span>Очистить распознанные треки</span>
+            <span>Очистить треки</span>
           </button>
         )}
 
@@ -128,7 +134,7 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ onToggleFavorite, isFa
           }`}
         >
           <Sparkles className="w-4 h-4" />
-          <span>Распознанные треки (Shazam)</span>
+          <span>Треки из эфира</span>
           <span
             className={`px-2 py-0.2 rounded-full text-[10px] font-mono font-bold ${
               activeTab === 'shazam'
@@ -165,16 +171,35 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ onToggleFavorite, isFa
       {/* TAB 1: RECOGNIZED SONGS (SHAZAM) */}
       {activeTab === 'shazam' && (
         <div className="space-y-3">
+          {recognizedTracks.length > 0 && (
+            <div className="relative max-w-md">
+              <Search className="w-4 h-4 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Найти трек, исполнителя или станцию…"
+                className="w-full pl-9 pr-9 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 focus:border-cyan-500/50 outline-none text-sm text-white placeholder:text-zinc-500"
+              />
+              {query && (
+                <button onClick={() => setQuery('')} className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-zinc-500 hover:text-white" aria-label="Очистить поиск">
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+          )}
+          {recognizedTracks.length > 0 && shownTracks.length === 0 && (
+            <p className="text-sm text-zinc-500 py-6 text-center">Ничего не найдено по запросу «{query}»</p>
+          )}
           {recognizedTracks.length === 0 ? (
             <div className="py-20 text-center text-zinc-400 bg-zinc-950/40 rounded-3xl border border-zinc-900">
               <Sparkles className="w-12 h-12 mx-auto text-cyan-500/50 mb-3" />
-              <h3 className="text-base font-bold text-white mb-1">Пока нет распознанных песен</h3>
+              <h3 className="text-base font-bold text-white mb-1">Пока нет треков</h3>
               <p className="text-xs text-zinc-500 max-w-md mx-auto">
-                Включайте музыку на радиостанциях! Умный фильтр сохраняет сюда только реальные проверенные песни с исполнителем и названием, отсекая шум и рекламу.
+                Включайте радио! Если станция передаёт название песни, оно само появится здесь — только настоящие песни с исполнителем, без рекламы и шума.
               </p>
             </div>
           ) : (
-            recognizedTracks.map((track) => (
+            shownTracks.map((track) => (
               <div
                 key={track.id}
                 className="p-4 rounded-2xl bg-zinc-950/80 border border-zinc-800/90 hover:border-cyan-500/40 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-lg group"
@@ -198,7 +223,7 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ onToggleFavorite, isFa
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
-                        SHAZAM VERIFIED
+                        В ЭФИРЕ
                       </span>
                       <span className="text-[11px] text-zinc-500 font-mono">
                         {formatTime(track.detectedAt)}
@@ -222,14 +247,24 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ onToggleFavorite, isFa
 
                 {/* Right: Search in 1-Click (YouTube, Spotify, Apple, Yandex) + Copy + Delete */}
                 <div className="flex flex-wrap items-center gap-2 self-start md:self-auto shrink-0">
-                  {/* YouTube Music */}
+                  {/* YouTube */}
                   <button
                     onClick={() => openSearch('youtube', track.artist, track.title)}
                     className="px-3 py-1.5 rounded-xl bg-zinc-900 hover:bg-rose-500/20 text-zinc-300 hover:text-rose-400 border border-zinc-800 text-xs font-semibold flex items-center gap-1.5 transition-colors"
-                    title="Искать в YouTube Music"
+                    title="Искать на YouTube"
                   >
                     <Youtube className="w-3.5 h-3.5 text-rose-500" />
                     <span>YouTube</span>
+                  </button>
+
+                  {/* Яндекс Музыка */}
+                  <button
+                    onClick={() => openSearch('yandex', track.artist, track.title)}
+                    className="px-3 py-1.5 rounded-xl bg-zinc-900 hover:bg-yellow-500/20 text-zinc-300 hover:text-yellow-300 border border-zinc-800 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                    title="Искать в Яндекс Музыке"
+                  >
+                    <Music2 className="w-3.5 h-3.5 text-yellow-400" />
+                    <span>Яндекс</span>
                   </button>
 
                   {/* Spotify */}
