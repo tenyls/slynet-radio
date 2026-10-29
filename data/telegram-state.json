@@ -205,10 +205,6 @@
     "c229f726-760d-11ea-b1cf-52543be04c81"
   ],
   "news": [
-    "https://www.rollingstone.com/music/music-news/mark-ronson-jessie-reyez-amy-winehouse-tribute-concert-1235646567/",
-    "https://www.nme.com/news/music/cliff-richard-says-hes-learning-reggae-for-new-version-of-the-lord-is-my-shepherd-for-christmas-single-3973872?utm_source=rss&utm_medium=rss&utm_campaign=cliff-richard-says-hes-learning-reggae-for-new-version-of-the-lord-is-my-shepherd-for-christmas-single",
-    "https://www.intermedia.ru/news/407609",
-    "https://www.billboard.com/video/talking-music-new-wave-of-podcasters-latin-music-week-2026/",
     "https://pitchfork.com/story/2hollis-announces-2027-tour/",
     "https://www.billboard.com/music/pop/the-prodigy-1997-greatest-pop-stars-podcast-1236365837/",
     "https://www.billboard.com/culture/tv-film/kanye-west-kourtney-kardashian-advice-premarital-hookups-1236365846/",
@@ -604,7 +600,11 @@
     "https://www.intermedia.ru/news/407781",
     "https://stereogum.com/2515937/sphere-coming-to-maryland/news/",
     "https://stereogum.com/2515875/merry-halloween-a-scarily-early-guide-to-this-years-new-christmas-albums/lists/album-list/",
-    "https://www.rollingstone.com/music/music-news/gracie-abrams-daughter-from-hell-deluxe-1235649339/"
+    "https://www.rollingstone.com/music/music-news/gracie-abrams-daughter-from-hell-deluxe-1235649339/",
+    "https://www.billboard.com/music/music-news/justice-gesaffelstein-pusher-gta-6-score-1236370392/",
+    "https://www.billboard.com/culture/tv-film/harry-shum-jr-glee-reboot-will-he-return-1236370375/",
+    "https://stereogum.com/2515960/bryan-adams-donald-trump-diss-track-epstein-files/music/",
+    "https://pitchfork.com/story/nick-valensi-is-busy-playing-with-everyone-but-the-strokes/"
   ],
   "releases": [
     "1.0.6",
@@ -814,6 +814,5 @@
   "featCta": 43,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 1,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
