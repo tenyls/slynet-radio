@@ -206,10 +206,6 @@
     "26edc6b6-d221-4814-a6a9-0dd5d5d365d2"
   ],
   "news": [
-    "https://pitchfork.com/story/2hollis-announces-2027-tour/",
-    "https://www.billboard.com/music/pop/the-prodigy-1997-greatest-pop-stars-podcast-1236365837/",
-    "https://www.billboard.com/culture/tv-film/kanye-west-kourtney-kardashian-advice-premarital-hookups-1236365846/",
-    "https://www.billboard.com/music/music-news/maya-hawke-praises-taylor-swift-poetry-eminem-greatness-1236365972/",
     "https://www.billboard.com/video/by-numbers-the-state-of-spanish-language-music-worldwide/",
     "https://www.billboard.com/pro/insomniac-ade-map-point-summit-conference-las-vegas-may/",
     "https://pitchfork.com/story/interpol-plot-2027-north-american-tour-with-deafheaven/",
@@ -605,7 +601,11 @@
     "https://www.billboard.com/music/music-news/justice-gesaffelstein-pusher-gta-6-score-1236370392/",
     "https://www.billboard.com/culture/tv-film/harry-shum-jr-glee-reboot-will-he-return-1236370375/",
     "https://stereogum.com/2515960/bryan-adams-donald-trump-diss-track-epstein-files/music/",
-    "https://pitchfork.com/story/nick-valensi-is-busy-playing-with-everyone-but-the-strokes/"
+    "https://pitchfork.com/story/nick-valensi-is-busy-playing-with-everyone-but-the-strokes/",
+    "https://stereogum.com/2515990/mei-semones-2-hands-howl-song-video/music/",
+    "https://www.billboard.com/culture/tv-film/ice-t-law-and-order-svu-halloween-ghost-story-first-look-1236370288/",
+    "https://www.billboard.com/pro/universal-music-q3-earnings/",
+    "https://stereogum.com/2516002/boys-noize-nachsteliebe-feat-brutalismus-3000/music/"
   ],
   "releases": [
     "1.0.6",
@@ -816,6 +816,5 @@
   "featCta": 43,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 2,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
