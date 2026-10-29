@@ -200,10 +200,6 @@
     "2ab0f5db-f677-11e9-bbf2-52543be04c81"
   ],
   "news": [
-    "https://www.nme.com/news/music/watch-mark-ronson-salaam-remi-corinne-bailey-rae-jessie-reyez-and-more-celebrate-20-years-of-back-to-black-with-amy-winehouses-band-at-londons-roundhouse-3973831?utm_source=rss&utm_medium=rss&utm_campaign=watch-mark-ronson-salaam-remi-corinne-bailey-rae-jessie-reyez-and-more-celebrate-20-years-of-back-to-black-with-amy-winehouses-band-at-londons-roundhouse",
-    "https://www.nme.com/news/music/noel-gallagher-to-appear-on-final-season-of-chicken-shop-date-3973817?utm_source=rss&utm_medium=rss&utm_campaign=noel-gallagher-to-appear-on-final-season-of-chicken-shop-date",
-    "https://www.billboard.com/music/country/john-anderson-death-reaction-1236365421/",
-    "https://www.billboard.com/video/ghazi-empire-global-expansion-latin-music-growth/",
     "https://www.nme.com/news/music/talking-heads-announce-first-ever-authorised-book-new-feeling-unseen-archive-material-3973842?utm_source=rss&utm_medium=rss&utm_campaign=talking-heads-announce-first-ever-authorised-book-new-feeling-unseen-archive-material",
     "https://www.billboard.com/culture/lifestyle/julia-stiles-reached-out-michelle-williams-blessing-dwts-ledger-1236365619/",
     "https://www.billboard.com/pro/reservoir-sues-suno-anthropic-over-ai-training/",
@@ -599,7 +595,11 @@
     "https://www.intermedia.ru/news/407771",
     "https://www.intermedia.ru/news/407773",
     "https://www.nme.com/news/gaming-news/justice-and-gesaffelstein-drop-new-grand-theft-auto-6-track-pusher-3974523?utm_source=rss&utm_medium=rss&utm_campaign=justice-and-gesaffelstein-drop-new-grand-theft-auto-6-track-pusher",
-    "https://www.nme.com/news/music/sam-fender-newcastle-ticket-sale-delayed-after-sophisticated-bot-attack-3974522?utm_source=rss&utm_medium=rss&utm_campaign=sam-fender-newcastle-ticket-sale-delayed-after-sophisticated-bot-attack"
+    "https://www.nme.com/news/music/sam-fender-newcastle-ticket-sale-delayed-after-sophisticated-bot-attack-3974522?utm_source=rss&utm_medium=rss&utm_campaign=sam-fender-newcastle-ticket-sale-delayed-after-sophisticated-bot-attack",
+    "https://stereogum.com/2515919/the-strokes-nick-valensi-joins-duran-duran-in-paris/news/",
+    "https://www.intermedia.ru/news/407763",
+    "https://www.intermedia.ru/news/407776",
+    "https://www.nme.com/news/music/u2-announce-the-greatest-show-on-earth-2027-uk-and-european-stadium-tour-with-wolf-alice-tickets-3974542?utm_source=rss&utm_medium=rss&utm_campaign=u2-announce-the-greatest-show-on-earth-2027-uk-and-european-stadium-tour-with-wolf-alice-tickets"
   ],
   "releases": [
     "1.0.6",
@@ -806,6 +806,5 @@
   "featCta": 42,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 1,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
