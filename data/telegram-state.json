@@ -191,7 +191,8 @@
     "451491bd-624e-41e8-ab4c-71816f10611e",
     "ex-nightride-horrorsynth",
     "bfcfd328-fe96-4f4f-9044-623ba6341078",
-    "4623426b-3740-47c3-8e0e-1370b08043cd"
+    "4623426b-3740-47c3-8e0e-1370b08043cd",
+    "ex-record-elect"
   ],
   "news": [
     "https://pitchfork.com/story/snoh-aalegra-unveils-new-album-with-song-featuring-nile-rodgers-and-raphael-saadiq/",
@@ -796,6 +797,5 @@
   "featCta": 40,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 1,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
