@@ -209,10 +209,6 @@
     "65908a60-3a4c-4d8c-b66c-d8eb96faefc6"
   ],
   "news": [
-    "https://www.billboard.com/pro/damon-dash-roc-a-fella-movie-rights-bankruptcy/",
-    "https://www.billboard.com/pro/feds-respond-to-pooh-shiesty-complaints/",
-    "https://www.billboard.com/culture/product-recommendations/acotar-books-6-7-release-dates-sarah-j-maas-buy-online-1236365976/",
-    "https://www.billboard.com/pro/spotify-co-ceos-talk-ai-music-remixing-tool-subscribers/",
     "https://www.rollingstone.com/music/music-news/john-mayer-new-label-sob-rock-records-1235646820/",
     "https://www.billboard.com/pro/global-nightlife-report-new-york-seoul-sydney-scenes-rate/",
     "https://www.billboard.com/lists/john-anderson-top-songs-chart-hits/",
@@ -608,7 +604,11 @@
     "https://www.billboard.com/music/chart-beat/my-chemical-romance-black-parade-first-number-one-album-1236370527/",
     "https://www.billboard.com/pro/dolly-parton-estate-bodycam-footage-hospital-incident-died/",
     "https://www.billboard.com/music/music-news/olivia-rodrigo-my-chemical-romance-show-billboard-200-high-1236370380/",
-    "https://www.billboard.com/pro/record-label-market-share-q3-2026-umg-columbia/"
+    "https://www.billboard.com/pro/record-label-market-share-q3-2026-umg-columbia/",
+    "https://www.billboard.com/music/music-news/leah-barylsky-rufus-du-sol-camerwoman-inhale-exhale-tour-1236370639/",
+    "https://www.intermedia.ru/news/407789",
+    "https://www.billboard.com/pro/notorious-big-estate-lawsuit-judge-faith-evans-send-14m/",
+    "https://www.billboard.com/lists/publishing-briefs-peermusic-acquires-120-publishing/"
   ],
   "releases": [
     "1.0.6",
@@ -823,6 +823,5 @@
   "featCta": 44,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 2,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
