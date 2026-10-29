@@ -3,7 +3,7 @@
  * Если код сайта новее — тихо скачиваем пакет (с проверкой SHA-256) и применяем при следующем запуске.
  * Серверы Capgo не используются: пакеты лежат на нашем GitHub Pages.
  */
-import { isNativeApp } from '../utils/platform';
+import { isNativeApp, FEATURES } from '../utils/platform';
 
 const VERSION_URL = 'https://tenyls.github.io/slynet-radio/app/version.json';
 const STATUS_KEY = 'slynet_update_status';
@@ -27,6 +27,8 @@ export async function initAppUpdater() {
     const { CapacitorUpdater } = await import('@capgo/capacitor-updater');
     // Обязательно: сообщаем, что эта версия запустилась нормально (иначе плагин откатит её назад)
     await CapacitorUpdater.notifyAppReady();
+    // Версия из RuStore обновляется только через магазин
+    if (!FEATURES.otaUpdates) return saveStatus('Обновления — через RuStore');
 
     const remote = await fetch(`${VERSION_URL}?t=${Date.now()}`, { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null));
     if (!remote?.version || !remote?.url) return saveStatus('Не удалось узнать версию на сайте');

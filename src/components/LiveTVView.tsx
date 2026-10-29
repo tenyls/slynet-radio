@@ -5,7 +5,8 @@ import { loadCatalog, CatalogTvChannel } from '../services/catalogService';
 import { useAudio } from '../context/AudioPlayerContext';
 import { useSlyNetSettings } from '../context/SlyNetSettingsContext';
 import { getMyCountry } from '../services/geoService';
-import { hiddenCountrySet } from '../utils/visibility';
+import { hiddenCountrySet, tvChannelAllowed } from '../utils/visibility';
+import { isRuStoreBuild, RUSTORE_TV_BLOCK } from '../utils/platform';
 
 /**
  * Телеканалы мира.
@@ -23,7 +24,7 @@ interface OfficialLink {
   youtube?: string;
 }
 
-const OFFICIAL_LINKS: OfficialLink[] = [
+const ALL_OFFICIAL_LINKS: OfficialLink[] = [
   { name: 'Euronews (Русский)', country: 'EU', category: 'news', website: 'https://ru.euronews.com/live', youtube: 'https://www.youtube.com/@euronewsru/live' },
   { name: 'BBC News', country: 'GB', category: 'news', website: 'https://www.bbc.com/news', youtube: 'https://www.youtube.com/@BBCNews/live' },
   { name: 'DW News', country: 'DE', category: 'news', website: 'https://www.dw.com/en/live-tv/s-100825', youtube: 'https://www.youtube.com/@dwnews/live' },
@@ -41,6 +42,10 @@ const OFFICIAL_LINKS: OfficialLink[] = [
   { name: 'Red Bull TV', country: 'AT', category: 'outdoor', website: 'https://www.redbull.com/tv', youtube: 'https://www.youtube.com/@redbull/live' },
   { name: 'Olympics', country: 'CH', category: 'sport', website: 'https://olympics.com/en/', youtube: 'https://www.youtube.com/@Olympics' },
 ];
+
+const OFFICIAL_LINKS = ALL_OFFICIAL_LINKS.filter(
+  (l) => !isRuStoreBuild || (tvChannelAllowed({ country: l.country, categories: [l.category] }) && !RUSTORE_TV_BLOCK.officialNames.test(l.name))
+);
 
 const CATEGORY_RU: Record<string, string> = {
   general: 'Общие',
@@ -109,7 +114,7 @@ export const LiveTVView: React.FC = () => {
           quality: '',
           custom: true,
         }));
-      const all = [...custom, ...c.tv];
+      const all = [...custom, ...c.tv].filter(tvChannelAllowed);
       setChannels(all);
       // Сначала показываем каналы страны пользователя, если они есть
       getMyCountry().then((mine) => {

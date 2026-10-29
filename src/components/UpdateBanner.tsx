@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Download, X, RefreshCw } from 'lucide-react';
-import { isNativeApp } from '../utils/platform';
+import { isNativeApp, FEATURES } from '../utils/platform';
 import { nativeVersion } from '../services/appUpdater';
 
 const APK = 'https://github.com/tenyls/slynet-radio/releases/download/android-latest/SlyNetRadio.apk';
@@ -19,6 +19,7 @@ export const UpdateBanner: React.FC = () => {
     if (!isNativeApp) return;
     const onReady = () => setReady(true);
     window.addEventListener('slynet_update_ready', onReady);
+    if (!FEATURES.apkLinks) return () => window.removeEventListener('slynet_update_ready', onReady);
     Promise.all([
       nativeVersion(),
       fetch('https://api.github.com/repos/tenyls/slynet-radio/releases/tags/android-latest', { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : null)),

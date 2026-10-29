@@ -12,7 +12,30 @@ export const isNativeApp: boolean =
 export const isStoreBuild: boolean =
   isNativeApp && typeof navigator !== 'undefined' && /SlyNet-Store/.test(navigator.userAgent || '');
 
+/**
+ * Отдельная сборка для RuStore (метка «SlyNet-RuStore» в User-Agent, пакет com.slynet.radio.rustore).
+ * В ней ТВ есть, но без российских и украинских каналов и без новостных/религиозных
+ * (правила модерации RuStore и законы РФ о СМИ). Владелец может выключить ТВ только в RuStore — в админке.
+ * Код в ней не обновляется «по воздуху» и нет ссылок на APK: обновления — только через RuStore.
+ */
+export const isRuStoreBuild: boolean =
+  isNativeApp && typeof navigator !== 'undefined' && /SlyNet-RuStore/.test(navigator.userAgent || '');
+
+/** Что убираем из ТВ в версии для RuStore */
+export const RUSTORE_TV_BLOCK = {
+  countries: ['RU', 'UA'],
+  categories: ['news', 'religious', 'legislative', 'public'],
+  /** Новостные каналы без категории «news» — по названию */
+  newsNames: /news|новост|вести|haber|noticias|nachrichten|notizie|nieuws|infos?\b|actualit|журнал|24\s?h|parliament|senate/i,
+  /** «Официальные эфиры» (ссылки) — по названию */
+  officialNames: /euronews|bbc|dw news|france 24|al jazeera|nhk|sky news|europa plus|bridge tv/i,
+};
+
 export const FEATURES = {
+  /** Ссылки на APK с сайта и проверка «вышел новый APK» — в магазинных версиях запрещено */
+  apkLinks: !isStoreBuild && !isRuStoreBuild,
+  /** Автообновление кода приложения с сайта (в RuStore обновления идут только через магазин) */
+  otaUpdates: !isRuStoreBuild,
   /** Запись эфира в файл: Apple 5.2.3 / Google Play запрещают сохранять чужие трансляции */
   recorder: !isNativeApp,
   /**
