@@ -210,7 +210,6 @@
     "ex-record-melodic"
   ],
   "news": [
-    "https://www.rollingstone.com/music/music-news/john-mayer-new-label-sob-rock-records-1235646820/",
     "https://www.billboard.com/pro/global-nightlife-report-new-york-seoul-sydney-scenes-rate/",
     "https://www.billboard.com/lists/john-anderson-top-songs-chart-hits/",
     "https://www.billboard.com/music/awards/2026-mercury-prize-winner-raye-music-may-contain-hope-1236365609/",
@@ -609,7 +608,8 @@
     "https://www.billboard.com/music/music-news/leah-barylsky-rufus-du-sol-camerwoman-inhale-exhale-tour-1236370639/",
     "https://www.intermedia.ru/news/407789",
     "https://www.billboard.com/pro/notorious-big-estate-lawsuit-judge-faith-evans-send-14m/",
-    "https://www.billboard.com/lists/publishing-briefs-peermusic-acquires-120-publishing/"
+    "https://www.billboard.com/lists/publishing-briefs-peermusic-acquires-120-publishing/",
+    "https://www.billboard.com/music/music-news/mariah-carey-queens-of-the-stone-age-new-music-friday-guide-1236367438/"
   ],
   "releases": [
     "1.0.6",
@@ -620,7 +620,7 @@
     "1.0.13"
   ],
   "askIndex": 2,
-  "lastNewsSource": "Rolling Stone",
+  "lastNewsSource": "Billboard",
   "lastReleaseAt": 1793303214153,
   "cams": [
     "1573776572",
@@ -824,7 +824,5 @@
   "featStyle": 4,
   "featCta": 44,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
-  "showIndex": 2,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "showIndex": 2
 }
