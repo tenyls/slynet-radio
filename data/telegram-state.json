@@ -216,10 +216,6 @@
     "ex-record-workout"
   ],
   "news": [
-    "https://www.intermedia.ru/news/407620",
-    "https://www.billboard.com/music/chart-beat/tate-mcrae-debuts-no-1-australia-housewife-1236367034/",
-    "https://www.billboard.com/lists/billboard-latin-music-awards-2026-things-you-didnt-see-on-tv/",
-    "https://www.intermedia.ru/news/407596",
     "https://www.billboard.com/music/music-news/lisa-miley-kacey-musgraves-new-music-friday-guide-1236366499/",
     "https://www.billboard.com/music/latin/cristian-castro-billboard-lifetime-achievement-award-2026-2-1236365983/",
     "https://www.billboard.com/music/pop/lisa-action-packed-tarantino-music-video-watch-1236366977/",
@@ -615,7 +611,11 @@
     "https://stereogum.com/2516108/5-thoughts-on-olivia-rodrigos-unraveled-tour/reviews/concert-review/",
     "https://www.intermedia.ru/news/407719",
     "https://www.intermedia.ru/news/407734",
-    "https://www.rollingstone.com/music/music-news/live-nation-my-chemical-romance-dallas-cowboys-cheerleaders-1235650825/"
+    "https://www.rollingstone.com/music/music-news/live-nation-my-chemical-romance-dallas-cowboys-cheerleaders-1235650825/",
+    "https://www.intermedia.ru/news/407807",
+    "https://www.nme.com/news/music/watch-harry-styles-recreate-x-factor-audition-stevie-wonder-harryween-3974732?utm_source=rss&utm_medium=rss&utm_campaign=watch-harry-styles-recreate-x-factor-audition-stevie-wonder-harryween",
+    "https://www.nme.com/news/music/blue-dot-fever-lily-allen-ticketmaster-unsold-seat-map-halloween-3974727?utm_source=rss&utm_medium=rss&utm_campaign=blue-dot-fever-lily-allen-ticketmaster-unsold-seat-map-halloween",
+    "https://www.intermedia.ru/news/407819"
   ],
   "releases": [
     "1.0.6",
@@ -835,6 +835,5 @@
   "featCta": 50,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 3,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
