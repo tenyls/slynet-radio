@@ -1,0 +1,158 @@
+# HANDOFF — SlyNet Radio (главный файл для Claude, Codex, DeepSeek)
+
+> **Сначала прочитай этот файл** (особенно «Правила, которые нельзя ломать», «Решения и пожелания владельца» и последние
+> записи «Журнала работ»). **После заметной работы допиши запись в «Журнал работ»** (новые записи — сверху).
+> Подробный паспорт с историей фич — `docs/PROJECT.md`. Вход для владельца (аккаунты, схема) лежит у него на ПК:
+> `G:\evvant\Projects\Projects\HANDOFF\SlyNet-Radio\HANDOFF.md`.
+>
+> Владелец — не программист, живёт в Германии. Отвечай **по-русски**, простыми словами, по шагам и с **полным путём
+> кликов** (какой сайт → что слева/сверху → какая кнопка). **Ключи и пароли он вводит сам — никогда не проси их прислать.**
+
+## 1. Что это за проект
+
+**SlyNet Radio** — бесплатное легальное интернет-радио со всего мира: сайт (PWA) + Android-приложение (телефон,
+планшет, Android TV, Android Auto) + сборка для RuStore. Каталог — открытый Radio Browser + свои эксклюзивы.
+
+| Что | Адрес |
+|---|---|
+| Сайт (основной для рекламы) | https://slynet-radio.pages.dev/ (Cloudflare Pages) |
+| Сайт (служебный, GitHub Pages) | https://tenyls.github.io/slynet-radio/ — обновления приложения, каталог, политика конфиденциальности для магазинов |
+| Сервер | Cloudflare Worker `slynet-api` → https://slynet-api.tenylse.workers.dev (`/health` — версия) |
+| Админка | любой из сайтов + `#admin` в конце адреса (пароль — секрет `ADMIN_PASSWORD` в воркере) |
+| Telegram | канал @SlyNetRadio (автопостинг) |
+| ВКонтакте | vk.com/clubslynet (тот же автопостинг, через мост на воркере) |
+| Репозиторий | https://github.com/tenyls/slynet-radio (аккаунт `tenyls`, ветка `main`, открытый) |
+
+## 2. Как устроено
+
+```
+GitHub tenyls/slynet-radio (main)
+  ├─ deploy.yml   ─► GitHub Pages + Cloudflare Pages «slynet-radio» + OTA-пакет app/bundle-<id>.zip (Capgo)
+  ├─ android.yml  ─► APK (выкладывается на сайт; android/ генерируется в CI)
+  ├─ android-rustore.yml ─► отдельная сборка com.slynet.radio.rustore для RuStore
+  ├─ catalog.yml  ─► ежедневно public/catalog.json + public/geo.json (бот коммитит сам)
+  ├─ telegram.yml ─► пост в час 07–22 по Берлину в Telegram (+ очередь в ВК)
+  └─ permissions-scan.yml ─► раз в месяц: какие станции запрещают сторонние приложения → отчёт
+Сайт/приложение ─► Worker slynet-api (KV `DB`): аккаунты, синхронизация избранного/плейлистов, /probe,
+                   /s (превью «Поделиться»), админ-публикация content.json в GitHub, мост ВК, Windy-камеры
+```
+
+| Часть | Где в коде |
+|---|---|
+| Интерфейс (React 19 + TS + Vite + Tailwind v4) | `src/` |
+| Плеер (веб) | `src/context/AudioPlayerContext.tsx`, HLS через hls.js |
+| Нативный плеер Android (ExoPlayer + эквалайзер/бас/спектр) | `native/android/java/SlyNetPlayer.java`, `SlyNetDsp.java`, `SlyNetNativePlugin.java`; JS-переходник `src/services/nativeAudio.ts` |
+| Остальной натив Android (виджет, будильник, Android Auto, «Поделиться») | `native/android/` + `scripts/android-native-patch.py`, `scripts/android-tv-patch.py` |
+| Разные сборки (сайт / Store / RuStore) | `src/utils/platform.ts` (маркер в User-Agent: `SlyNet-Store`, `SlyNet-RuStore`), `src/utils/visibility.ts` |
+| Админка | `src/components/Admin*.tsx`; контент сайта — `public/content.json` |
+| Запрещённые станции | `data/stream-policy.json` + `src/constants/streamPolicy.ts`; вернуть — Админка → Видимость |
+| Каталог | `scripts/build-catalog.mjs` |
+| Автопостинг | `scripts/telegram-post.mjs` (расписание `HOURLY`), постеры `public/promo/*.jpg`, релизы `public/releases.json` |
+| Экран блокировки / обложки | `src/services/lockArtwork.ts`, `src/components/Visualizer.tsx` |
+| Сервер | `worker/index.js` (деплой — вручную владельцем, см. п. 4) |
+| Магазины | `docs/STORE.md`, `docs/RUSTORE.md`, графика `docs/rustore/`; RuStore-реклама включается в `data/stores.json` |
+
+## 3. Как собрать и выложить
+
+```
+npm ci
+npm run build        # проверка типов + сборка в dist/ — должна пройти без ошибок
+```
+1. Коммит от `Claude <noreply@anthropic.com>` (Codex — от своего имени или через Pull Request).
+2. **Перед push — обязательно `git pull --rebase`** (боты коммитят каждый час, иначе push отклонят).
+3. Push в `main` → `deploy.yml` сам выкладывает оба сайта и OTA-обновление за 2–4 минуты. Новый APK нужен только если
+   менялся `native/` (тогда workflow «Android» → потом обновить ссылку/пост).
+4. **Сервер (`worker/index.js`) сам НЕ выкладывается.** Владелец: dash.cloudflare.com → слева **Workers & Pages** →
+   **slynet-api** → вверху **Edit code** → выделить всё, вставить весь файл → **Deploy**. Проверка: `/health` → `version`.
+5. Запуск workflow вручную: github.com/tenyls/slynet-radio → вверху **Actions** → слева нужный workflow → справа **Run workflow**.
+
+## 4. Секреты — только названия (значения никогда не писать)
+
+- **GitHub** (github.com/tenyls/slynet-radio → Settings → Secrets and variables → Actions): `ANDROID_KEYSTORE_BASE64`,
+  `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHANNEL`, `GEMINI_API_KEY`,
+  `VK_TOKEN`, `VK_GROUP_ID`, `VK_BRIDGE_KEY`, `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`.
+- **Cloudflare Worker `slynet-api`** (Workers & Pages → slynet-api → Settings → Variables and Secrets): `ADMIN_PASSWORD`,
+  `TOKEN_SECRET` (не менять — разлогинит всех), `GITHUB_TOKEN`, `WINDY_API_KEY`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`,
+  `VK_BRIDGE_KEY`, `VK_CLIENT_ID`, `VK_SERVICE_TOKEN`, `VK_ID_HOST`, `VK_SCOPE`; привязка KV `DB`.
+- **Ключ подписи Android** (keystore) — терять нельзя: без него приложение не обновится у людей.
+
+## 5. Правила, которые нельзя ломать
+
+1. Только легальные официальные потоки. Никаких пиратских плейлистов, не предлагать и не подсказывать их.
+2. Станции из `data/stream-policy.json` скрыты везде (сайт, приложение, каталог, глобус) — кроме тех, что владелец
+   вернул тумблером (`allowedStreamHosts` в `content.json`).
+3. **ТВ нигде не упоминать в рекламе, постерах и постах.** В Google Play/App Store-сборке раздела ТВ нет; в RuStore — ТВ
+   без российских/украинских каналов и новостей. «Android TV» как устройство упоминать можно.
+4. **В рекламе, постерах, QR и подписях постов — только https://slynet-radio.pages.dev/**. github.io-адрес не удалять:
+   на нём автообновления приложения и политика конфиденциальности.
+5. Посты в Telegram — **без звука** (`SILENT = true`). Каждое обновление — пост с хук-текстом и своим постером
+   (`public/releases.json` → `post`, `image`; `telegram.yml` mode=`release`). **Публиковать в канал — только после
+   «да» владельца.**
+6. RuStore-сборка: без OTA-обновлений кода и без ссылок на APK (`FEATURES` в `platform.ts`). Ссылки на RuStore в
+   рекламе — только когда `data/stores.json` → `"rustore": true`.
+7. `android/` не коммитить — он генерируется в CI. Натив — только в `native/android/` + патч-скрипты.
+8. Не трогать ключ подписи, `TOKEN_SECRET`, KV `DB`.
+9. Не путать аккаунты GitHub: этот проект — только `tenyls`. `jeavnex` и `eai-apps` — чужие проекты, их не трогать.
+10. Второй проект владельца (радио на других аккаунтах) — здесь не трогать.
+
+## 6. Готовый запрос для Codex
+
+```
+Прочитай HANDOFF.md в корне репозитория tenyls/slynet-radio (правила, решения владельца, последние записи журнала).
+Сделай задачу: <задача>. Выполни npm ci && npm run build без ошибок. Перед push — git pull --rebase.
+Допиши запись в «Журнал работ» в HANDOFF.md (дата, кто, что, зачем, файлы, что проверить).
+Объясни владельцу по-русски, что нажать (например, принять Pull Request).
+```
+
+## 7. Мы одна команда (Claude, Codex, DeepSeek)
+
+- Каждую заметную работу записывай в «Журнал работ» ниже: дата и время, **кто** (Claude / Codex / DeepSeek), что
+  сделал и **зачем**, какие файлы, что проверить.
+- Перед работой читай последние записи журнала — что делал другой помощник.
+- Исправляешь чужую работу — напиши, **чью** (кто и какая запись), что было не так и **почему** поправил. Не откатывай
+  чужие изменения молча.
+- Не уверен — оставь пометку «**Внимание следующему помощнику:** …». Подстраховывайте друг друга.
+- Договорился с владельцем о важном — допиши строку в «Решения и пожелания владельца».
+
+## 8. Решения и пожелания владельца
+
+Формат: `ГГГГ-ММ-ДД, с кем: решение`. Перед работой прочитай — не делай против этих решений.
+
+- 2026-10, Claude: отвечать по-русски, по шагам, с полным путём кликов; ключи и пароли владелец вводит сам.
+- 2026-10, Claude: перед push всегда `git pull --rebase` (боты коммитят каждый час).
+- 2026-10, Claude: только легальные потоки; станции, запретившие сторонние приложения, скрываются.
+- 2026-10, Claude: ТВ не упоминать в рекламе, постерах и постах; в Google Play / App Store — без ТВ.
+- 2026-10, Claude: одно универсальное Android-приложение (телефон, планшет, ТВ).
+- 2026-10, Claude: посты в Telegram без звука; на каждое обновление — пост с хуком и своим постером; публиковать только после «да» владельца.
+- 2026-10, Claude: ВК — только ключ сообщества (без VK ID / бизнес-верификации); картинки в ВК пока не идут — посты текстом.
+- 2026-10-29, Claude: RuStore — отдельная сборка `com.slynet.radio.rustore`: ТВ без каналов РФ/Украины и новостей, без OTA и APK-ссылок; эквалайзер в описании указывать только там, где он реально работает (нативный плеер).
+- 2026-10-29, Claude: Cloudflare-зеркало на отдельном аккаунте → https://slynet-radio.pages.dev.
+- 2026-10-29, Claude: в рекламе, постерах, QR и подписях — только https://slynet-radio.pages.dev/.
+- 2026-10-29, Claude: реклама в канале — один пост в час (07–22 по Берлину), фишки с постерами; RuStore-ссылки — только после одобрения RuStore.
+- 2026-10-29, Claude: App Store для SlyNet Radio — отложено (риск отказа по правилу 5.2.3).
+- 2026-10-30, Claude: станции, запретившие сторонние приложения, не удаляются насовсем — видны в Админке → Видимость, их можно вернуть тумблером.
+- 2026-10-30, Claude: робот поиска разрешений станций (раз в месяц) только пишет отчёт; блокировку добавляем вручную.
+- 2026-10-30/31, Claude (идеи, **не делать без команды владельца**): свои M3U/HLS-плейлисты пользователя + EPG + личный кабинет —
+  скорее всего **отдельным брендом** (IPTV-плеер), а SlyNet Radio остаётся чистым радио. Для iPhone — «пустой» плеер
+  без наших каналов и без ссылок на списки. M3U-ссылки радио по жанрам на сайте — хорошая идея на будущее.
+
+## 9. Ожидает владельца
+
+- Сообщить, когда RuStore одобрит → поставить `"rustore": true` в `data/stores.json` и выпустить RuStore-версию с нативным плеером.
+
+---
+
+## Журнал работ
+
+Формат заголовка: `### ГГГГ-ММ-ДД ЧЧ:ММ — кто (Claude / Codex / DeepSeek) — версия`. Новые записи — сверху.
+
+### 2026-10-31 15:40 — Claude — 1.0.13 (сайт 0.8.6)
+- **Что:** создал `HANDOFF.md` (этот файл), `AGENTS.md`, `CLAUDE.md`; вход для владельца на ПК —
+  `G:\evvant\Projects\Projects\HANDOFF\SlyNet-Radio\HANDOFF.md`. Раздел «Решения и пожелания владельца» заполнен из
+  наших разговоров.
+- **Зачем:** чтобы работу мог продолжить любой помощник (Claude, Codex, DeepSeek), не ломая договорённости.
+- **Перед этим (29–30.10, Claude):** нативный плеер Android с эквалайзером/басом/визуализацией (1.0.13, опубликован в
+  канале); RuStore-сборка отправлена на модерацию; Cloudflare-зеркало; новые постеры и почасовой автопостинг;
+  робот `permissions-scan.yml`; раздел «Станции, запретившие сторонние приложения» в Админке → Видимость.
+- **Файлы:** `HANDOFF.md`, `AGENTS.md`, `CLAUDE.md`.
+- **Проверить:** ничего в коде не менялось.
