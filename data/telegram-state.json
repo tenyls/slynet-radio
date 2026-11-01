@@ -222,10 +222,6 @@
     "ex-record-recordclassix"
   ],
   "news": [
-    "https://www.billboard.com/music/rock/2027-sonic-temple-festival-lineup-blink-182-turnstile-1236367059/",
-    "https://www.intermedia.ru/news/407632",
-    "https://www.nme.com/news/music/suede-interview-mercury-prize-new-anarcho-punk-album-manic-street-preachers-tour-3973989?utm_source=rss&utm_medium=rss&utm_campaign=suede-interview-mercury-prize-new-anarcho-punk-album-manic-street-preachers-tour",
-    "https://www.billboard.com/lists/most-played-song-biggest-artist-warm-2026-dance-insights-report/",
     "https://www.intermedia.ru/news/407628",
     "https://www.nme.com/news/music/watch-my-chemical-romance-bring-out-fake-dallas-cowboys-cheerleaders-hollywood-bowl-3974041?utm_source=rss&utm_medium=rss&utm_campaign=watch-my-chemical-romance-bring-out-fake-dallas-cowboys-cheerleaders-hollywood-bowl",
     "https://www.intermedia.ru/news/407636",
@@ -621,7 +617,11 @@
     "https://www.nme.com/news/music/watch-gracie-abrams-channel-romeo-juliet-for-performances-of-hit-the-wall-and-here-you-come-there-you-go-on-snl-3974753?utm_source=rss&utm_medium=rss&utm_campaign=watch-gracie-abrams-channel-romeo-juliet-for-performances-of-hit-the-wall-and-here-you-come-there-you-go-on-snl",
     "https://www.nme.com/news/music/turnstile-turned-down-the-chance-to-tour-with-metallica-3974749?utm_source=rss&utm_medium=rss&utm_campaign=turnstile-turned-down-the-chance-to-tour-with-metallica",
     "https://www.intermedia.ru/news/407826",
-    "https://www.billboard.com/culture/product-recommendations/new-york-marathon-2026-watch-live-online-free-1236369518/"
+    "https://www.billboard.com/culture/product-recommendations/new-york-marathon-2026-watch-live-online-free-1236369518/",
+    "https://www.billboard.com/lists/best-halloween-costumes-paris-hilton-kim-kardashian/",
+    "https://stereogum.com/2516238/gracie-abrams-and-david-s-pumpkins-returns-to-snl/news/",
+    "https://pitchfork.com/story/juan-atkins-co-founder-of-techno-music-dies-at-64/",
+    "https://stereogum.com/2516231/billy-strings-plays-he-man-themed-set-dressed-as-he-man/news/"
   ],
   "releases": [
     "1.0.6",
@@ -633,7 +633,7 @@
     "2G-2026-11-01"
   ],
   "askIndex": 2,
-  "lastNewsSource": "Rolling Stone",
+  "lastNewsSource": "Stereogum",
   "lastReleaseAt": 1793543443105,
   "cams": [
     "1573776572",
@@ -845,6 +845,5 @@
   "featStyle": 7,
   "featCta": 55,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
-  "showIndex": 2,
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "showIndex": 2
 }
