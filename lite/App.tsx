@@ -235,11 +235,13 @@ function RadioApp() {
       {tab === 'popular' && <>
         <p className="lite-intro">Радио с вами. Даже когда сеть слабая.</p>
         <p className="lite-muted">Общий каталог SlyNet. Без анимации и загрузки картинок по умолчанию.</p>
-        <div className="lite-actions"><WeakNetToggle /><button onClick={() => setModal('sync')}>Войти / перенести избранное</button></div>
+        <div className="lite-actions"><button className="lite-primary" disabled={!current && !stations.length} onClick={() => current ? audio.togglePlayPause() : stations[0] && audio.playStation(stations[0], stations)}>{current && audio.isPlaying ? 'Пауза' : 'Слушать радио'}</button><WeakNetToggle /></div>
+        <button onClick={() => setModal('sync')}>Войти / перенести избранное</button>
         <div className="lite-actions"><button disabled={busy} onClick={() => void runSearch('random')}>Мне повезёт</button><button disabled={busy} onClick={() => void runSearch('clicktrend')}>В тренде</button><button disabled={busy} onClick={() => void runSearch(undefined, true)}>Моя страна</button></div>
         <details className="lite-preferences"><summary>Экономия трафика</summary><p>Выбираем лёгкий поток, если вещатель его предоставляет. Можно слушать любые станции; у некоторых есть только поток высокого качества.</p><label><input type="checkbox" checked={images} onChange={(e) => setImagesEnabled(e.target.checked)} /> Загружать картинки и обложки</label><p>На другом адресе браузер хранит настройки отдельно. Войдите в свой аккаунт или перенесите избранное через меню синхронизации.</p></details>
       </>}
       {listing && <>
+        <details className="lite-search-panel" open={tab !== 'popular'}><summary>Поиск по названию, стране и жанру</summary>
         <form className="lite-filters" onSubmit={(e) => { e.preventDefault(); if (tab !== 'favorites') void runSearch(); }}>
           <label className="lite-query">Название или жанр<input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Найти радиостанцию" type="search" /></label>
           <button type="button" onClick={voiceSearch} aria-pressed={listening}>{listening ? 'Остановить микрофон' : 'Голосовой поиск'}</button>
@@ -249,6 +251,7 @@ function RadioApp() {
           {tab !== 'favorites' && <button type="submit" disabled={busy}>Найти в мировом каталоге</button>}
           <button type="button" onClick={() => { setQuery(''); setCountry(''); setGenre(''); setLowOnly(false); setResults(null); }}>Сбросить</button>
         </form>
+        </details>
         {(tab === 'curated' || tab === 'exclusive') && <div className="lite-groups">{(tab === 'curated' ? catalog?.curated : catalog?.exclusive)?.map((g) => <button key={g.id} aria-pressed={g.id === group} onClick={() => { setGroup(g.id); setResults(null); }}>{g.name} · {g.stations.length}</button>)}</div>}
         {loadError && <p role="alert">{loadError} <button onClick={reloadCatalog}>Повторить</button></p>}
         {!catalog && !loadError && tab !== 'favorites' ? <p role="status">Загружаем каталог…</p> : <StationGrid {...gridProps} stations={stations} emptySubtitle={tab === 'favorites' ? 'Добавляйте станции сердечком или войдите в аккаунт.' : 'Выберите подборку или выполните поиск в мировом каталоге.'} />}

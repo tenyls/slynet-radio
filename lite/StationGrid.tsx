@@ -20,7 +20,7 @@ export function StationGrid({ stations, currentStation, isPlaying, isLoading, is
     const current = currentStation?.stationuuid === station.stationuuid;
     return <li key={station.stationuuid} aria-current={current || undefined}>
       <button className="lite-station-play" onClick={() => current ? togglePlayPause() : onPlayStation(station, stations)} aria-label={`${current && isPlaying ? 'Пауза' : 'Слушать'} ${station.name}`}>
-        <span aria-hidden>{current && isPlaying ? 'Ⅱ' : '▶'}</span><span><strong>{station.name}</strong><small>{[station.country, pickStream(station).bitrate ? `${pickStream(station).bitrate} кбит/с` : '', station.tags?.split(',')[0]].filter(Boolean).join(' · ')}</small></span>
+        <span aria-hidden>{current && isPlaying ? 'Ⅱ' : '▶'}</span><span><strong title={station.name}>{station.name}</strong><small>{[station.country, pickStream(station).bitrate ? `${pickStream(station).bitrate} кбит/с` : '', station.tags?.split(',')[0]].filter(Boolean).join(' · ')}</small></span>
       </button>
       <button aria-label={`Избранное: ${station.name}`} aria-pressed={isFavorite(station.stationuuid)} onClick={() => onToggleFavorite(station)}>{isFavorite(station.stationuuid) ? '♥' : '♡'}</button>
       <details className="lite-row-more"><summary aria-label={`Действия: ${station.name}`}>⋯</summary><div>
