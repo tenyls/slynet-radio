@@ -10,8 +10,10 @@ self.addEventListener('fetch', (event) => {
   if (request.method !== 'GET' || url.origin !== location.origin || url.pathname.startsWith('/api/')) return;
   const asset = url.pathname.startsWith('/assets/');
   const data = ['/core.json', '/data/content.json', '/data/catalog.json', '/data/geo.json'].includes(url.pathname);
-  if (!asset && !data && request.mode !== 'navigate') return;
-  const key = request.mode === 'navigate' ? '/' : url.pathname;
+  // Only the app shell itself is cached as '/'. Other pages (privacy.html) must not overwrite it.
+  const shell = request.mode === 'navigate' && (url.pathname === '/' || url.pathname === '/index.html');
+  if (!asset && !data && !shell) return;
+  const key = shell ? '/' : url.pathname;
   event.respondWith((async () => {
     const cache = await caches.open(CACHE);
     if (asset) { const cached = await cache.match(key); if (cached) return cached; }
