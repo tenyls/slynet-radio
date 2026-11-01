@@ -632,7 +632,7 @@
     "1.0.13",
     "2G-2026-11-01"
   ],
-  "askIndex": 2,
+  "askIndex": 3,
   "lastNewsSource": "Stereogum",
   "lastReleaseAt": 1793543443105,
   "cams": [
@@ -845,6 +845,5 @@
   "featStyle": 7,
   "featCta": 55,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
-  "showIndex": 2,
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "showIndex": 2
 }
