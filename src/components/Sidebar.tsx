@@ -1,4 +1,5 @@
-import { FEATURES } from '../utils/platform';
+import { FEATURES, isNativeApp } from '../utils/platform';
+import { LITE_URL } from './BottomNav';
 import React from 'react';
 import { MainTab, SlyNetSettings, Language } from '../types/radio';
 import {
@@ -220,6 +221,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </button>
           );
         })}
+        {!isNativeApp && (
+          <a href={LITE_URL} title="Лёгкая версия: без анимации и картинок, для медленного интернета" className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-zinc-400 hover:text-white hover:bg-zinc-900 transition-colors">
+            <span className="w-5 text-center">📶</span>
+            <span>2G-версия для слабого интернета</span>
+          </a>
+        )}
       </nav>
 
       {/* QUICK LAUNCH TOOLS HUB (Car Mode, EQ, REC, Alarm) */}

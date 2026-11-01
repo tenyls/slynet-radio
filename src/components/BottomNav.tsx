@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { MainTab } from '../types/radio';
 import { useSlyNetSettings } from '../context/SlyNetSettingsContext';
 import { isSectionHidden } from '../utils/visibility';
+import { isNativeApp } from '../utils/platform';
+
+export const LITE_URL = 'https://2g.slynet-radio.pages.dev/';
 import { Flame, LayoutGrid, Sparkles, Search, Heart, Clock, Video, Mic2, Tv, Smartphone, Globe2, MoreHorizontal, X, Crown, Info } from 'lucide-react';
 
 interface BottomNavProps {
@@ -93,6 +96,14 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onSelectTab, f
                 );
               })}
             </div>
+            {!isNativeApp && (
+              <a
+                href={LITE_URL}
+                className="flex items-center justify-center gap-2 py-3 mb-1 rounded-2xl bg-zinc-900 border border-zinc-800 text-zinc-200 text-sm font-bold"
+              >
+                📶 2G-версия для слабого интернета
+              </a>
+            )}
           </div>
         </div>
       )}

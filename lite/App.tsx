@@ -220,12 +220,12 @@ function RadioApp() {
       <button onClick={() => setMenu(!menu)} aria-expanded={menu} aria-controls="lite-menu">{menu ? 'Закрыть' : 'Меню'}</button>
     </header>
     {menu && <nav id="lite-menu" aria-label="Все разделы" className="lite-menu">
+      <a className="lite-full-link" href="https://slynet-radio.pages.dev/">← Полная версия сайта (глобус, анимация, обложки)</a>
       {TABS.filter(([id]) => !isSectionHidden(settings, id)).map(([id, name]) => <button key={id} aria-current={tab === id ? 'page' : undefined} onClick={() => navigate(id)}>{name}</button>)}
       <button onClick={() => { setModal('sync'); setMenu(false); }}>Аккаунт и синхронизация</button>
       <button onClick={() => { setModal('support'); setMenu(false); }}>Поддержка</button>
       <button onClick={() => { setModal('about'); setMenu(false); }}>О проекте и обновления</button>
       {isOwnerMode && <button onClick={() => setModal('admin')}>Админка</button>}
-      <a href="https://slynet-radio.pages.dev/">Полная версия сайта ↗</a>
     </nav>}
     <nav className="lite-quick" aria-label="Быстрый переход">
       {(['popular', 'search', 'favorites', 'playlists'] as Tab[]).filter((id) => !isSectionHidden(settings, id)).map((id) => <button key={id} aria-current={tab === id ? 'page' : undefined} onClick={() => navigate(id)}>{TABS.find(([key]) => key === id)?.[1]}</button>)}

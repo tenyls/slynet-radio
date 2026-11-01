@@ -25,6 +25,7 @@ button, summary, a { touch-action: manipulation; }
 .lite-menu { padding: 12px 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 7px; border-bottom: 1px solid #43564a; background: #142219; }
 .lite-menu > button, .lite-menu > a { text-align: left; }
 .lite-menu > a { padding: 10px; }
+.lite-menu > a.lite-full-link { grid-column: 1 / -1; border: 1px solid #5f9b74; border-radius: 7px; background: #1f3a2a; color: #b9f3cf; font-weight: 700; }
 .lite-app a { color: #a4e7bd; text-decoration: underline; text-underline-offset: 3px; }
 .lite-app h1 { font-size: 22px; font-weight: 750; margin: 0 0 10px; }
 .lite-app h2 { font-size: 18px; margin: 18px 0 10px; }

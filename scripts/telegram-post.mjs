@@ -831,9 +831,9 @@ async function postRelease(state) {
     await postPhotoOrText({
       photo: img || BANNER,
       caption: await withFooter(r.post),
-      buttons: { inline_keyboard: [[{ text: '📲 Скачать новую версию', url: SITE + '#apps' }], [{ text: '▶️ Слушать сейчас', url: SITE }]] },
+      buttons: { inline_keyboard: r.buttons?.length ? r.buttons.map((b) => [{ text: b.text, url: b.url }]) : [[{ text: '📲 Скачать новую версию', url: SITE + '#apps' }], [{ text: '▶️ Слушать сейчас', url: SITE }]] },
     });
-    await vkPost(r.post, SITE + '#apps', img);
+    await vkPost(r.post, r.buttons?.[0]?.url || SITE + '#apps', img);
     state.releases.push(...fresh.map((x) => x.version));
     state.lastReleaseAt = Date.now();
     return log('опубликован релиз', r.version);
