@@ -13,7 +13,10 @@ async function mockFetch(callback, run) {
 test('only fixed public data files can be fetched; no forwarding auth/cookies/query', async () => {
   await mockFetch(async (url, opts) => {
     assert.equal(url, 'https://slynet-radio.pages.dev/content.json');
-    assert.equal(opts.headers, undefined);
+    assert.equal(opts.redirect, 'manual'); // Cloudflare Workers rejects redirect: 'error'.
+    assert.equal(opts.headers.Authorization, undefined);
+    assert.equal(opts.headers.Cookie, undefined);
+    assert.equal(opts.headers['Cache-Control'], 'no-cache');
     return Response.json({ apiUrl: 'https://slynet-api.tenylse.workers.dev', appTitle: 'SlyNet Radio' });
   }, async () => {
     const response = await worker.fetch(new Request(`${ORIGIN}/data/content.json?token=do-not-forward`, { headers: { Authorization: 'test', Cookie: 'test' } }), env);
@@ -39,6 +42,15 @@ test('same account API, bearer and body pass through; private responses never ca
     assert.equal(response.headers.get('cache-control'), 'no-store');
     assert.equal(response.headers.get('set-cookie'), null);
     assert.equal(response.headers.get('access-control-allow-origin'), null);
+  });
+});
+
+test('public-data redirects fail closed without following another upstream', async () => {
+  let calls = 0;
+  await mockFetch(async () => { calls++; return Response.redirect('https://unexpected.example/', 302); }, async () => {
+    const response = await worker.fetch(new Request(`${ORIGIN}/data/catalog.json`), env);
+    assert.equal(response.status, 502);
+    assert.equal(calls, 1);
   });
 });
 

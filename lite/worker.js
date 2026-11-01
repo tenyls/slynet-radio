@@ -40,9 +40,14 @@ export default {
         if (!DATA.has(name)) return json({ error: 'Файл не найден' }, 404);
         if (!['GET', 'HEAD'].includes(request.method)) return json({ error: 'Метод не разрешён' }, 405);
         // Fixed public upstream: no arbitrary URLs, credentials, tokens or user query strings.
-        const response = await fetch(`${SITE}/${name}`, { method: request.method, redirect: 'error', cache: 'no-store' });
+        // Workers supports manual/follow, but not the browser's redirect: 'error'.
+        const response = await fetch(`${SITE}/${name}`, {
+          method: request.method, redirect: 'manual',
+          headers: { 'Cache-Control': 'no-cache', Pragma: 'no-cache' },
+        });
+        if (response.status >= 300 && response.status < 400) return json({ error: 'Основной сайт перенаправил запрос. Попробуйте позже.' }, 502);
         const headers = new Headers({ 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': name === 'content.json' ? 'no-store' : 'public, max-age=300' });
-        return new Response(response.body, { status: response.status, headers });
+        return new Response(request.method === 'HEAD' ? null : await response.text(), { status: response.status, headers });
       }
       // Existing components use these relative public paths.
       if (url.pathname === '/app/version.json' || url.pathname === '/releases.json') {
