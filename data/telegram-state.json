@@ -222,7 +222,8 @@
     "ex-record-recordclassix",
     "bcb3b03a-f0ec-4ceb-b22f-922138858800",
     "f2d3e6ea-9319-4e73-bac6-1c326fc7ae14",
-    "ex-record-fbass"
+    "ex-record-fbass",
+    "c68224d9-0082-47fb-976f-6c08e2e05b21"
   ],
   "news": [
     "https://www.rollingstone.com/music/music-news/chappell-roan-performance-pinkpantheress-lola-young-1235647178/",
@@ -853,5 +854,5 @@
   "featCta": 60,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 2,
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
