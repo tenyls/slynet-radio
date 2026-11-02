@@ -223,10 +223,6 @@
     "bcb3b03a-f0ec-4ceb-b22f-922138858800"
   ],
   "news": [
-    "https://www.intermedia.ru/news/407628",
-    "https://www.nme.com/news/music/watch-my-chemical-romance-bring-out-fake-dallas-cowboys-cheerleaders-hollywood-bowl-3974041?utm_source=rss&utm_medium=rss&utm_campaign=watch-my-chemical-romance-bring-out-fake-dallas-cowboys-cheerleaders-hollywood-bowl",
-    "https://www.intermedia.ru/news/407636",
-    "https://www.intermedia.ru/news/407637",
     "https://stereogum.com/2515417/worlds-top-autograph-seeker-apologizes-to-harry-styles-after-heated-street-encounter/news/",
     "https://pitchfork.com/story/haywire-set-jam-packed-2027-tour/",
     "https://www.billboard.com/video/billboard-hot-latin-songs-top-10-countdown-october-24-2026/",
@@ -622,7 +618,11 @@
     "https://www.billboard.com/lists/best-halloween-costumes-paris-hilton-kim-kardashian/",
     "https://stereogum.com/2516238/gracie-abrams-and-david-s-pumpkins-returns-to-snl/news/",
     "https://pitchfork.com/story/juan-atkins-co-founder-of-techno-music-dies-at-64/",
-    "https://stereogum.com/2516231/billy-strings-plays-he-man-themed-set-dressed-as-he-man/news/"
+    "https://stereogum.com/2516231/billy-strings-plays-he-man-themed-set-dressed-as-he-man/news/",
+    "https://www.billboard.com/music/concerts/suki-waterhouse-australian-crawl-sydney-opera-houses-on-the-steps-1236371837/",
+    "https://www.intermedia.ru/news/407750",
+    "https://www.intermedia.ru/news/407798",
+    "https://www.billboard.com/pro/ausify-campaign-returns/"
   ],
   "releases": [
     "1.0.6",
@@ -848,6 +848,5 @@
   "featCta": 56,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 2,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
