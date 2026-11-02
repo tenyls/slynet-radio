@@ -224,10 +224,6 @@
     "f2d3e6ea-9319-4e73-bac6-1c326fc7ae14"
   ],
   "news": [
-    "https://stereogum.com/2515423/haute-freddy-film-noir-in-your-eyes-peter-gabriel-cover/music/",
-    "https://www.nme.com/news/music/u2-bono-elon-musk-doge-cuts-unconscionable-republican-party-hijacked-3974078?utm_source=rss&utm_medium=rss&utm_campaign=u2-bono-elon-musk-doge-cuts-unconscionable-republican-party-hijacked",
-    "https://www.nme.com/news/music/jade-interview-mercury-prize-new-angel-dreams-new-music-reading-leeds-glastonbury-3974066?utm_source=rss&utm_medium=rss&utm_campaign=jade-interview-mercury-prize-new-angel-dreams-new-music-reading-leeds-glastonbury",
-    "https://www.billboard.com/music/music-news/ariana-grande-debuts-new-hairstyle-boyfriend-ricky-alvarez-1236367155/",
     "https://stereogum.com/2515460/bottom-of-the-hill-isnt-closing-after-all/news/",
     "https://www.nme.com/news/music/queens-of-the-stone-age-announce-2027-perfecth-us-tour-with-pixies-3974084?utm_source=rss&utm_medium=rss&utm_campaign=queens-of-the-stone-age-announce-2027-perfecth-us-tour-with-pixies",
     "https://www.billboard.com/music/rb-hip-hop/cardi-b-rare-pink-rolex-3-million-dollar-birthday-video-1236367173/",
@@ -623,7 +619,11 @@
     "https://www.intermedia.ru/news/407832",
     "https://www.intermedia.ru/news/407848",
     "https://www.nme.com/news/music/tributes-paid-after-death-of-techno-co-founder-juan-atkins-age-64-a-true-visionary-who-opened-the-door-for-so-many-of-us-3974814?utm_source=rss&utm_medium=rss&utm_campaign=tributes-paid-after-death-of-techno-co-founder-juan-atkins-age-64-a-true-visionary-who-opened-the-door-for-so-many-of-us",
-    "https://www.intermedia.ru/news/407849"
+    "https://www.intermedia.ru/news/407849",
+    "https://www.billboard.com/music/music-news/harry-styles-msg-residency-voter-registrations-headcount-1236371947/",
+    "https://www.rollingstone.com/music/music-news/juan-atkins-tribute-derrick-may-kevin-saunderson-techno-1235651287/",
+    "https://www.billboard.com/culture/product-recommendations/gap-jyt-boy-band-collection-hoodies-mall-tour-shop-online-1236371939/",
+    "https://www.billboard.com/culture/product-recommendations/best-buy-gift-guide-audio-google-home-marshall-shop-online-1236367892/"
   ],
   "releases": [
     "1.0.6",
@@ -850,7 +850,5 @@
   "featStyle": 3,
   "featCta": 59,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
-  "showIndex": 2,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "showIndex": 2
 }
