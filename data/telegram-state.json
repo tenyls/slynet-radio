@@ -224,10 +224,6 @@
     "f2d3e6ea-9319-4e73-bac6-1c326fc7ae14"
   ],
   "news": [
-    "https://stereogum.com/2515460/bottom-of-the-hill-isnt-closing-after-all/news/",
-    "https://www.nme.com/news/music/queens-of-the-stone-age-announce-2027-perfecth-us-tour-with-pixies-3974084?utm_source=rss&utm_medium=rss&utm_campaign=queens-of-the-stone-age-announce-2027-perfecth-us-tour-with-pixies",
-    "https://www.billboard.com/music/rb-hip-hop/cardi-b-rare-pink-rolex-3-million-dollar-birthday-video-1236367173/",
-    "https://stereogum.com/2515445/chappell-roan-brought-out-pinkpantheress-caroline-polachek-lola-young-at-super-graphic-spectacular-night-2/news/",
     "https://www.rollingstone.com/music/music-news/chappell-roan-performance-pinkpantheress-lola-young-1235647178/",
     "https://pitchfork.com/story/noel-gallagher-talks-vegans-macca-underwear-on-chicken-shop-date/",
     "https://www.billboard.com/lists/executive-turntable-barbara-cane-retires-from-bmi/",
@@ -623,7 +619,11 @@
     "https://www.billboard.com/music/music-news/harry-styles-msg-residency-voter-registrations-headcount-1236371947/",
     "https://www.rollingstone.com/music/music-news/juan-atkins-tribute-derrick-may-kevin-saunderson-techno-1235651287/",
     "https://www.billboard.com/culture/product-recommendations/gap-jyt-boy-band-collection-hoodies-mall-tour-shop-online-1236371939/",
-    "https://www.billboard.com/culture/product-recommendations/best-buy-gift-guide-audio-google-home-marshall-shop-online-1236367892/"
+    "https://www.billboard.com/culture/product-recommendations/best-buy-gift-guide-audio-google-home-marshall-shop-online-1236367892/",
+    "https://www.billboard.com/lists/ella-langley-choosin-texas-hot-100-number-one-26th-week/",
+    "https://www.rollingstone.com/music/music-news/andy-garcia-david-foster-paul-anka-kennedy-center-honors-1235651317/",
+    "https://www.billboard.com/music/music-news/harry-styles-thanks-new-yorkers-village-voice-msg-residency-1236372047/",
+    "https://www.billboard.com/lists/2026-kennedy-center-honorees-list/"
   ],
   "releases": [
     "1.0.6",
@@ -850,5 +850,6 @@
   "featStyle": 3,
   "featCta": 59,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
-  "showIndex": 2
+  "showIndex": 2,
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
