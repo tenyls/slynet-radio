@@ -1,6 +1,8 @@
 package com.slynet.radio;
 
 import android.content.Context;
+import android.net.Uri;
+import android.os.SystemClock;
 import android.os.Handler;
 import android.os.Looper;
 import androidx.annotation.NonNull;
@@ -9,6 +11,7 @@ import androidx.annotation.OptIn;
 import androidx.media3.common.AudioAttributes;
 import androidx.media3.common.C;
 import androidx.media3.common.MediaItem;
+import androidx.media3.common.MediaMetadata;
 import androidx.media3.common.Metadata;
 import androidx.media3.common.PlaybackException;
 import androidx.media3.common.Player;
@@ -57,6 +60,9 @@ public class SlyNetPlayer {
     private boolean startedOnce = false;
     private int retries = 0;
     private String lastState = "";
+    private long pausedAt = 0;
+    /** Название/станция/обложка для карточки в шторке и на экране блокировки (присылает приложение) */
+    private MediaMetadata meta = new MediaMetadata.Builder().setTitle("SlyNet Radio").build();
 
     private SlyNetPlayer(Context c) {
         ctx = c;
@@ -104,6 +110,7 @@ public class SlyNetPlayer {
         player.setHandleAudioBecomingNoisy(true); // выдернули наушники — пауза
         player.setWakeMode(C.WAKE_MODE_NETWORK); // экран выключен — сеть и процессор не засыпают
         player.setVolume(volume);
+        SlyNetPlaybackService.playerChanged(player);
         player.addListener(new Player.Listener() {
             @Override
             public void onIsPlayingChanged(boolean isPlaying) {
@@ -154,13 +161,46 @@ public class SlyNetPlayer {
         });
     }
 
+    private MediaItem item() {
+        return new MediaItem.Builder().setUri(url).setMediaMetadata(meta).build();
+    }
+
+    /** Плеер для системной карточки (создаётся при необходимости). Только в главном потоке. */
+    Player exo() {
+        ensure();
+        return player;
+    }
+
+    /** Новое название песни/станции и обложка — карточка обновляется без перезапуска эфира */
+    private String metaKey = "";
+
+    void setMeta(String title, String artist, String artwork) {
+        run(() -> {
+            String key = title + "\u0001" + artist + "\u0001" + artwork;
+            if (key.equals(metaKey)) return; // ничего не поменялось — эфир не трогаем
+            metaKey = key;
+            MediaMetadata.Builder b = new MediaMetadata.Builder()
+                .setTitle(title == null || title.isEmpty() ? "SlyNet Radio" : title)
+                .setArtist(artist)
+                .setAlbumTitle("SlyNet Radio")
+                .setStation(artist);
+            if (artwork != null && !artwork.isEmpty()) b.setArtworkUri(Uri.parse(artwork));
+            meta = b.build();
+            if (player != null && !url.isEmpty() && player.getMediaItemCount() > 0) {
+                try {
+                    player.replaceMediaItem(0, item());
+                } catch (Exception ignored) {}
+            }
+        });
+    }
+
     private void reconnect(String why) {
         retries++;
         emit("buffering", "reconnect:" + why);
         final String u = url;
         main.postDelayed(() -> {
             if (!wantPlay || player == null || !u.equals(url)) return;
-            player.setMediaItem(MediaItem.fromUri(url));
+            player.setMediaItem(item());
             player.prepare();
             player.play();
         }, Math.min(8000, 1500L * retries));
@@ -193,12 +233,13 @@ public class SlyNetPlayer {
             retries = 0;
             startedOnce = false;
             lastState = "";
+            pausedAt = 0;
             if (url.isEmpty()) {
                 player.stop();
                 player.clearMediaItems();
                 return;
             }
-            player.setMediaItem(MediaItem.fromUri(url));
+            player.setMediaItem(item());
             player.prepare();
         });
     }
@@ -208,8 +249,12 @@ public class SlyNetPlayer {
             ensure();
             if (url.isEmpty()) return;
             wantPlay = true;
-            if (player.getPlaybackState() == Player.STATE_IDLE || player.getPlaybackState() == Player.STATE_ENDED) {
-                player.setMediaItem(MediaItem.fromUri(url));
+            SlyNetPlaybackService.start(ctx);
+            // Пауза дольше 3 с — подключаемся к эфиру заново, чтобы играло «сейчас», а не старый кусок
+            boolean stale = pausedAt > 0 && SystemClock.elapsedRealtime() - pausedAt > 3000;
+            pausedAt = 0;
+            if (stale || player.getPlaybackState() == Player.STATE_IDLE || player.getPlaybackState() == Player.STATE_ENDED) {
+                player.setMediaItem(item());
                 player.prepare();
             }
             player.play();
@@ -219,6 +264,7 @@ public class SlyNetPlayer {
     void pause() {
         run(() -> {
             wantPlay = false;
+            pausedAt = SystemClock.elapsedRealtime();
             if (player != null) player.pause();
         });
     }
@@ -264,7 +310,7 @@ public class SlyNetPlayer {
             lastState = "";
             if (!url.isEmpty()) {
                 ensure();
-                player.setMediaItem(MediaItem.fromUri(url));
+                player.setMediaItem(item());
                 player.prepare();
                 if (was) player.play();
             }

@@ -2,7 +2,7 @@ import { isNativeApp } from '../utils/platform';
 import { pickStream, lowerStream, isWeakMode, QUALITY_EVENT } from '../services/streamQuality';
 import { loadCatalog } from '../services/catalogService';
 import { setStream, loadHls, preloadHlsIfNeeded } from '../services/hlsAudio';
-import { detectNativePlayer, NativeAudio, loadSound, applySound, getSystemVolume, setSystemVolume } from '../services/nativeAudio';
+import { detectNativePlayer, NativeAudio, loadSound, applySound, getSystemVolume, setSystemVolume, hasNativeSession, setNativeMeta } from '../services/nativeAudio';
 import { stationCard } from '../services/lockArtwork';
 import { probeStream, markGeoBlocked, clearGeoBlocked, myNetwork } from '../services/streamCheck';
 import { hasNative, nativeNowPlaying, nativeSetAlarm, nativeStopAlarm, nativeLaunchAction, onNative } from '../services/nativeBridge';
@@ -438,6 +438,14 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       console.warn('Web Audio API initialization note (fallback to direct audio):', err);
     }
   }, [bassBoost]);
+
+  // Своя нативная карточка включилась — старую карточку плагина убираем, чтобы не было двух
+  useEffect(() => {
+    if (!nativeEngine || !hasNativeSession()) return;
+    import('@capgo/capacitor-media-session')
+      .then(({ MediaSession }) => MediaSession.setPlaybackState({ playbackState: 'none' }))
+      .catch(() => {});
+  }, [nativeEngine]);
 
   // Android с нативным плеером: ползунок = громкость телефона (звук самого плеера всегда 100 %)
   const sysVolRef = useRef(false);
@@ -1252,6 +1260,9 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         return;
       }
       if (action === 'toggle') return n.togglePlayPause();
+      // «Дальше/назад» из шторки, с экрана блокировки, с наушников
+      if (action === 'next') return controlsRef.current.playNext();
+      if (action === 'prev') return controlsRef.current.playPrevious();
       if (action === 'alarm') {
         // будильник сработал, пользователь открыл приложение — продолжаем ту же станцию уже в приложении
         nativeStopAlarm();
@@ -1365,6 +1376,12 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       setIsPlaying(false);
     };
 
+    // Новый APK: своя нативная карточка — кнопки работают прямо с плеером, даже когда страница «спит»
+    if (isNativeApp && nativeEngine && hasNativeSession()) {
+      setNativeMeta(meta.title, meta.artist, meta.artwork[0]?.src || '');
+      return;
+    }
+
     if (isNativeApp) {
       import('@capgo/capacitor-media-session')
         .then(async ({ MediaSession }) => {
@@ -1392,7 +1409,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     } catch (e) {
       console.warn('MediaSession handler error:', e);
     }
-  }, [currentStation, isPlaying, currentTrackTitle, lockArt]);
+  }, [currentStation, isPlaying, currentTrackTitle, lockArt, nativeEngine]);
 
   const clearError = useCallback(() => setError(null), []);
 

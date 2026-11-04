@@ -65,6 +65,7 @@ public class SlyNetNativePlugin extends Plugin {
         SlyNetPlayer p = SlyNetPlayer.get(getContext());
         p.setListener(null);
         p.stop();
+        SlyNetPlaybackService.stop(getContext());
         prefs(getContext()).edit().putBoolean("np_playing", false).apply();
         NowPlayingWidget.updateAll(getContext());
         super.handleOnDestroy();
@@ -200,7 +201,7 @@ public class SlyNetNativePlugin extends Plugin {
         JSArray f = new JSArray();
         for (float x : SlyNetDsp.FREQS) f.put((int) x);
         JSObject o = new JSObject();
-        o.put("version", 1);
+        o.put("version", 2); // 2 — своя карточка в шторке и на экране блокировки (SlyNetPlaybackService)
         o.put("bands", f);
         call.resolve(o);
     }
@@ -226,6 +227,13 @@ public class SlyNetNativePlugin extends Plugin {
     @PluginMethod
     public void playerStop(PluginCall call) {
         SlyNetPlayer.get(getContext()).stop();
+        call.resolve();
+    }
+
+    /** Карточка в шторке / на экране блокировки: {title, artist, artwork} */
+    @PluginMethod
+    public void playerMeta(PluginCall call) {
+        SlyNetPlayer.get(getContext()).setMeta(call.getString("title", ""), call.getString("artist", ""), call.getString("artwork", ""));
         call.resolve();
     }
 

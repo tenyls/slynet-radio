@@ -17,6 +17,7 @@ interface PlayerPlugin {
   playerPause(): Promise<void>;
   playerStop(): Promise<void>;
   playerVolume(o: { volume: number }): Promise<void>;
+  playerMeta(o: { title: string; artist: string; artwork: string }): Promise<void>;
   getSystemVolume(): Promise<{ volume: number }>;
   setSystemVolume(o: { volume: number }): Promise<void>;
   playerEq(o: { enabled: boolean; gains: number[]; bass: number }): Promise<void>;
@@ -30,6 +31,7 @@ interface PlayerPlugin {
 const P = registerPlugin<PlayerPlugin>('SlyNetNative');
 
 let detected: Promise<number[] | null> | null = null;
+let nativeVersion = 0;
 /** Полосы эквалайзера, если нативный плеер есть; иначе null */
 export function detectNativePlayer(): Promise<number[] | null> {
   if (!detected) {
@@ -38,6 +40,7 @@ export function detectNativePlayer(): Promise<number[] | null> {
         if (Capacitor.getPlatform() !== 'android' || !Capacitor.isPluginAvailable('SlyNetNative')) return null;
         const info = await P.playerInfo();
         if (!(info?.version >= 1 && Array.isArray(info.bands))) return null;
+        nativeVersion = info.version;
         // Аварийный выключатель из админки (Видимость → «Нативный плеер Android»): все вернутся на старый плеер
         if (await nativeSwitchedOff()) return null;
         return info.bands;
@@ -60,6 +63,14 @@ export async function getSystemVolume(): Promise<number | null> {
 }
 export function setSystemVolume(volume: number): Promise<void> {
   return P.setSystemVolume({ volume }).catch(() => {});
+}
+
+/** В APK есть своя карточка плеера (шторка, экран блокировки) — версия 2 и новее */
+export const hasNativeSession = () => nativeVersion >= 2;
+
+/** Название, станция и обложка для карточки в шторке и на экране блокировки */
+export function setNativeMeta(title: string, artist: string, artwork: string) {
+  P.playerMeta({ title, artist, artwork: /^https?:|^data:/.test(artwork) ? artwork : '' }).catch(() => {});
 }
 
 async function nativeSwitchedOff(): Promise<boolean> {

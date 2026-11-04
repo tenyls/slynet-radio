@@ -51,6 +51,19 @@ block = '''
 '''
 if 'NowPlayingWidget' not in s:
     s = s.replace('</application>', block + '    </application>', 1)
+# Карточка плеера в шторке и на экране блокировки (Media3 MediaSessionService)
+for perm in ['android.permission.FOREGROUND_SERVICE', 'android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK']:
+    if f'"{perm}"' not in s:
+        s = s.replace('<application', f'<uses-permission android:name="{perm}" />\n    <application', 1)
+if 'SlyNetPlaybackService' not in s:
+    s = s.replace('</application>', '''
+        <!-- Шторка, экран блокировки, наушники, Bluetooth -->
+        <service android:name=".SlyNetPlaybackService" android:exported="true" android:foregroundServiceType="mediaPlayback">
+            <intent-filter>
+                <action android:name="androidx.media3.session.MediaSessionService" />
+            </intent-filter>
+        </service>
+    </application>''', 1)
 # Ссылки slynet://open — «Открыть в приложении» из браузера
 if 'android:scheme="slynet"' not in s:
     s = re.sub(r'(<activity[^>]*MainActivity[\s\S]*?</intent-filter>)', r'''\1
@@ -72,5 +85,7 @@ if 'androidx.media:media' not in gs:
 # Нативный плеер радио (Media3/ExoPlayer): эквалайзер, визуализация, буфер, HLS
 if 'media3-exoplayer' not in gs:
     gs = re.sub(r'(dependencies\s*\{)', r'\1\n    implementation "androidx.media3:media3-exoplayer:1.5.1"\n    implementation "androidx.media3:media3-exoplayer-hls:1.5.1"', gs, count=1)
+if 'media3-session' not in gs:
+    gs = re.sub(r'(dependencies\s*\{)', r'\1\n    implementation "androidx.media3:media3-session:1.5.1"', gs, count=1)
 g.write_text(gs)
-print('Нативные части добавлены: виджет, будильник, Android Auto')
+print('Нативные части добавлены: виджет, будильник, Android Auto, карточка плеера')
