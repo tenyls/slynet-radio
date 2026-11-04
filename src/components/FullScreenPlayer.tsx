@@ -1,11 +1,12 @@
 import { Sparkles } from 'lucide-react';
+import { LiteImg } from './LiteImg';
 import { ListPlus as ListPlusIcon } from 'lucide-react';
 import { openShare } from './ShareSheet';
 import { openAddToPlaylist } from './PlaylistModals';
 import { findSimilar } from './SimilarStations';
 import { WeakNetToggle } from './QualityChip';
 import { StationLogo } from './StationLogo';
-import { FEATURES } from '../utils/platform';
+import { FEATURES, CAN_SET_VOLUME } from '../utils/platform';
 import { Visualizer } from './Visualizer';
 import { loadSound } from '../services/nativeAudio';
 import React, { useState, useEffect, useMemo } from 'react';
@@ -266,7 +267,7 @@ export const FullScreenPlayer: React.FC<FullScreenPlayerProps> = ({ isFavorite, 
 
   return (
     <>
-      <div className="fixed inset-0 z-[56] h-[100dvh] overflow-hidden bg-gradient-to-b from-zinc-950 via-zinc-900 to-black select-none animate-fade-in">
+      <div className="pt-safe fixed inset-0 z-[56] h-[100dvh] overflow-hidden bg-gradient-to-b from-zinc-950 via-zinc-900 to-black select-none animate-fade-in">
         {coverSrc && (
           <div
             className="absolute inset-0 bg-cover bg-center blur-3xl opacity-25 scale-125 pointer-events-none"
@@ -336,7 +337,7 @@ export const FullScreenPlayer: React.FC<FullScreenPlayerProps> = ({ isFavorite, 
               style={{ width: 'min(100cqw, 100cqh, 320px)', height: 'min(100cqw, 100cqh, 320px)' }}
             >
               {coverSrc ? (
-                <img
+                <LiteImg
                   src={coverSrc}
                   alt=""
                   referrerPolicy="no-referrer"
@@ -471,8 +472,13 @@ export const FullScreenPlayer: React.FC<FullScreenPlayerProps> = ({ isFavorite, 
             </button>
           </div>
 
-          {/* Громкость */}
-          <div className="flex items-center gap-2 shrink-0">
+          {/* Громкость (на iPhone её меняют только боковые кнопки) */}
+          {!CAN_SET_VOLUME && (
+            <div className="flex items-center justify-center gap-2 shrink-0 text-[11px] text-zinc-500">
+              <Volume2 className="w-3.5 h-3.5" /> Громкость — кнопками сбоку телефона
+            </div>
+          )}
+          <div className={`${CAN_SET_VOLUME ? 'flex' : 'hidden'} items-center gap-2 shrink-0`}>
             <button onClick={toggleMute} aria-label={isMuted ? 'Включить звук' : 'Без звука'} className="text-zinc-400 hover:text-white p-1">
               {isMuted || volume === 0 ? <VolumeX className="w-4 h-4 text-red-400" /> : volume < 0.5 ? <Volume1 className="w-4 h-4" /> : <Volume2 className="w-4 h-4 text-lime-400" />}
             </button>

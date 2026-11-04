@@ -48,3 +48,14 @@ export const FEATURES = {
 
 /** Откуда брать свежие content.json / catalog.json: в приложении — с сайта (чтобы обновлялись без новой версии приложения) */
 export const DATA_BASE = isNativeApp ? 'https://tenyls.github.io/slynet-radio/' : './';
+
+/** iPhone/iPad: сайт не может менять громкость (её меняют только боковые кнопки) — ползунок в плеере прячем */
+export const CAN_SET_VOLUME: boolean = (() => {
+  try {
+    const ua = navigator.userAgent || '';
+    const ios = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    return !ios;
+  } catch {
+    return true;
+  }
+})();

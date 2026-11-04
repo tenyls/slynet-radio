@@ -1,5 +1,5 @@
 import { StationLogo } from './StationLogo';
-import { FEATURES } from '../utils/platform';
+import { FEATURES, CAN_SET_VOLUME } from '../utils/platform';
 import { liveFallbackLabel } from '../services/rdsService';
 import React, { useState, useEffect } from 'react';
 import { useAudio } from '../context/AudioPlayerContext';
@@ -308,7 +308,7 @@ export const BottomPlayer: React.FC<BottomPlayerProps> = ({
             </button>
 
             {/* Volume slider */}
-            <div className="flex items-center gap-2">
+            <div className={`${CAN_SET_VOLUME ? 'flex' : 'hidden'} items-center gap-2`}>
               <button
                 onClick={toggleMute}
                 aria-label={isMuted ? 'Включить звук' : 'Без звука'}

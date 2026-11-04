@@ -1,4 +1,5 @@
 import React from 'react';
+import { LiteImg } from './LiteImg';
 import { ExternalLink } from 'lucide-react';
 import { PartnerLink } from '../types/radio';
 
@@ -17,7 +18,7 @@ export const PartnersBlock: React.FC<{ partners?: PartnerLink[] }> = ({ partners
             rel={p.isAd ? 'sponsored noopener noreferrer' : 'noopener noreferrer'}
             className="flex items-center gap-3 p-3 rounded-2xl bg-zinc-900/60 border border-zinc-800 hover:bg-zinc-800/70 transition-colors"
           >
-            {p.image ? <img src={p.image} alt="" loading="lazy" className="w-10 h-10 rounded-lg object-cover shrink-0" /> : null}
+            {p.image ? <LiteImg src={p.image} alt="" loading="lazy" className="w-10 h-10 rounded-lg object-cover shrink-0" /> : null}
             <span className="min-w-0 flex-1">
               <span className="block text-sm font-semibold text-white truncate">{p.title}</span>
               {p.description ? <span className="block text-[11px] text-zinc-400 truncate">{p.description}</span> : null}

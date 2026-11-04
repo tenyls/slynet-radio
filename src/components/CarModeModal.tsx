@@ -1,3 +1,5 @@
+import { CAN_SET_VOLUME } from '../utils/platform';
+import { LiteImg } from './LiteImg';
 import React, { useState, useEffect } from 'react';
 import { useAudio } from '../context/AudioPlayerContext';
 import { Station, CityWeather } from '../types/radio';
@@ -153,7 +155,7 @@ export const CarModeModal: React.FC<CarModeModalProps> = ({
         <div className="flex items-center gap-5 p-5 sm:p-6 rounded-3xl bg-zinc-900/80 border border-white/10 shadow-2xl mb-8">
           <div className="w-20 h-20 sm:w-28 sm:h-28 rounded-2xl overflow-hidden shrink-0 bg-black/60 border border-white/10 shadow-lg">
             {currentStation?.favicon && currentStation.favicon.startsWith('http') ? (
-              <img
+              <LiteImg
                 src={currentStation.favicon}
                 alt={currentStation.name}
                 className="w-full h-full object-cover"
@@ -238,7 +240,7 @@ export const CarModeModal: React.FC<CarModeModalProps> = ({
         </div>
 
         {/* VOLUME BAR */}
-        <div className="flex items-center gap-4 px-6 py-4 rounded-2xl bg-zinc-900/60 border border-white/10 mb-8">
+        <div className={`${CAN_SET_VOLUME ? 'flex' : 'hidden'} items-center gap-4 px-6 py-4 rounded-2xl bg-zinc-900/60 border border-white/10 mb-8`}>
           <button onClick={toggleMute} className="text-zinc-400 hover:text-white">
             {isMuted || volume === 0 ? (
               <VolumeX className="w-7 h-7 text-red-400" />
@@ -292,7 +294,7 @@ export const CarModeModal: React.FC<CarModeModalProps> = ({
                   >
                     <div className="w-10 h-10 rounded-xl overflow-hidden shrink-0 bg-black/50 border border-white/5 flex items-center justify-center">
                       {st.favicon && st.favicon.startsWith('http') ? (
-                        <img src={st.favicon} alt={st.name} className="w-full h-full object-cover" />
+                        <LiteImg src={st.favicon} alt={st.name} className="w-full h-full object-cover" />
                       ) : (
                         <Radio className="w-5 h-5 text-zinc-400" />
                       )}

@@ -16,6 +16,7 @@ import { ExclusiveSection } from './components/ExclusiveSection';
 import { MyPlaylist, openPlaylist } from './components/MyPlaylist';
 import { RecordSpotlight, openRecord } from './components/RecordSpotlight';
 import { AppsView } from './components/AppsView';
+const LiteGeography = React.lazy(() => import('../lite/Geography'));
 const GlobeView = React.lazy(() => import('./components/GlobeView').then((m) => ({ default: m.GlobeView })));
 import { UpdateBanner } from './components/UpdateBanner';
 import { IntroSplash } from './components/IntroSplash';
@@ -29,6 +30,7 @@ import { PartnersBlock } from './components/PartnersBlock';
 import { Station, MainTab, BitrateFilter, GenreCategory } from './types/radio';
 import { GENRES } from './constants/genres';
 import { Sidebar } from './components/Sidebar';
+import { useLiteMode } from './utils/liteMode';
 import { BottomNav } from './components/BottomNav';
 import { Header } from './components/Header';
 import { GenreBar } from './components/GenreBar';
@@ -84,6 +86,7 @@ import {
 } from 'lucide-react';
 
 function RadioApp() {
+  const [liteOn] = useLiteMode();
   const {
     currentStation,
     isPlaying,
@@ -479,7 +482,7 @@ function RadioApp() {
       {/* Main Content Area */}
       <div className="relative z-10 flex-1 flex flex-col min-w-0 pb-48 md:pb-28">
         {/* Mobile Top Header */}
-        <div className="md:hidden flex items-center justify-between px-4 py-3 bg-zinc-950/90 backdrop-blur-md border-b border-zinc-900 sticky top-0 z-30">
+        <div className="md:hidden flex items-center justify-between px-4 pb-3 pt-safe-3 bg-zinc-950/90 backdrop-blur-md border-b border-zinc-900 sticky top-0 z-30">
           <div className="flex items-center gap-2.5 min-w-0">
             <SlyNetLogo
               customLogoUrl={settings.customLogoUrl}
@@ -1065,7 +1068,7 @@ function RadioApp() {
 
           {currentTab === 'globe' && (
             <React.Suspense fallback={<div className="py-20 text-center text-zinc-400">Загружаем глобус…</div>}>
-              <GlobeView />
+              {liteOn ? <LiteGeography /> : <GlobeView />}
             </React.Suspense>
           )}
 

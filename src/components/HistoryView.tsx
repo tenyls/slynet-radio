@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { LiteImg } from './LiteImg';
 import { useAudio } from '../context/AudioPlayerContext';
 import { Station, RecognizedTrack, PlayedTrackHistory } from '../types/radio';
 import {
@@ -208,7 +209,7 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ onToggleFavorite, isFa
                 <div className="flex items-center gap-4 min-w-0">
                   <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl overflow-hidden shrink-0 bg-zinc-900 border border-white/10 shadow-md relative group-hover:scale-105 transition-transform">
                     {track.artworkUrl ? (
-                      <img
+                      <LiteImg
                         src={track.artworkUrl}
                         alt={`${track.artist} - ${track.title}`}
                         className="w-full h-full object-cover"
@@ -362,7 +363,7 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ onToggleFavorite, isFa
 
                     <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 bg-black/50 border border-white/5">
                       {item.stationFavicon && item.stationFavicon.startsWith('http') ? (
-                        <img
+                        <LiteImg
                           src={item.stationFavicon}
                           alt={item.stationName}
                           className="w-full h-full object-cover"

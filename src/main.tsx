@@ -1,4 +1,5 @@
 import { initAppUpdater } from './services/appUpdater';
+import { initLiteMode } from './utils/liteMode';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 // Шрифты встроены в сайт (без запросов к Google — важно для GDPR)
@@ -7,6 +8,7 @@ import '@fontsource/jetbrains-mono/500.css';
 import '@fontsource/jetbrains-mono/600.css';
 import './index.css';
 
+initLiteMode();
 createRoot(document.getElementById('root')!).render(<App />);
 
 // Service worker — только в собранной версии на https (не мешает разработке на localhost)

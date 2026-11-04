@@ -3,6 +3,7 @@ import { MainTab } from '../types/radio';
 import { useSlyNetSettings } from '../context/SlyNetSettingsContext';
 import { isSectionHidden } from '../utils/visibility';
 import { isNativeApp } from '../utils/platform';
+import { useLiteMode } from '../utils/liteMode';
 
 export const LITE_URL = 'https://2g.slynet-radio.pages.dev/';
 import { Flame, LayoutGrid, Sparkles, Search, Heart, Clock, Video, Mic2, Tv, Smartphone, Globe2, MoreHorizontal, X, Crown, Info } from 'lucide-react';
@@ -16,6 +17,7 @@ interface BottomNavProps {
 /** Нижнее меню телефона: 5 крупных кнопок + «Ещё» со всеми остальными разделами */
 export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onSelectTab, favoritesCount }) => {
   const [moreOpen, setMoreOpen] = useState(false);
+  const [lite, setLite] = useLiteMode();
   const { settings } = useSlyNetSettings();
   const visible = (t: { id: string }) => !isSectionHidden(settings, t.id);
 
@@ -96,6 +98,16 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onSelectTab, f
                 );
               })}
             </div>
+            <button
+              onClick={() => setLite(!lite)}
+              aria-pressed={lite}
+              className={`w-full flex items-center justify-between gap-2 py-3 px-4 mb-2 rounded-2xl border text-sm font-bold ${
+                lite ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-200' : 'bg-zinc-900 border-zinc-800 text-zinc-200'
+              }`}
+            >
+              <span>🍃 Лёгкий режим</span>
+              <span className="text-xs font-semibold opacity-80">{lite ? 'включён — без анимаций и картинок' : 'выключен'}</span>
+            </button>
             {!isNativeApp && (
               <a
                 href={LITE_URL}

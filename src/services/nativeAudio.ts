@@ -17,6 +17,8 @@ interface PlayerPlugin {
   playerPause(): Promise<void>;
   playerStop(): Promise<void>;
   playerVolume(o: { volume: number }): Promise<void>;
+  getSystemVolume(): Promise<{ volume: number }>;
+  setSystemVolume(o: { volume: number }): Promise<void>;
   playerEq(o: { enabled: boolean; gains: number[]; bass: number }): Promise<void>;
   playerBuffer(o: { ms: number }): Promise<void>;
   playerViz(o: { enabled: boolean }): Promise<void>;
@@ -45,6 +47,19 @@ export function detectNativePlayer(): Promise<number[] | null> {
     })();
   }
   return detected;
+}
+
+/** Громкость телефона 0…1 (null — в этом APK метода ещё нет) */
+export async function getSystemVolume(): Promise<number | null> {
+  try {
+    const r = await P.getSystemVolume();
+    return typeof r?.volume === 'number' ? r.volume : null;
+  } catch {
+    return null;
+  }
+}
+export function setSystemVolume(volume: number): Promise<void> {
+  return P.setSystemVolume({ volume }).catch(() => {});
 }
 
 async function nativeSwitchedOff(): Promise<boolean> {

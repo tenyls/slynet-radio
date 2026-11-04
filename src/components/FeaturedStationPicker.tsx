@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { LiteImg } from './LiteImg';
 import { Search, Radio, X, Loader2, Play } from 'lucide-react';
 import { Station } from '../types/radio';
 import { fetchStations } from '../services/radioApi';
@@ -70,7 +71,7 @@ export const FeaturedStationPicker: React.FC<Props> = ({ value, customStations, 
       {value ? (
         <div className="flex items-center gap-3 p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30">
           <span className="w-10 h-10 rounded-lg overflow-hidden bg-zinc-900 flex items-center justify-center shrink-0">
-            {value.favicon ? <img src={value.favicon} alt="" className="w-full h-full object-cover" /> : <Radio className="w-4 h-4 text-zinc-500" />}
+            {value.favicon ? <LiteImg src={value.favicon} alt="" className="w-full h-full object-cover" /> : <Radio className="w-4 h-4 text-zinc-500" />}
           </span>
           <div className="min-w-0 flex-1">
             <div className="text-sm font-bold text-white truncate">{value.name}</div>

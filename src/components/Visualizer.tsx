@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useAudio } from '../context/AudioPlayerContext';
 import { onSpectrum } from '../services/nativeAudio';
+import { useLiteMode } from '../utils/liteMode';
 
 /**
  * Визуализация музыки (столбики-спектр, отражение снизу, «пики»).
@@ -10,7 +11,7 @@ import { onSpectrum } from '../services/nativeAudio';
  */
 const BARS = 32;
 
-export const Visualizer: React.FC<{ className?: string; dense?: boolean }> = ({ className = '', dense = false }) => {
+const VisualizerInner: React.FC<{ className?: string; dense?: boolean }> = ({ className = '', dense = false }) => {
   const { isPlaying, nativeEngine } = useAudio();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const target = useRef<number[]>(new Array(BARS).fill(0));
@@ -105,3 +106,9 @@ function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: numbe
   ctx.closePath();
   ctx.fill();
 }
+
+/** В «Лёгком режиме» визуализации нет — холст и цикл анимации вообще не запускаются */
+export const Visualizer: React.FC<{ className?: string; dense?: boolean }> = (props) => {
+  const [lite] = useLiteMode();
+  return lite ? null : <VisualizerInner {...props} />;
+};

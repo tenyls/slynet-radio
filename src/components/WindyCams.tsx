@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { LiteImg } from './LiteImg';
 import { X, ExternalLink, Loader2, MapPin } from 'lucide-react';
 import { api, hasApi } from '../services/apiService';
 import { getMyCountry } from '../services/geoService';
@@ -168,7 +169,7 @@ export const WindyCams: React.FC = () => {
           {shown.map((c) => (
             <button key={c.id} onClick={() => openCam(c)} className="text-left rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-800 hover:border-cyan-500/40 active:scale-[0.98] transition">
               <div className="relative aspect-video bg-zinc-800">
-                {c.image && <img src={c.image} alt="" loading="lazy" className="w-full h-full object-cover" />}
+                {c.image && <LiteImg src={c.image} alt="" loading="lazy" className="w-full h-full object-cover" />}
                 {c.live && <span className="absolute top-2 left-2 px-1.5 py-0.5 rounded-md bg-rose-600 text-white text-[10px] font-bold">LIVE</span>}
               </div>
               <div className="p-2.5">
@@ -222,7 +223,7 @@ export const WindyCams: React.FC = () => {
               {open.player ? (
                 <iframe src={open.player} title={open.title} className="w-full h-full" allow="autoplay; fullscreen" allowFullScreen />
               ) : (
-                <img src={open.image} alt="" className="w-full h-full object-contain" />
+                <LiteImg src={open.image} alt="" className="w-full h-full object-contain" />
               )}
             </div>
             <p className="mt-2 text-[11px] text-zinc-500">Webcams provided by windy.com</p>

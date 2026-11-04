@@ -1,4 +1,5 @@
 import { FEATURES } from '../utils/platform';
+import { LiteImg } from './LiteImg';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Tv, Play, ExternalLink, Search, Youtube, Globe, AlertTriangle, Loader2, X } from 'lucide-react';
 import { loadCatalog, CatalogTvChannel } from '../services/catalogService';
@@ -322,7 +323,7 @@ export const LiveTVView: React.FC = () => {
                 >
                   <div className="relative aspect-video rounded-xl bg-zinc-950 flex items-center justify-center overflow-hidden mb-2">
                     {ch.logo ? (
-                      <img src={ch.logo} alt="" loading="lazy" referrerPolicy="no-referrer" className="max-w-[70%] max-h-[70%] object-contain" />
+                      <LiteImg src={ch.logo} alt="" loading="lazy" referrerPolicy="no-referrer" className="max-w-[70%] max-h-[70%] object-contain" />
                     ) : (
                       <Tv className="w-8 h-8 text-zinc-600" />
                     )}

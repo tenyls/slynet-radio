@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLiteMode } from '../utils/liteMode';
 
 /** Цвета «буквенной» обложки — стабильные для каждой станции */
 const PALETTE = [
@@ -55,7 +56,8 @@ export const StationLogo: React.FC<{ favicon?: string; homepage?: string; name: 
   const primary = favicon && /^https?:\/\//.test(favicon) ? favicon.replace(/^http:\/\//, 'https://') : '';
   const sources = [primary, siteIconUrl(homepage)].filter(Boolean);
   const [step, setStep] = useState(0);
-  const src = sources[step];
+  const [lite] = useLiteMode();
+  const src = lite ? undefined : sources[step];
 
   if (src) {
     const isSiteIcon = src !== primary;

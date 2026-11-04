@@ -2,7 +2,7 @@ import { isNativeApp } from '../utils/platform';
 import { pickStream, lowerStream, isWeakMode, QUALITY_EVENT } from '../services/streamQuality';
 import { loadCatalog } from '../services/catalogService';
 import { setStream, loadHls, preloadHlsIfNeeded } from '../services/hlsAudio';
-import { detectNativePlayer, NativeAudio, loadSound, applySound } from '../services/nativeAudio';
+import { detectNativePlayer, NativeAudio, loadSound, applySound, getSystemVolume, setSystemVolume } from '../services/nativeAudio';
 import { stationCard } from '../services/lockArtwork';
 import { probeStream, markGeoBlocked, clearGeoBlocked, myNetwork } from '../services/streamCheck';
 import { hasNative, nativeNowPlaying, nativeSetAlarm, nativeStopAlarm, nativeLaunchAction, onNative } from '../services/nativeBridge';
@@ -121,6 +121,8 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return () => clearTimeout(t);
   }, [volume]);
   const [isMuted, setIsMuted] = useState<boolean>(false);
+  const isMutedRef = useRef(false);
+  isMutedRef.current = isMuted;
   const [playlist, setPlaylist] = useState<Station[]>([]);
 
   // Modals state
@@ -437,12 +439,42 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   }, [bassBoost]);
 
+  // Android с нативным плеером: ползунок = громкость телефона (звук самого плеера всегда 100 %)
+  const sysVolRef = useRef(false);
+  useEffect(() => {
+    if (!nativeEngine) return;
+    let alive = true;
+    const pull = async () => {
+      const v = await getSystemVolume();
+      if (!alive || v === null) return;
+      if (!sysVolRef.current) {
+        sysVolRef.current = true;
+        if (audioRef.current) audioRef.current.volume = isMutedRef.current ? 0 : 1;
+      }
+      setVolumeState((prev) => (Math.abs(prev - v) > 0.02 ? v : prev));
+    };
+    pull();
+    const t = setInterval(() => {
+      if (document.visibilityState === 'visible') pull();
+    }, 1500);
+    document.addEventListener('visibilitychange', pull);
+    return () => {
+      alive = false;
+      sysVolRef.current = false;
+      clearInterval(t);
+      document.removeEventListener('visibilitychange', pull);
+    };
+  }, [nativeEngine]);
+
   // Update volume
   const setVolume = useCallback(
     (val: number) => {
       const clamped = Math.max(0, Math.min(1, val));
       setVolumeState(clamped);
-      if (audioRef.current) {
+      if (sysVolRef.current) {
+        // Android (нативный плеер): ползунок двигает громкость телефона, как боковые кнопки
+        setSystemVolume(clamped);
+      } else if (audioRef.current) {
         audioRef.current.volume = clamped;
       }
       if (clamped > 0 && isMuted) {
@@ -455,6 +487,12 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   // Toggle Mute
   const toggleMute = useCallback(() => {
     if (!audioRef.current) return;
+    if (sysVolRef.current) {
+      // Android: «без звука» — только у плеера, громкость телефона не трогаем
+      audioRef.current.volume = isMuted ? 1 : 0;
+      setIsMuted(!isMuted);
+      return;
+    }
     if (isMuted) {
       const restoreVol = previousVolumeRef.current || 0.85;
       audioRef.current.volume = restoreVol;
@@ -629,7 +667,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       try {
         // Direct stream loading without crossOrigin to prevent CORS rejection on Icecast/Shoutcast
         audioRef.current.removeAttribute('crossOrigin');
-        audioRef.current.volume = isMuted ? 0 : volume;
+        audioRef.current.volume = isMuted ? 0 : sysVolRef.current ? 1 : volume;
         if (!setStream(audioRef.current, streamUrl)) {
           // HLS-поток на компьютере: ждём hls.js и запускаем
           const a = audioRef.current;
@@ -705,6 +743,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     if (!curr || pl.length === 0) return;
     const currentIndex = pl.findIndex((s) => s.stationuuid === curr.stationuuid);
     const nextIndex = currentIndex >= 0 ? (currentIndex + 1) % pl.length : 0;
+    if (pl[nextIndex].stationuuid === curr.stationuuid) return; // в списке одна станция — не ставим на паузу
     playStation(pl[nextIndex], pl);
   }, [currentStation, playlist, playStation]);
 
@@ -715,6 +754,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     if (!curr || pl.length === 0) return;
     const currentIndex = pl.findIndex((s) => s.stationuuid === curr.stationuuid);
     const prevIndex = currentIndex > 0 ? currentIndex - 1 : pl.length - 1;
+    if (pl[prevIndex].stationuuid === curr.stationuuid) return;
     playStation(pl[prevIndex], pl);
   }, [currentStation, playlist, playStation]);
 
@@ -1256,7 +1296,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     // Fade-out during last 20 seconds
     if (sleepTimerRemainingSec <= 20 && audioRef.current) {
       const fadeFactor = sleepTimerRemainingSec / 20;
-      audioRef.current.volume = Math.max(0.02, volume * fadeFactor);
+      audioRef.current.volume = Math.max(0.02, (sysVolRef.current ? 1 : volume) * fadeFactor);
     }
 
     const interval = setInterval(() => {

@@ -1,5 +1,6 @@
 import { FEATURES, isNativeApp } from '../utils/platform';
 import { LITE_URL } from './BottomNav';
+import { useLiteMode } from '../utils/liteMode';
 import React from 'react';
 import { MainTab, SlyNetSettings, Language } from '../types/radio';
 import {
@@ -69,6 +70,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     setIsAlarmOpen,
     isRecording,
   } = useAudio();
+  const [lite, setLite] = useLiteMode();
 
   const lang = settings.language || 'ru';
   const t = TRANSLATIONS[lang] || TRANSLATIONS.ru;
@@ -221,6 +223,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </button>
           );
         })}
+        <button
+          onClick={() => setLite(!lite)}
+          aria-pressed={lite}
+          title="Без анимаций, размытия и картинок — для слабого компьютера и медленного интернета"
+          className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-zinc-400 hover:text-white hover:bg-zinc-900 transition-colors text-left"
+        >
+          <span className="w-5 text-center">🍃</span>
+          <span className="flex-1">Лёгкий режим</span>
+          <span className={`text-[10px] font-bold ${lite ? 'text-emerald-400' : 'text-zinc-600'}`}>{lite ? 'ВКЛ' : 'ВЫКЛ'}</span>
+        </button>
         {!isNativeApp && (
           <a href={LITE_URL} title="Лёгкая версия: без анимации и картинок, для медленного интернета" className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-zinc-400 hover:text-white hover:bg-zinc-900 transition-colors">
             <span className="w-5 text-center">📶</span>

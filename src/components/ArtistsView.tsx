@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { LiteImg } from './LiteImg';
 import { ARTISTS_DATA, ArtistItem } from '../constants/artists';
 import { Station } from '../types/radio';
 import { useAudio } from '../context/AudioPlayerContext';
@@ -128,6 +129,22 @@ export const ArtistsView: React.FC<ArtistsViewProps> = ({
   const [openId, setOpenId] = useState<string | null>(null);
   const { mode, setMode } = useViewMode();
 
+  // «Дальше / назад» идут по всем артистам в том порядке, как они показаны на экране (а не по станциям одного артиста)
+  const queueFor = (artistId: string, own: Station[]) => {
+    const seen = new Set<string>();
+    const out: Station[] = [];
+    for (const a of filteredArtists) {
+      for (const st of a.id === artistId ? own : found[a.id] || []) {
+        if (!seen.has(st.stationuuid)) {
+          seen.add(st.stationuuid);
+          out.push(st);
+        }
+      }
+    }
+    for (const st of own) if (!seen.has(st.stationuuid)) out.push(st);
+    return out;
+  };
+
   const stationList = (artist: ArtistItem) => {
     const list = found[artist.id] || [];
     return (
@@ -140,7 +157,7 @@ export const ArtistsView: React.FC<ArtistsViewProps> = ({
             isPlaying={isPlaying}
             isFavorite={isFavorite(st.stationuuid)}
             trackTitle={currentTrackTitle}
-            onPlay={() => playStation(st, list)}
+            onPlay={() => playStation(st, queueFor(artist.id, list))}
             onToggleFavorite={() => onToggleFavorite(st)}
           />
         ))}
@@ -162,7 +179,7 @@ export const ArtistsView: React.FC<ArtistsViewProps> = ({
       const list = await findArtistStations(artist);
       setFound((prev) => ({ ...prev, [artist.id]: list }));
       if (list.length) {
-        playStation(list[0], list);
+        playStation(list[0], queueFor(artist.id, list));
       } else {
         setNotice(
           artist.category === 'ost'
@@ -374,7 +391,7 @@ export const ArtistsView: React.FC<ArtistsViewProps> = ({
               >
                 {/* Top Image Banner */}
                 <div className="relative aspect-[16/10] w-full overflow-hidden bg-zinc-900">
-                  <img
+                  <LiteImg
                     src={artist.avatar}
                     alt={artist.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"

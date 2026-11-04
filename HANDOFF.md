@@ -165,6 +165,34 @@ npm run build        # проверка типов + сборка в dist/ — �
 
 Формат заголовка: `### ГГГГ-ММ-ДД ЧЧ:ММ — кто (Claude / Codex / Antigravity + модель / DeepSeek) — версия`. Новые записи — сверху.
 
+### 2026-11-04 20:15 — Claude (Sonnet 5.5) — тесты владельца на iPhone, Xiaomi Mi 8 (Android 10), Pixel
+- **Что сделал:**
+  1. **iPhone (приложение на экране «Домой»):** шапка и полноэкранный плеер теперь начинаются под часами/батареей
+     (`.pt-safe`, `.pt-safe-3` в `index.css`, `env(safe-area-inset-top)`; `black-translucent` не менял).
+  2. **Переключение «дальше/назад» у артистов:** плейлистом был список станций одного артиста (часто 1 станция) →
+     «дальше» возвращало ту же станцию. Теперь `ArtistsView.queueFor` строит очередь из всех артистов в порядке на экране;
+     `playNext/playPrevious` не ставят паузу, если следующая — та же станция.
+  3. **Громкость:** iPhone — браузер не умеет менять громкость, ползунок спрятан (`CAN_SET_VOLUME` в `platform.ts`,
+     подсказка «кнопками сбоку»). Android с нативным плеером — ползунок управляет громкостью телефона
+     (`getSystemVolume/setSystemVolume` в `SlyNetNativePlugin.java`, синхронизация в `AudioPlayerContext`;
+     «без звука» — только у плеера). **Нужен новый APK**; в старых работает как раньше.
+  4. **«Лёгкий режим»** (меню «Ещё» и боковое меню): `src/utils/liteMode.ts`, класс `html.lite-mode` (без анимаций,
+     размытия, теней), без логотипов/картинок (`LiteImg`, `StationLogo`), без визуализации, вместо 3D-глобуса —
+     список городов (`lite/Geography.tsx`). Включается сам при «Экономии трафика»/2G, если владелец не выбирал вручную.
+- **НЕ сделано (нужна нативная переделка):** кнопка паузы в шторке не работает, нет управления на экране блокировки
+  (Xiaomi, Android 10), на Pixel пауза из шторки не срабатывает, а Play запускает радио заново. **Причина:**
+  нативный ExoPlayer (`SlyNetPlayer.java`) не имеет своего `MediaSession`; карточку в шторке рисует JS-плагин
+  `@capgo/capacitor-media-session`, кнопки идут через WebView/JS (на MIUI он засыпает). **План:** `media3-session` +
+  `MediaSessionService` с тем же ExoPlayer (системные кнопки напрямую в плеер, «дальше/назад» — событием в JS,
+  метаданные и обложка — из JS через плагин), убрать Capgo в нативном режиме, патч манифеста в
+  `scripts/android-native-patch.py` (сервис + `FOREGROUND_SERVICE_MEDIA_PLAYBACK`).
+- **Файлы:** `src/App.tsx`, `src/index.css`, `src/components/{FullScreenPlayer,BottomPlayer,CarModeModal,BottomNav,Sidebar,ArtistsView,StationLogo,Visualizer,LiteImg}.tsx`,
+  `src/context/AudioPlayerContext.tsx`, `src/services/nativeAudio.ts`, `src/utils/{platform,liteMode}.ts`, `src/main.tsx`,
+  `lite/Geography.tsx`, `native/android/java/SlyNetNativePlugin.java`.
+- **Проверено:** `tsc`, сборки сайта и 2G (161,5 КБ), 7 тестов, лёгкий режим в браузере 390×844. На телефонах не проверялось.
+- **Внимание следующему помощнику:** `MediaSession`-переделку делать на сильной модели (Opus) — без устройства
+  легко сломать сборку; собирать в CI и смотреть аннотации ошибок.
+
 ### 2026-11-01 15:30 — Claude — ссылки между основной и 2G-версией + новость
 - **Что:** на основном сайте — «📶 2G-версия для слабого интернета» в меню «Ещё» (телефон) и внизу бокового меню
   (планшет/компьютер); в приложении Android скрыта (`isNativeApp`). На 2G — первой строкой «Меню» крупная кнопка

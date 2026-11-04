@@ -6,6 +6,7 @@ import { useSlyNetSettings } from '../src/context/SlyNetSettingsContext';
 import { COUNTRIES } from '../src/constants/countries';
 import { StationGrid } from './StationGrid';
 import type { Station } from '../src/types/radio';
+import { DATA_BASE } from '../src/utils/platform';
 
 // Same geographic catalog as the main globe. A static point map needs no WebGL or textures.
 type Point = [number, number, number, string, string, string[]?];
@@ -23,7 +24,7 @@ export default function Geography() {
   const requestId = useRef(0);
   useEffect(() => {
     const abort = new AbortController();
-    fetch('/data/geo.json', { signal: abort.signal }).then((r) => { if (!r.ok) throw new Error(); return r.json(); })
+    fetch(`${DATA_BASE}geo.json`, { signal: abort.signal }).then((r) => { if (!r.ok) throw new Error(); return r.json(); })
       .then((data) => setPoints(data.points || [])).catch((e) => { if (e.name !== 'AbortError') setError('Не удалось загрузить города. Обновите страницу.'); });
     return () => abort.abort();
   }, []);

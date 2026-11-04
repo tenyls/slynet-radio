@@ -236,6 +236,28 @@ public class SlyNetNativePlugin extends Plugin {
         call.resolve();
     }
 
+    /** Громкость телефона (поток «Музыка») 0…1 — ползунок в приложении двигает её же, как боковые кнопки */
+    @PluginMethod
+    public void getSystemVolume(PluginCall call) {
+        android.media.AudioManager am = (android.media.AudioManager) getContext().getSystemService(android.content.Context.AUDIO_SERVICE);
+        JSObject r = new JSObject();
+        int max = am == null ? 0 : am.getStreamMaxVolume(android.media.AudioManager.STREAM_MUSIC);
+        r.put("volume", max > 0 ? am.getStreamVolume(android.media.AudioManager.STREAM_MUSIC) / (double) max : 1.0);
+        call.resolve(r);
+    }
+
+    @PluginMethod
+    public void setSystemVolume(PluginCall call) {
+        Double v = call.getDouble("volume", 1.0);
+        android.media.AudioManager am = (android.media.AudioManager) getContext().getSystemService(android.content.Context.AUDIO_SERVICE);
+        if (am != null && v != null) {
+            int max = am.getStreamMaxVolume(android.media.AudioManager.STREAM_MUSIC);
+            int idx = Math.round((float) (Math.max(0.0, Math.min(1.0, v)) * max));
+            am.setStreamVolume(android.media.AudioManager.STREAM_MUSIC, idx, 0);
+        }
+        call.resolve();
+    }
+
     /** {enabled, gains:[10 чисел, дБ −12…+12], bass: 0…12 дБ} */
     @PluginMethod
     public void playerEq(PluginCall call) {
