@@ -155,6 +155,8 @@ public class SlyNetPlayer {
                     if (en instanceof IcyInfo && ((IcyInfo) en).title != null) {
                         Listener l = listener;
                         if (l != null) l.onTitle(((IcyInfo) en).title);
+                        // Песня в карточке шторки меняется сама, даже если приложение «спит»
+                        setMeta(((IcyInfo) en).title.trim(), metaArtist, metaArt);
                     }
                 }
             }
@@ -173,12 +175,16 @@ public class SlyNetPlayer {
 
     /** Новое название песни/станции и обложка — карточка обновляется без перезапуска эфира */
     private String metaKey = "";
+    private String metaArtist = "";
+    private String metaArt = "";
 
     void setMeta(String title, String artist, String artwork) {
         run(() -> {
             String key = title + "\u0001" + artist + "\u0001" + artwork;
             if (key.equals(metaKey)) return; // ничего не поменялось — эфир не трогаем
             metaKey = key;
+            metaArtist = artist == null ? "" : artist;
+            metaArt = artwork == null ? "" : artwork;
             MediaMetadata.Builder b = new MediaMetadata.Builder()
                 .setTitle(title == null || title.isEmpty() ? "SlyNet Radio" : title)
                 .setArtist(artist)
