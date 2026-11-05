@@ -233,10 +233,6 @@
     "4e2dee09-d692-42b7-aff6-7caced5b14d3"
   ],
   "news": [
-    "https://www.rollingstone.com/music/music-news/stevie-wonder-lawsuit-evict-woman-rent-free-house-1235647480/",
-    "https://www.nme.com/news/music/watch-noel-gallagher-talk-oasis-reunion-on-chicken-shop-date-3974092?utm_source=rss&utm_medium=rss&utm_campaign=watch-noel-gallagher-talk-oasis-reunion-on-chicken-shop-date",
-    "https://pitchfork.com/story/slayyyter-cancels-remaining-uk-and-european-tour-dates/",
-    "https://www.nme.com/news/music/slayyyter-cancels-uk-and-european-tour-dates-due-to-illness-3974102?utm_source=rss&utm_medium=rss&utm_campaign=slayyyter-cancels-uk-and-european-tour-dates-due-to-illness",
     "https://www.intermedia.ru/news/407650",
     "https://www.billboard.com/pro/summer-walker-bebe-rexha-billboard-canada-women-in-music/",
     "https://www.billboard.com/music/rb-hip-hop/drake-new-certifications-riaa-diamond-views-marvins-room-1236367433/",
@@ -632,7 +628,11 @@
     "https://www.billboard.com/music/rb-hip-hop/nicki-minaj-appears-election-day-new-hampshire-polling-site-1236373944/",
     "https://www.billboard.com/culture/tv-film/cher-response-michael-douglas-moonstruck-oscar-diss-1236373958/",
     "https://pitchfork.com/story/four-tet-remixes-the-durutti-column/",
-    "https://www.billboard.com/music/chart-beat/renee-spearman-montell-jordan-kim-burrell-song-tops-gospel-1236373892/"
+    "https://www.billboard.com/music/chart-beat/renee-spearman-montell-jordan-kim-burrell-song-tops-gospel-1236373892/",
+    "https://www.intermedia.ru/news/407900",
+    "https://www.intermedia.ru/news/407897",
+    "https://www.billboard.com/music/concerts/bigbang-world-tour-finale-sofi-stadium-1236374554/",
+    "https://www.billboard.com/pro/icmp-john-phelan-interview-big-ai-australian-copyright/"
   ],
   "releases": [
     "1.0.6",
@@ -866,6 +866,5 @@
   "featCta": 68,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 1,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://ai.google.dev/gemini-api/docs"
 }
