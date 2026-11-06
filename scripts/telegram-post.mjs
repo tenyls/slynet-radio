@@ -71,11 +71,24 @@ async function saveState(s) {
 const SILENT = true;
 async function tg(method, body) {
   if (/^send/.test(method)) body = { ...body, disable_notification: SILENT };
-  const r = await fetchT(`https://api.telegram.org/bot${TOKEN}/${method}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
+  // Если до Telegram не достучались (соединение не установилось) — пробуем ещё до 3 раз.
+  // Повтор безопасен: сообщение в этом случае точно не ушло.
+  let r;
+  for (let attempt = 1; ; attempt++) {
+    try {
+      r = await fetchT(`https://api.telegram.org/bot${TOKEN}/${method}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      break;
+    } catch (e) {
+      const codes = [e?.cause?.code, ...(e?.cause?.errors || []).map((x) => x.code)];
+      const connectFail = codes.some((c) => ['ETIMEDOUT', 'ENETUNREACH', 'ECONNREFUSED', 'EAI_AGAIN'].includes(c));
+      if (!connectFail || attempt >= 3) throw e;
+      await new Promise((ok) => setTimeout(ok, 5000 * attempt));
+    }
+  }
   const j = await r.json();
   if (!j.ok) throw new Error(`${method}: ${j.description}`);
   return j.result;
