@@ -165,6 +165,19 @@ npm run build        # проверка типов + сборка в dist/ — �
 
 Формат заголовка: `### ГГГГ-ММ-ДД ЧЧ:ММ — кто (Claude / Codex / Antigravity + модель / DeepSeek) — версия`. Новые записи — сверху.
 
+### 2026-11-06 14:55 — Claude (Sonnet 5.5) — защита Телеграм-бота от зависаний и обрывов
+- **Что:** 6.11 запуск `telegram.yml` (10:59 по Берлину) завис ~4 часа на шаге «Публикация»; из-за `concurrency: telegram`
+  остальные запуски стояли в очереди, посты не выходили (последний пост — 9:54). Отменил зависший запуск вручную.
+  Утром (запуск 08:10) был обрыв связи GitHub→Telegram (`ETIMEDOUT`/`ENETUNREACH`).
+- **Что изменил:** `.github/workflows/telegram.yml` — `timeout-minutes: 10` у job `post` (зависший запуск сам остановится);
+  `scripts/telegram-post.mjs`, функция `tg()` — до 3 попыток с паузой, **только** если соединение не установилось
+  (ETIMEDOUT/ENETUNREACH/ECONNREFUSED/EAI_AGAIN), поэтому дублей постов быть не должно. Ошибки API Telegram не повторяются.
+- **Если посты не выходят:** смотри https://github.com/tenyls/slynet-radio/actions/workflows/telegram.yml — нет ли запуска «In progress»
+  дольше 10 минут или «Pending» в очереди; отмена — внутри запуска, кнопка «Cancel workflow».
+- **Идея (не делали):** Telegram 13.2 умеет «живые» HTML-сообщения; в Bot API 10.3 способа отправки через бота не нашли —
+  возможно только вручную из приложения. Пробный пост ждёт команды владельца.
+- **Файлы:** `.github/workflows/telegram.yml`, `scripts/telegram-post.mjs`, `HANDOFF.md`. **Проверить:** почасовой запуск проходит за ~2 минуты.
+
 ### 2026-11-04 21:00 — Claude (Opus 5.5) — своя карточка плеера в шторке и на экране блокировки (Android)
 - **Что:** нативный плеер получил свой системный `MediaSession` (Media3): новый сервис
   `native/android/java/SlyNetPlaybackService.java` (MediaSessionService + `RemotePlayer` поверх ExoPlayer).
