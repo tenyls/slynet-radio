@@ -243,10 +243,6 @@
     "ex-record-skazki"
   ],
   "news": [
-    "https://www.intermedia.ru/news/407660",
-    "https://www.intermedia.ru/news/407658",
-    "https://www.rollingstone.com/music/music-news/the-notebook-musical-london-west-end-premiere-1235647109/",
-    "https://www.intermedia.ru/news/407617",
     "https://www.intermedia.ru/news/407649",
     "https://www.rollingstone.com/music/music-news/my-chemical-romance-legal-action-dallas-cowboys-cheerleaders-1235647551/",
     "https://consequence.net/2026/10/heavy-song-of-the-week-tony-iommi-over-the-violent-sun/",
@@ -642,7 +638,11 @@
     "https://www.billboard.com/music/music-news/celine-dion-metallica-sphere-air-bass-video-1236376892/",
     "https://www.intermedia.ru/news/407964",
     "https://www.intermedia.ru/news/407963",
-    "https://www.nme.com/news/music/manic-street-preachers-suede-o2-london-co-headline-show-setlist-photos-footage-3975347?utm_source=rss&utm_medium=rss&utm_campaign=manic-street-preachers-suede-o2-london-co-headline-show-setlist-photos-footage"
+    "https://www.nme.com/news/music/manic-street-preachers-suede-o2-london-co-headline-show-setlist-photos-footage-3975347?utm_source=rss&utm_medium=rss&utm_campaign=manic-street-preachers-suede-o2-london-co-headline-show-setlist-photos-footage",
+    "https://pitchfork.com/story/richard-lloyd-television-guitarist-dies-at-75/",
+    "https://www.rollingstone.com/music/music-news/richard-lloyd-television-guitarist-dead-obituary-1235614110/",
+    "https://www.intermedia.ru/news/407960",
+    "https://www.rollingstone.com/music/music-news/deep-purple-ian-gillan-successful-surgery-medical-emergency-1235654349/"
   ],
   "releases": [
     "1.0.6",
@@ -883,5 +883,5 @@
   "featCta": 78,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 3,
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://aistudio.google.com/docs/get-"
 }
