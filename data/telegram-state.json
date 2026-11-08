@@ -246,10 +246,6 @@
     "ex-record-lofi"
   ],
   "news": [
-    "https://www.intermedia.ru/news/407649",
-    "https://www.rollingstone.com/music/music-news/my-chemical-romance-legal-action-dallas-cowboys-cheerleaders-1235647551/",
-    "https://consequence.net/2026/10/heavy-song-of-the-week-tony-iommi-over-the-violent-sun/",
-    "https://consequence.net/2026/10/angine-de-poitrine-lesson-bands-gimmick/",
     "https://www.intermedia.ru/news/407654",
     "https://stereogum.com/2515438/yeule-hysterique/music/",
     "https://www.intermedia.ru/news/407586",
@@ -645,7 +641,11 @@
     "https://pitchfork.com/story/richard-lloyd-television-guitarist-dies-at-75/",
     "https://www.rollingstone.com/music/music-news/richard-lloyd-television-guitarist-dead-obituary-1235614110/",
     "https://www.intermedia.ru/news/407960",
-    "https://www.rollingstone.com/music/music-news/deep-purple-ian-gillan-successful-surgery-medical-emergency-1235654349/"
+    "https://www.rollingstone.com/music/music-news/deep-purple-ian-gillan-successful-surgery-medical-emergency-1235654349/",
+    "https://www.rollingstone.com/music/music-news/snl-watch-the-strokes-perform-lonely-future-going-shopping-1235654344/",
+    "https://www.intermedia.ru/news/407968",
+    "https://www.intermedia.ru/news/407887",
+    "https://www.intermedia.ru/news/407906"
   ],
   "releases": [
     "1.0.6",
@@ -887,6 +887,5 @@
   "featCta": 79,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 3,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://aistudio.google.com/docs/get-",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://aistudio.google.com/docs/get-"
 }
