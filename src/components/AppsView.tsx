@@ -8,6 +8,10 @@ const APK_PHONE = `${REPO}/releases/download/android-latest/SlyNetRadio.apk`;
 // Одно универсальное приложение для телефонов, планшетов и Android TV
 const APK_TV = APK_PHONE;
 const SITE = 'https://slynet-radio.pages.dev/';
+// RuStore: приложение одобрено модерацией (08.11.2026)
+const RUSTORE_APP = 'https://www.rustore.ru/catalog/app/com.slynet.radio.rustore';
+const RUSTORE_GET = 'https://www.rustore.ru/download'; // сам магазин RuStore для телефона
+const RUSTORE_TV = 'https://www.rustore.ru/tv'; // RuStore для Android TV и приставок
 
 interface Versions {
   apk?: string;
@@ -143,8 +147,23 @@ export const AppsView: React.FC = () => {
           >
             <Download className="w-5 h-5" /> Скачать SlyNet Radio для Android
           </a>
+          <a
+            href={RUSTORE_APP}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-sky-500 hover:bg-sky-400 text-zinc-950 font-extrabold text-sm shadow-lg shadow-sky-500/30 active:scale-[0.98]"
+          >
+            <Download className="w-5 h-5" /> Установить из RuStore
+          </a>
+          <p className="text-[11px] text-zinc-400 -mt-2 text-center">
+            Нет RuStore?{' '}
+            <a href={RUSTORE_GET} target="_blank" rel="noopener noreferrer" className="text-sky-300 underline">
+              Скачать магазин RuStore
+            </a>
+          </p>
           <div className="space-y-1.5">
             <VersionLine label="Последняя версия APK" value={ver.apk ? `v${ver.apk}` : undefined} date={ver.apkDate} extra={ver.apkSize ? `${(ver.apkSize / 1048576).toFixed(1)} МБ` : ''} />
+            <VersionLine label="RuStore" value="доступно" extra="установка и обновления в один тап" />
             <VersionLine label="Google Play" value="скоро" extra="будет та же версия" />
             <VersionLine label="Обновление содержимого" value={ver.web} date={ver.webDate} extra="приходит в приложение само" />
           </div>
@@ -153,6 +172,9 @@ export const AppsView: React.FC = () => {
             <li>Разрешите установку из браузера, если телефон спросит.</li>
             <li>Нажмите «Установить» (Play Защита может предупредить — это тестовая версия).</li>
           </ol>
+          <p className="text-[11px] text-zinc-500 leading-relaxed">
+            * Через APK-файл новые версии приходят намного быстрее: приложение обновляется «по воздуху», не дожидаясь проверки магазина. В RuStore обновления выходят после модерации.
+          </p>
           <div className="flex flex-wrap items-center gap-2">
             <Soon store="Google Play" />
           </div>
@@ -181,6 +203,13 @@ export const AppsView: React.FC = () => {
             <li>Откройте в нём ссылку на APK из этой кнопки и установите.</li>
             <li>SlyNet Radio появится в списке приложений, управление — пультом.</li>
           </ol>
+          <p className="text-[11px] text-zinc-400">
+            Или установите из магазина:{' '}
+            <a href={RUSTORE_TV} target="_blank" rel="noopener noreferrer" className="text-violet-300 underline">
+              RuStore для Android TV
+            </a>
+            {' '}→ найдите «SlyNet Radio».
+          </p>
           <div className="flex flex-wrap items-center gap-2">
             <Soon store="Google Play для ТВ" />
           </div>
