@@ -165,6 +165,16 @@ npm run build        # проверка типов + сборка в dist/ — �
 
 Формат заголовка: `### ГГГГ-ММ-ДД ЧЧ:ММ — кто (Claude / Codex / Antigravity + модель / DeepSeek) — версия`. Новые записи — сверху.
 
+### 2026-11-08 13:40 — Claude (Sonnet 5.5) — SlyNet Radio одобрен в RuStore
+- **Что:** владелец сообщил: приложение одобрено в RuStore (https://www.rustore.ru/catalog/app/com.slynet.radio.rustore).
+  `data/stores.json` → `"rustore": true` — бот теперь добавляет строку и кнопки RuStore во все рекламные посты и включил в ротацию
+  посты «SlyNet Radio в RuStore» и про Android TV. Новость выходит через `public/releases.json` (запись `RuStore-2026-11-08`,
+  поля `post`/`image`/`buttons`), постер `public/promo/release-rustore.jpg` (QR на страницу в RuStore).
+- **Сайт:** `src/components/AppsView.tsx` — кнопка «Установить из RuStore», ссылка «Нет RuStore? Скачать магазин», строка RuStore в версиях,
+  ссылка на RuStore для Android TV и сноска: через APK обновления приходят быстрее (по воздуху), в RuStore — после модерации.
+- **Правило владельца:** в постах и постерах только адрес https://slynet-radio.pages.dev/; ссылка на сам магазин RuStore — для тех, у кого его нет.
+- **Проверить:** пост вышел в канал и ВК; на сайте в «Приложения» видна кнопка RuStore.
+
 ### 2026-11-06 14:55 — Claude (Sonnet 5.5) — защита Телеграм-бота от зависаний и обрывов
 - **Что:** 6.11 запуск `telegram.yml` (10:59 по Берлину) завис ~4 часа на шаге «Публикация»; из-за `concurrency: telegram`
   остальные запуски стояли в очереди, посты не выходили (последний пост — 9:54). Отменил зависший запуск вручную.

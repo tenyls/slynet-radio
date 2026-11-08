@@ -135,5 +135,32 @@
     "fixed": [
       "«Моя страна» теперь определяется точно"
     ]
+  },
+  {
+    "version": "RuStore-2026-11-08",
+    "date": "2026-11-08",
+    "title": "SlyNet Radio теперь в RuStore",
+    "added": [
+      "Приложение SlyNet Radio одобрено и доступно в RuStore",
+      "На сайте: кнопка «Установить из RuStore» и ссылка на сам магазин"
+    ],
+    "improved": [],
+    "fixed": [],
+    "image": "promo/release-rustore.jpg",
+    "post": "🎉 <b>SlyNet Radio теперь в RuStore!</b>\n\nМодерация пройдена — наше приложение официально появилось в магазине RuStore 📥\n\n✅ установка и обновления в один тап\n📱 телефоны, планшеты и Android TV\n🎧 тысячи станций, избранное, эквалайзер и музыка при выключенном экране\n\n👉 <a href=\"https://www.rustore.ru/catalog/app/com.slynet.radio.rustore\">SlyNet Radio в RuStore</a>\n\nНет RuStore? Он бесплатный: <a href=\"https://www.rustore.ru/download\">скачать магазин</a> — установка занимает пару минут.\n\n<i>* Через APK-файл с нашего сайта новые версии приходят намного быстрее: приложение обновляется «по воздуху», без ожидания проверки магазина. В RuStore обновления выходят после модерации.</i>",
+    "buttons": [
+      {
+        "text": "📥 SlyNet Radio в RuStore",
+        "url": "https://www.rustore.ru/catalog/app/com.slynet.radio.rustore"
+      },
+      {
+        "text": "⬇️ Нет RuStore? Скачать",
+        "url": "https://www.rustore.ru/download"
+      },
+      {
+        "text": "🌍 Открыть сайт",
+        "url": "https://slynet-radio.pages.dev/"
+      }
+    ]
   }
 ]
