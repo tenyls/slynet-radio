@@ -250,10 +250,6 @@
     "e698b1df-bd9c-4084-9c21-22a452b27664"
   ],
   "news": [
-    "https://stereogum.com/2515535/ali-g-ropes-noel-gallagher-into-new-movie-promo/news/",
-    "https://www.intermedia.ru/news/407642",
-    "https://www.intermedia.ru/news/407643",
-    "https://consequence.net/2026/10/tony-iommi-from-the-dark-album-stream/",
     "https://www.rollingstone.com/music/music-news/elvis-presley-rightsholders-anthropic-lawsuit-infringement-1235647682/",
     "https://www.billboard.com/music/rb-hip-hop/jay-z-la-night-one-guests-blue-ivy-john-legend-scarface-1236367544/",
     "https://www.billboard.com/video/doja-cat-meta-interview/",
@@ -649,7 +645,11 @@
     "https://pitchfork.com/story/rosalia-celebrates-lux-anniversary-with-1000-song-playlist/",
     "https://www.billboard.com/music/rock/the-strokes-snl-walton-goggins-cameo-performance-video-1236377034/",
     "https://stereogum.com/2516998/kurt-vile-brings-out-ethan-buckler-for-a-king-kong-song-in-louisville/news/",
-    "https://stereogum.com/2516990/the-knicks-attempt-damage-control-after-tyler-kolek-calls-taylor-swift-a-fake-fan/news/"
+    "https://stereogum.com/2516990/the-knicks-attempt-damage-control-after-tyler-kolek-calls-taylor-swift-a-fake-fan/news/",
+    "https://www.intermedia.ru/news/407899",
+    "https://www.intermedia.ru/news/407949",
+    "https://www.billboard.com/culture/tv-film/ariana-grande-o-christmas-tree-robert-de-niro-ben-stiller-1236377155/",
+    "https://www.billboard.com/lists/top-country-albums-number-ones-biggest/"
   ],
   "releases": [
     "1.0.6",
@@ -895,6 +895,5 @@
   "featCta": 83,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 1,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://aistudio.google.com/docs/get-",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://aistudio.google.com/docs/get-"
 }
