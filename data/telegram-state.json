@@ -258,10 +258,6 @@
     "ex-fip-rock"
   ],
   "news": [
-    "https://www.nme.com/news/music/my-chemical-romance-legal-action-dallas-cowboys-cheerleaders-hollywood-bowl-3974167?utm_source=rss&utm_medium=rss&utm_campaign=my-chemical-romance-legal-action-dallas-cowboys-cheerleaders-hollywood-bowl",
-    "https://www.intermedia.ru/news/407662",
-    "https://consequence.net/2026/10/spanish-drum-virtuoso-el-estepario-siberiano-nine-inch-nails/",
-    "https://www.nme.com/news/music/watch-ali-g-mock-noel-gallagher-oasis-comeback-cinema-3974172?utm_source=rss&utm_medium=rss&utm_campaign=watch-ali-g-mock-noel-gallagher-oasis-comeback-cinema",
     "https://pitchfork.com/story/ryan-goslings-band-dead-mans-bones-tease-return/",
     "https://pitchfork.com/story/kacey-musgraves-reveals-middle-of-nowhere-companion-album/",
     "https://www.intermedia.ru/news/407627",
@@ -657,7 +653,11 @@
     "https://www.rollingstone.com/music/music-news/dua-lipa-tame-impala-sza-headline-coachella-2027-1235630556/",
     "https://stereogum.com/2517560/coachella-reveals-2027-lineup/news/",
     "https://www.billboard.com/music/music-news/coachella-2027-lineup-1236376135/",
-    "https://www.intermedia.ru/news/407930"
+    "https://www.intermedia.ru/news/407930",
+    "https://stereogum.com/2517628/racing-mount-pleasant-great-destroyer/music/",
+    "https://pitchfork.com/story/jeanne-river-recruits-cameron-winter-for-debut-single/",
+    "https://www.billboard.com/culture/tv-film/brandy-monica-sheryl-crow-maren-morris-sing-dwts-videos-1236379429/",
+    "https://stereogum.com/2517624/runnner-announces-new-album-love-songs-from-the-hottest-summer-on-record-hear-want-to-want-to/music/"
   ],
   "releases": [
     "1.0.6",
@@ -911,5 +911,5 @@
   "featCta": 93,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 3,
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://aistudio.google.com/docs/get-"
 }
