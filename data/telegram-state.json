@@ -907,5 +907,6 @@
   "featStyle": 3,
   "featCta": 91,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
-  "showIndex": 2
+  "showIndex": 2,
+  "vkError": "wall.post 15: Access denied: admin 2fa check fail"
 }
