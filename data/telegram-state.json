@@ -254,7 +254,8 @@
     "8d19ab98-ff22-440c-af05-0b1669b8a2ba",
     "ex-record-russiangold",
     "fb1fd397-78fd-11ea-8a3b-52543be04c81",
-    "1d4d7e90-fe9b-413a-9dda-f3aa507a848c"
+    "1d4d7e90-fe9b-413a-9dda-f3aa507a848c",
+    "ex-fip-rock"
   ],
   "news": [
     "https://www.nme.com/news/music/my-chemical-romance-legal-action-dallas-cowboys-cheerleaders-hollywood-bowl-3974167?utm_source=rss&utm_medium=rss&utm_campaign=my-chemical-romance-legal-action-dallas-cowboys-cheerleaders-hollywood-bowl",
@@ -909,6 +910,5 @@
   "featCta": 92,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 2,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://aistudio.google.com/docs/get-",
-  "vkError": "wall.post 15: Access denied: admin 2fa check fail"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://aistudio.google.com/docs/get-"
 }
