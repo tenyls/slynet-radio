@@ -260,7 +260,8 @@
     "1e6e8797-ca3e-41d2-881b-56fa455f3ee1",
     "ex-record-drumhits",
     "7b56337d-048b-4545-ba70-704e37cdba7a",
-    "b17c5f06-8ad2-4641-95d0-e532040d7e3a"
+    "b17c5f06-8ad2-4641-95d0-e532040d7e3a",
+    "ex-record-rave"
   ],
   "news": [
     "https://www.billboard.com/music/music-news/cardi-b-katseye-concert-daughters-kulture-blossom-1236367584/",
@@ -919,6 +920,5 @@
   "featCta": 98,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 1,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://aistudio.google.com/docs/get-",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://aistudio.google.com/docs/get-"
 }
