@@ -265,7 +265,8 @@
     "16c1e8aa-1e9e-422b-9611-842b61a70983",
     "6cb03e29-0706-445d-9a28-282e3c21dcd6",
     "ex-record-gop",
-    "6e6b07e9-8fcf-4ab5-b2cb-562e07e28ce6"
+    "6e6b07e9-8fcf-4ab5-b2cb-562e07e28ce6",
+    "4a5c183a-cebb-11e9-8502-52543be04c81"
   ],
   "news": [
     "https://www.nme.com/news/music/pulp-interview-mercury-prize-war-child-help-2-brian-eno-different-class-3974140?utm_source=rss&utm_medium=rss&utm_campaign=pulp-interview-mercury-prize-war-child-help-2-brian-eno-different-class",
@@ -927,6 +928,5 @@
   "featCta": 102,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 2,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://aistudio.google.com/docs/get-",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://aistudio.google.com/docs/get-"
 }
