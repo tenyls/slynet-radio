@@ -267,7 +267,8 @@
     "ex-record-gop",
     "6e6b07e9-8fcf-4ab5-b2cb-562e07e28ce6",
     "4a5c183a-cebb-11e9-8502-52543be04c81",
-    "ex-record-latina"
+    "ex-record-latina",
+    "961d37d6-0601-11e8-ae97-52543be04c81"
   ],
   "news": [
     "https://www.billboard.com/music/pop/harry-styles-coming-up-roses-video-release-date-1236367595/",
@@ -929,6 +930,5 @@
   "featStyle": 8,
   "featCta": 104,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
-  "showIndex": 2,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://aistudio.google.com/docs/get-"
+  "showIndex": 2
 }
