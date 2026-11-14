@@ -270,10 +270,6 @@
     "ex-record-latina"
   ],
   "news": [
-    "https://www.billboard.com/culture/product-recommendations/best-christmas-gifts-music-lovers-shop-online-2026-1236360927/",
-    "https://www.billboard.com/culture/product-recommendations/ufc-333-oct-2026-watch-mma-live-online-free-1236364114/",
-    "https://www.intermedia.ru/news/407648",
-    "https://consequence.net/2026/10/scott-weiland-vaseline-live/",
     "https://www.billboard.com/music/pop/harry-styles-coming-up-roses-video-release-date-1236367595/",
     "https://pitchfork.com/story/watch-jay-z-bring-out-dr-dre-and-snoop-dogg-at-la-tour-closer/",
     "https://consequence.net/2026/10/tinashe-2027-tour-dates/",
@@ -669,7 +665,11 @@
     "https://www.billboard.com/music/rock/journey-deen-castronovo-steps-away-steve-murphy-drummer-1236382208/",
     "https://www.intermedia.ru/news/408032",
     "https://www.intermedia.ru/news/408043",
-    "https://www.rollingstone.com/music/music-news/rock-and-roll-hall-of-fame-induction-ceremony-flights-1235658269/"
+    "https://www.rollingstone.com/music/music-news/rock-and-roll-hall-of-fame-induction-ceremony-flights-1235658269/",
+    "https://www.intermedia.ru/news/408121",
+    "https://www.intermedia.ru/news/408120",
+    "https://www.intermedia.ru/news/408117",
+    "https://www.rollingstone.com/music/music-news/kanye-west-settles-lawsuit-alice-merton-holocaust-survivors-1235658191/"
   ],
   "releases": [
     "1.0.6",
@@ -930,6 +930,5 @@
   "featCta": 104,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 2,
-  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://aistudio.google.com/docs/get-",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "aiError": "gemini-2.5-flash HTTP 404: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use models/gemini-3.8-flash for the latest features and improvements. We recommend you to use the Interactions API (https://aistudio.google.com/docs/get-"
 }
