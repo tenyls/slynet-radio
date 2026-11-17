@@ -165,6 +165,15 @@ npm run build        # проверка типов + сборка в dist/ — �
 
 Формат заголовка: `### ГГГГ-ММ-ДД ЧЧ:ММ — кто (Claude / Codex / Antigravity + модель / DeepSeek) — версия`. Новые записи — сверху.
 
+### 2026-11-18 00:10 — Claude (Opus 5.5) — радио в России без VPN (ретрансляторы)
+- **Что:** владелец 17.11: в России Cloudflare заблокирован → сделать, чтобы SlyNet работал через наши серверы. В Android-приложении
+  `src/services/relayFetch.ts` оборачивает fetch: запросы к slynet-radio.pages.dev, slynet-api.tenylse.workers.dev и
+  de1.api.radio-browser.info при ошибке повторяются через ретрансляторы на трёх серверах владельца («Оператор», «Голландец», «Молдова»)
+  нативно (`native/android/java/SlyNetRelay.java`, метод `relayFetch` в SlyNetNativePlugin, сертификаты закреплены по SHA-256).
+  На ретрансляторах префиксы `/slynet-site`, `/slynet-api`, `/radio-rb` (Caddy, обновляет владелец файлом run-relay-update-2.bat в G:\evvant\Projects\SSH).
+- **Нужно:** новый APK (нативная часть). RuStore-версию собрать и загрузить владельцу. Сайт в браузере так не спасти: без домена браузер не доверяет сертификату ретранслятора.
+- **Не проверено:** в России на устройстве.
+
 ### 2026-11-08 13:40 — Claude (Sonnet 5.5) — SlyNet Radio одобрен в RuStore
 - **Что:** владелец сообщил: приложение одобрено в RuStore (https://www.rustore.ru/catalog/app/com.slynet.radio.rustore).
   `data/stores.json` → `"rustore": true` — бот теперь добавляет строку и кнопки RuStore во все рекламные посты и включил в ротацию
