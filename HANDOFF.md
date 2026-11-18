@@ -170,7 +170,7 @@ npm run build        # проверка типов + сборка в dist/ — �
   `src/services/relayFetch.ts` оборачивает fetch: запросы к slynet-radio.pages.dev, slynet-api.tenylse.workers.dev и
   de1.api.radio-browser.info при ошибке повторяются через ретрансляторы на трёх серверах владельца («Оператор», «Голландец», «Молдова»)
   нативно (`native/android/java/SlyNetRelay.java`, метод `relayFetch` в SlyNetNativePlugin, сертификаты закреплены по SHA-256).
-  На ретрансляторах префиксы `/slynet-site`, `/slynet-api`, `/radio-rb` (Caddy, обновляет владелец файлом run-relay-update-2.bat в G:\evvant\Projects\SSH).
+  На ретрансляторах префиксы `/slynet-site`, `/slynet-api`, `/radio-rb` (Caddy; владелец запустил run-relay-update-2.bat 18.11 — на всех трёх серверах /slynet-site и /slynet-api отвечают 200).
 - **Нужно:** новый APK (нативная часть). RuStore-версию собрать и загрузить владельцу. Сайт в браузере так не спасти: без домена браузер не доверяет сертификату ретранслятора.
 - **Не проверено:** в России на устройстве.
 
