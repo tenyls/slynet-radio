@@ -173,6 +173,7 @@ npm run build        # проверка типов + сборка в dist/ — �
   На ретрансляторах префиксы `/slynet-site`, `/slynet-api`, `/radio-rb` (Caddy; владелец запустил run-relay-update-2.bat 18.11 — на всех трёх серверах /slynet-site и /slynet-api отвечают 200).
 - **Нужно:** новый APK (нативная часть). RuStore-версию собрать и загрузить владельцу. Сайт в браузере так не спасти: без домена браузер не доверяет сертификату ретранслятора.
 - **Не проверено:** в России на устройстве.
+- [x] 18.11: зеркала сайта для России (DuckDNS, настоящий сертификат Let's Encrypt через DNS-проверку, Caddy с duckdns на наших серверах, порт 8444; 8443 — только для приложений): радио https://yairadio.duckdns.org:8444 («Голландец»), https://yaiplay-radio.duckdns.org:8444 («Оператор»); SlyNet https://slynetradio.duckdns.org:8444 и https://slynet-radio.duckdns.org:8444. Сайт на зеркале ходит к API через то же зеркало (relayFetch.ts installMirrorFetch). Токен DuckDNS — только у владельца (G:\evvant\Projects\SSH\duckdns-token.txt) и в /opt/yai-relay/duckdns.env на серверах. Скрипты: mirror2-dutch.sh, mirror3-operator.sh.
 
 ### 2026-11-08 13:40 — Claude (Sonnet 5.5) — SlyNet Radio одобрен в RuStore
 - **Что:** владелец сообщил: приложение одобрено в RuStore (https://www.rustore.ru/catalog/app/com.slynet.radio.rustore).
