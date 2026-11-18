@@ -1,6 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0"><channel>
 <title>SlyNet Radio</title><link>https://slynet-radio.pages.dev/</link><description>Радио со всего мира: станции дня, новости музыки и обновления SlyNet Radio</description><language>ru</language>
+<item><title>SlyNet Radio снова открывается в России — без VPN!</title><link>https://slynet-radio.duckdns.org:8444/</link><guid isPermaLink="false">slynet-1795034615449</guid><pubDate>Wed, 18 Nov 2026 20:43:35 GMT</pubDate><description>🇷🇺 SlyNet Radio снова открывается в России — без VPN!
+
+У многих в России сайты на Cloudflare перестали открываться или грузятся очень медленно. Мы сделали своё зеркало на наших серверах 👇
+
+🌍 Обычный адрес — https://slynet-radio.pages.dev/
+из России сайт теперь сам перекинет на зеркало
+
+🇷🇺 Не открывается? Зеркало — https://slynet-radio.duckdns.org:8444/
+тот же сайт: те же станции, избранное и плейлисты — войдите в аккаунт, и всё на месте
+
+📱 Приложение для Android обновлено: при блокировке оно само идёт через наши серверы.
+
+👉 Сохраните ссылку на зеркало и поделитесь с друзьями в России 💚
+
+🎧 Слушать: https://slynet-radio.pages.dev/
+📱 Приложения: https://slynet-radio.pages.dev/#apps
+📢 Telegram: https://t.me/SlyNetRadio</description></item>
 <item><title>Взгляд на мир: Хендерсон</title><link>https://slynet-radio.pages.dev/#webcams</link><guid isPermaLink="false">slynet-1795015945921</guid><pubDate>Wed, 18 Nov 2026 15:32:25 GMT</pubDate><description>📷 Взгляд на мир: Хендерсон
 🌍 Соединенные Штаты
 
@@ -389,15 +406,6 @@ SlyNet Radio работает на Android TV и смарт-приставках
 🌍 Португалия · 🎧 192 kbps
 
 GoloFM — радио из страны Португалия, в эфире: desporto. Включайте и слушайте бесплатно, без рекламы и регистрации.
-
-🎧 Слушать: https://slynet-radio.pages.dev/
-📱 Приложения: https://slynet-radio.pages.dev/#apps
-📢 Telegram: https://t.me/SlyNetRadio</description></item>
-<item><title>Попробуйте сегодня ✨ Слабый интернет — не проблема</title><link>https://slynet-radio.pages.dev/</link><guid isPermaLink="false">slynet-1794484590630</guid><pubDate>Thu, 12 Nov 2026 11:56:30 GMT</pubDate><description>Попробуйте сегодня ✨ Слабый интернет — не проблема
-
-Качество звука подстраивается под интернет: на слабой связи станция переключается на лёгкий поток и не прерывается. Можно выбрать режим «экономия трафика».
-
-Подпишитесь на канал, чтобы не пропустить новые фишки.
 
 🎧 Слушать: https://slynet-radio.pages.dev/
 📱 Приложения: https://slynet-radio.pages.dev/#apps
