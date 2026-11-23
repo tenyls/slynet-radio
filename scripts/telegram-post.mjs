@@ -529,7 +529,8 @@ async function ai(system, user, maxTokens = 700) {
     AI_ERROR = 'нет секрета GEMINI_API_KEY';
     return null;
   }
-  for (const model of ['gemini-flash-latest', 'gemini-2.5-flash']) {
+  // Список проверен 23.11.2026 по ai.google.dev/gemini-api/docs/models: недоступная (404) или перегруженная (503) модель — берём следующую
+  for (const model of ['gemini-flash-latest', 'gemini-3.8-flash', 'gemini-3.6-flash', 'gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-2.5-flash-lite', 'gemini-2.5-flash']) {
     try {
       const r = await fetchT(
         `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
