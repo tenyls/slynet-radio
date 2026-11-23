@@ -274,7 +274,6 @@
     "36a841b2-01ba-4e9e-9ec9-bc7a62b14cc1"
   ],
   "news": [
-    "https://pitchfork.com/story/elvis-presley-catalog-owners-sue-ai-company-anthropic-for-copyright-infringement/",
     "https://www.billboard.com/music/country/miranda-lambert-halftime-cowboys-thanksgiving-1236367616/",
     "https://www.billboard.com/music/concerts/jay-z-la-night-2-dr-dre-snoop-dogg-too-short-guests-1236367642/",
     "https://www.billboard.com/music/chart-beat/olivia-rodrigo-you-seem-pretty-sad-back-to-no1-billboard200-1236367607/",
@@ -673,7 +672,8 @@
     "https://www.intermedia.ru/news/408124",
     "https://www.billboard.com/culture/product-recommendations/ufc-334-gane-vs-hokit-nov-2026-watch-mma-live-online-free-1236379461/",
     "https://www.rollingstone.com/music/music-news/robyn-sexistential-songs-show-me-love-tiny-desk-performance-1235658322/",
-    "https://www.intermedia.ru/news/408123"
+    "https://www.intermedia.ru/news/408123",
+    "https://stereogum.com/2520267/billy-corgan-announces-deluxe-zwan-reissue-with-previously-unreleased-tracks/music/"
   ],
   "releases": [
     "1.0.6",
@@ -687,7 +687,7 @@
     "RU-2026-11-18"
   ],
   "askIndex": 4,
-  "lastNewsSource": "NME",
+  "lastNewsSource": "Stereogum",
   "lastReleaseAt": 1795034616608,
   "cams": [
     "1573776572",
@@ -946,6 +946,5 @@
   "featCta": 109,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 1,
-  "lastAutoKey": "2026-11-23T16",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "lastAutoKey": "2026-11-23T17"
 }
