@@ -272,7 +272,8 @@
     "5ae9af57-5254-44c7-8632-8d638468ca38",
     "ex-rp-main",
     "36a841b2-01ba-4e9e-9ec9-bc7a62b14cc1",
-    "cec4e1cf-7f70-4b8d-8908-6a8c85b78e49"
+    "cec4e1cf-7f70-4b8d-8908-6a8c85b78e49",
+    "ex-record-trop"
   ],
   "news": [
     "https://www.billboard.com/music/country/miranda-lambert-halftime-cowboys-thanksgiving-1236367616/",
@@ -948,6 +949,5 @@
   "featCta": 110,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 1,
-  "lastAutoKey": "2026-11-23T20",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "lastAutoKey": "2026-11-23T21"
 }
