@@ -163,7 +163,16 @@ npm run build        # проверка типов + сборка в dist/ — �
 
 ## Журнал работ
 
-Формат заголовка: `### ГГГГ-ММ-ДД ЧЧ:ММ — кто (Claude / Codex / Antigravity + модель / DeepSeek) — версия`. Новые записи — сверху.
+Формат заголовка: `### 2026-11-23 14:55 — Claude (Sonnet 5.5) — часы Cloudflare для бота Телеграм-канала
+- **Проблема:** с 15.11 GitHub запускает расписание `telegram.yml` только 2–3 раза в сутки вместо каждого часа (workflow активен, запуски успешны) —
+  в канале не было новостей. Причина на стороне GitHub (пропуск scheduled-событий), код бота ни при чём.
+- **Что сделал:** `worker/index.js` — обработчик `scheduled`: каждый час шлёт `workflow_dispatch` (mode=auto) на `telegram.yml`, итог пишет в KV `cron:tg`
+  и показывает в `/health` (поля `cron`, `cronToken`); версия воркера `2026-11-23`. `scripts/telegram-post.mjs` — в auto-режиме не публикует второй раз
+  в тот же час (`state.lastAutoKey`). `worker/wrangler.toml`, `worker/README.md` — описание. Расписание GitHub оставлено запасным.
+- **Нужно от владельца:** создать токен GitHub (Actions: Read and write), добавить секрет `GH_DISPATCH_TOKEN` в Worker, вставить новый `worker/index.js` → Deploy,
+  добавить Cron Trigger `7 6-21 * * *`. **Проверить:** `/health` → `cron.status: "ok"`, посты идут каждый час.
+
+### ГГГГ-ММ-ДД ЧЧ:ММ — кто (Claude / Codex / Antigravity + модель / DeepSeek) — версия`. Новые записи — сверху.
 
 ### 2026-11-18 00:10 — Claude (Opus 5.5) — радио в России без VPN (ретрансляторы)
 - **Что:** владелец 17.11: в России Cloudflare заблокирован → сделать, чтобы SlyNet работал через наши серверы. В Android-приложении

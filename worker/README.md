@@ -69,3 +69,12 @@ Permissions → Repository permissions → **Contents: Read and write** → Gene
 
 **4.** Сайт → `#admin` → «🛰 Сервер» → **«Подключить ВКонтакте»** → войдите в ВК → разрешите доступ → «ВКонтакте подключён».
 Раз в ~полгода (или если в статусе появится ошибка) нажмите кнопку снова.
+
+---
+
+## Часы для бота Телеграм-канала (с 23.11.2026)
+
+GitHub с 15.11 запускает наше расписание `telegram.yml` только 2–3 раза в сутки. Поэтому бота каждый час запускает Worker (`scheduled` в `index.js`
+→ GitHub API `workflow_dispatch`, режим `auto`). Расписание GitHub осталось запасным; дубль в один и тот же час бот пропускает (`lastAutoKey`).
+- Секрет `GH_DISPATCH_TOKEN` (fine-grained токен GitHub, репозиторий `slynet-radio`, право **Actions: Read and write**). Без него берётся `GITHUB_TOKEN`.
+- Cron в Cloudflare: `7 6-21 * * *`. Состояние последнего запуска — в `https://slynet-api.tenylse.workers.dev/health` (поле `cron`).

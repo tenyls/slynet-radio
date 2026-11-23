@@ -6,3 +6,8 @@ compatibility_date = "2026-09-01"
 # [[kv_namespaces]]
 # binding = "DB"
 # id = "<id из панели>"
+
+# Часы для бота Телеграм-канала (GitHub с 15.11.2026 пропускает свои расписания). Время UTC: 06–21 = 07–22 по Берлину зимой.
+# В панели: Worker → Settings → Trigger Events → Cron Triggers → Add → `7 6-21 * * *`
+[triggers]
+crons = ["7 6-21 * * *"]

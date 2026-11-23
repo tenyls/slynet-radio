@@ -1036,7 +1036,8 @@ function autoMode() {
   return HOURLY[h] || 'none';
 }
 
-const mode = (process.argv[2] || 'auto') === 'auto' ? autoMode() : process.argv[2];
+const isAuto = (process.argv[2] || 'auto') === 'auto';
+const mode = isAuto ? autoMode() : process.argv[2];
 if (mode === 'none') {
   log('в этот час пост не запланирован');
   process.exit(0);
@@ -1052,6 +1053,13 @@ if (!TOKEN || !CHANNEL) {
   process.exit(0);
 }
 const state = await loadState();
+// Часы Cloudflare и расписание GitHub могут сработать в один час — второй раз в этот час не публикуем
+const hourKey = new Date().toISOString().slice(0, 13);
+if (isAuto && state.lastAutoKey === hourKey) {
+  log('в этот час уже публиковали — пропускаю');
+  process.exit(0);
+}
+if (isAuto) state.lastAutoKey = hourKey;
 try {
   if (mode === 'day') await postStation(state, true);
   else if (mode === 'station') await postStation(state);

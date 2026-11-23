@@ -29,6 +29,10 @@ const ALLOWED_ORIGINS = ['https://tenyls.github.io', 'https://slynet-radio.pages
 const DAY = 86400;
 
 export default {
+  // Часы Cloudflare: каждый час запускают бота Телеграм-канала. GitHub с 15.11 стал пропускать свои расписания (2–3 запуска в сутки).
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(dispatchTelegram(env));
+  },
   async fetch(request, env, ctx) {
     const origin = request.headers.get('Origin') || '';
     const cors = {
@@ -47,7 +51,7 @@ export default {
     const url = new URL(request.url);
     const p = url.pathname.replace(/\/+$/, '') || '/';
     try {
-      if (p === '/' || p === '/health') return json({ ok: true, service: 'slynet-api', kv: !!env.DB, publish: !!env.GITHUB_TOKEN, telegram: !!env.TELEGRAM_BOT_TOKEN, windy: !!env.WINDY_API_KEY, vk: !!env.VK_CLIENT_ID, share: true, playlists: true, probe: true, version: '2026-11-01' });
+      if (p === '/' || p === '/health') return json({ cron: env.DB ? await env.DB.get('cron:tg', 'json') : null, cronToken: !!(env.GH_DISPATCH_TOKEN || env.GITHUB_TOKEN), ok: true, service: 'slynet-api', kv: !!env.DB, publish: !!env.GITHUB_TOKEN, telegram: !!env.TELEGRAM_BOT_TOKEN, windy: !!env.WINDY_API_KEY, vk: !!env.VK_CLIENT_ID, share: true, playlists: true, probe: true, version: '2026-11-23' });
       if (p === '/s') return sharePage(url);
       if (p === '/meta') return await handleMeta(url, json, ctx);
       if (p === '/webcams') return await handleWebcams(url, env, json, ctx);
@@ -168,6 +172,26 @@ async function handleSupport(request, env, ip, json, ctx) {
     );
   }
   return json({ ok: true });
+}
+
+// ---------- Запуск бота Телеграм-канала по часам Cloudflare ----------
+// Нужен секрет GH_DISPATCH_TOKEN (GitHub, право «Actions: Read and write» на репозиторий slynet-radio); если его нет — берётся GITHUB_TOKEN.
+async function dispatchTelegram(env) {
+  const token = env.GH_DISPATCH_TOKEN || env.GITHUB_TOKEN;
+  let status = 'нет токена';
+  if (token) {
+    try {
+      const r = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/actions/workflows/telegram.yml/dispatches`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'User-Agent': 'slynet-api', Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ref: 'main', inputs: { mode: 'auto' } }),
+      });
+      status = r.status === 204 ? 'ok' : `GitHub ${r.status}`;
+    } catch (e) {
+      status = 'ошибка сети';
+    }
+  }
+  if (env.DB) await env.DB.put('cron:tg', JSON.stringify({ at: new Date().toISOString(), status }));
 }
 
 // ---------- Публикация content.json в GitHub ----------
