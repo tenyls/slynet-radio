@@ -40,6 +40,11 @@ const log = (...a) => console.log(new Date().toISOString().slice(11, 19), ...a);
 
 const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+/** Соединение не установилось (до Telegram не достучались) — запрос точно не ушёл, повторять безопасно */
+function isConnectFail(e) {
+  const codes = [e?.cause?.code, ...(e?.cause?.errors || []).map((x) => x.code)];
+  return codes.some((c) => ['ETIMEDOUT', 'ENETUNREACH', 'ECONNREFUSED', 'EAI_AGAIN', 'UND_ERR_CONNECT_TIMEOUT'].includes(c));
+}
 
 async function fetchT(url, opts = {}, ms = 15000) {
   const c = new AbortController();
@@ -83,9 +88,7 @@ async function tg(method, body) {
       });
       break;
     } catch (e) {
-      const codes = [e?.cause?.code, ...(e?.cause?.errors || []).map((x) => x.code)];
-      const connectFail = codes.some((c) => ['ETIMEDOUT', 'ENETUNREACH', 'ECONNREFUSED', 'EAI_AGAIN'].includes(c));
-      if (!connectFail || attempt >= 3) throw e;
+      if (!isConnectFail(e) || attempt >= 3) throw e;
       await new Promise((ok) => setTimeout(ok, 5000 * attempt));
     }
   }
@@ -131,19 +134,31 @@ async function postPhotoOrText({ photo, caption, buttons, preview = false, silen
   // photo: Buffer (наша карточка), URL или null
   if (photo && Buffer.isBuffer(photo)) {
     try {
-      const fd = new FormData();
-      fd.append('chat_id', CHANNEL);
-      fd.append('caption', caption);
-      fd.append('parse_mode', 'HTML');
-      if (silent || SILENT) fd.append('disable_notification', 'true');
-      if (buttons) fd.append('reply_markup', JSON.stringify(buttons));
-      fd.append('photo', new Blob([photo], { type: 'image/png' }), 'slynet.png');
-      const r = await fetchT(`https://api.telegram.org/bot${TOKEN}/sendPhoto`, { method: 'POST', body: fd }, 30000);
+      let r;
+      // Если связь с Telegram оборвалась до отправки — до 3 попыток, иначе картинка камеры подменится логотипом
+      for (let attempt = 1; ; attempt++) {
+        const fd = new FormData();
+        fd.append('chat_id', CHANNEL);
+        fd.append('caption', caption);
+        fd.append('parse_mode', 'HTML');
+        if (silent || SILENT) fd.append('disable_notification', 'true');
+        if (buttons) fd.append('reply_markup', JSON.stringify(buttons));
+        fd.append('photo', new Blob([photo], { type: 'image/png' }), 'slynet.png');
+        try {
+          r = await fetchT(`https://api.telegram.org/bot${TOKEN}/sendPhoto`, { method: 'POST', body: fd }, 30000);
+          break;
+        } catch (e) {
+          // Любая сетевая ошибка: всё равно дальше ушёл бы второй пост с логотипом, так что повтор не хуже
+          if (attempt >= 3) throw e;
+          log('фото-карточка: нет связи с Telegram (' + (e?.cause?.code || e.message) + '), повтор', attempt);
+          await sleep(4000 * attempt);
+        }
+      }
       const j = await r.json();
       if (j.ok) return j.result;
       log('фото-карточка не отправилась:', j.description);
     } catch (e) {
-      log('фото-карточка не отправилась:', e.message);
+      log('фото-карточка не отправилась:', e.message, e?.cause?.code || '');
     }
     photo = BANNER;
   }
