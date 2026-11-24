@@ -276,7 +276,8 @@
     "ex-record-trop",
     "9d7164f4-a886-4b05-be3c-f54229e443f4",
     "a0897d83-35e9-42d8-9dd9-91e7ed988e9f",
-    "ex-record-dj-gvozd"
+    "ex-record-dj-gvozd",
+    "a0f4d2c1-b39a-4062-8c71-26482548900c"
   ],
   "news": [
     "https://www.intermedia.ru/news/407592",
@@ -955,6 +956,5 @@
   "featCta": 114,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 2,
-  "lastAutoKey": "2026-11-24T20",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "lastAutoKey": "2026-11-24T21"
 }
