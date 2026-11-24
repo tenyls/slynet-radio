@@ -277,7 +277,6 @@
     "9d7164f4-a886-4b05-be3c-f54229e443f4"
   ],
   "news": [
-    "https://www.billboard.com/music/chart-beat/olivia-rodrigo-you-seem-pretty-sad-back-to-no1-billboard200-1236367607/",
     "https://www.billboard.com/culture/product-recommendations/sunday-night-football-2026-2027-watch-nfl-live-online-free-1236343279/",
     "https://www.intermedia.ru/news/407592",
     "https://www.intermedia.ru/news/407616",
@@ -676,7 +675,8 @@
     "https://www.intermedia.ru/news/408123",
     "https://stereogum.com/2520267/billy-corgan-announces-deluxe-zwan-reissue-with-previously-unreleased-tracks/music/",
     "https://www.intermedia.ru/news/408321",
-    "https://www.billboard.com/music/concerts/benny-benassi-fedde-le-grand-australian-shows-1236388520/"
+    "https://www.billboard.com/music/concerts/benny-benassi-fedde-le-grand-australian-shows-1236388520/",
+    "https://www.nme.com/news/music/nme-magazine-november-december-2026-issue-how-to-buy-3976263"
   ],
   "releases": [
     "1.0.6",
@@ -690,7 +690,7 @@
     "RU-2026-11-18"
   ],
   "askIndex": 4,
-  "lastNewsSource": "Billboard",
+  "lastNewsSource": "NME",
   "lastReleaseAt": 1795034616608,
   "cams": [
     "1573776572",
@@ -951,6 +951,5 @@
   "featCta": 112,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 1,
-  "lastAutoKey": "2026-11-24T11",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "lastAutoKey": "2026-11-24T12"
 }
