@@ -932,9 +932,10 @@
     "1793911374",
     "1793910579",
     "1508414086",
-    "1701462033"
+    "1701462033",
+    "1605152077"
   ],
-  "camIndex": 21,
+  "camIndex": 22,
   "vkVia": "photo",
   "featRecent": [
     "webcams",
@@ -950,6 +951,5 @@
   "featCta": 111,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 1,
-  "lastAutoKey": "2026-11-24T09",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "lastAutoKey": "2026-11-24T10"
 }
