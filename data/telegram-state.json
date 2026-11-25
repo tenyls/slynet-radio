@@ -282,7 +282,6 @@
     "ex-record-neurofunk"
   ],
   "news": [
-    "https://www.intermedia.ru/news/407616",
     "https://www.billboard.com/business/publishing/kenny-macpherson-big-deal-music-publisher-dies-71-1236367718/",
     "https://www.billboard.com/music/rock/jack-white-brother-eddie-gillis-dies-third-man-pressing-1236367714/",
     "https://www.intermedia.ru/news/407666",
@@ -681,7 +680,8 @@
     "https://www.billboard.com/music/concerts/benny-benassi-fedde-le-grand-australian-shows-1236388520/",
     "https://www.nme.com/news/music/nme-magazine-november-december-2026-issue-how-to-buy-3976263",
     "https://stereogum.com/2521272/sid-the-cat-stereogum-present-ramones-night-in-la-next-month/news/",
-    "https://www.intermedia.ru/news/408277"
+    "https://www.intermedia.ru/news/408277",
+    "https://www.billboard.com/pro/the-beatles-apple-hq-savile-row-experience-approved-2027/"
   ],
   "releases": [
     "1.0.6",
@@ -695,7 +695,7 @@
     "RU-2026-11-18"
   ],
   "askIndex": 4,
-  "lastNewsSource": "InterMedia",
+  "lastNewsSource": "Billboard",
   "lastReleaseAt": 1795034616608,
   "cams": [
     "1573776572",
@@ -959,6 +959,5 @@
   "featCta": 116,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 2,
-  "lastAutoKey": "2026-11-25T11",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "lastAutoKey": "2026-11-25T12"
 }
