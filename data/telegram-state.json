@@ -281,7 +281,8 @@
     "5e742a0e-a341-4878-a683-46139b6c5b67",
     "ex-record-neurofunk",
     "6058ff93-ee55-407e-9221-c6ad07fd2531",
-    "dbdae111-2ceb-48e8-aa6b-cc544c57d043"
+    "dbdae111-2ceb-48e8-aa6b-cc544c57d043",
+    "ex-fip-jazz"
   ],
   "news": [
     "https://www.billboard.com/music/rock/jack-white-brother-eddie-gillis-dies-third-man-pressing-1236367714/",
@@ -963,6 +964,5 @@
   "featCta": 117,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 3,
-  "lastAutoKey": "2026-11-25T20",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "lastAutoKey": "2026-11-25T21"
 }
