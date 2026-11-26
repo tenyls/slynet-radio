@@ -288,7 +288,6 @@
     "ex-record-feel"
   ],
   "news": [
-    "https://www.billboard.com/lists/2026-caribbean-music-awards-best-moments-soca-dancehall/",
     "https://www.billboard.com/music/music-news/lisa-press-play-best-new-music-poll-results-1236367660/",
     "https://www.nme.com/news/music/phoebe-bridgers-all-points-east-2027-line-up-tickets-tour-london-3974184?utm_source=rss&utm_medium=rss&utm_campaign=phoebe-bridgers-all-points-east-2027-line-up-tickets-tour-london",
     "https://www.intermedia.ru/news/407667",
@@ -687,7 +686,8 @@
     "https://www.rollingstone.com/music/music-news/new-order-first-tour-without-drummer-stephen-morris-1235664185/",
     "https://www.billboard.com/lists/andy-taylor-six-deep-dive-career-moments/",
     "https://www.intermedia.ru/news/408381",
-    "https://www.nme.com/news/music/westside-cowboy-gurriers-lime-garden-lead-stacked-dot-to-dot-2027-line-up-3977010"
+    "https://www.nme.com/news/music/westside-cowboy-gurriers-lime-garden-lead-stacked-dot-to-dot-2027-line-up-3977010",
+    "https://stereogum.com/2522004/macy-gray-is-releasing-her-new-album-in-a-microdrama/news/"
   ],
   "releases": [
     "1.0.6",
@@ -701,7 +701,7 @@
     "RU-2026-11-18"
   ],
   "askIndex": 4,
-  "lastNewsSource": "NME",
+  "lastNewsSource": "Stereogum",
   "lastReleaseAt": 1795034616608,
   "cams": [
     "1573776572",
@@ -969,6 +969,5 @@
   "featCta": 120,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 1,
-  "lastAutoKey": "2026-11-26T16",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "lastAutoKey": "2026-11-26T17"
 }
