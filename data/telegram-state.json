@@ -285,7 +285,8 @@
     "ex-fip-jazz",
     "5d6b5573-d661-477a-82fc-1d0d03799679",
     "52bb00fe-dc31-11e9-a8ba-52543be04c81",
-    "ex-record-feel"
+    "ex-record-feel",
+    "2ca712c4-2d5f-4dbd-a2e3-1961136eec4e"
   ],
   "news": [
     "https://www.billboard.com/music/music-news/lisa-press-play-best-new-music-poll-results-1236367660/",
@@ -969,6 +970,5 @@
   "featCta": 120,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 1,
-  "lastAutoKey": "2026-11-26T17",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "lastAutoKey": "2026-11-26T18"
 }
