@@ -290,7 +290,8 @@
     "3dc4d4af-a0fd-4d0d-b3a0-723668b68d24",
     "ex-record-tecktonik",
     "c5537928-638d-4eef-b603-11a089027f8c",
-    "47651599-e323-4375-a9bf-aaae945e243e"
+    "47651599-e323-4375-a9bf-aaae945e243e",
+    "ex-record-mdl"
   ],
   "news": [
     "https://www.nme.com/news/music/uche-yara-the-cover-playlist-3974207?utm_source=rss&utm_medium=rss&utm_campaign=uche-yara-the-cover-playlist",
@@ -977,6 +978,5 @@
   "featCta": 124,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 2,
-  "lastAutoKey": "2026-11-27T17",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "lastAutoKey": "2026-11-27T18"
 }
