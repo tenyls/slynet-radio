@@ -292,7 +292,6 @@
     "c5537928-638d-4eef-b603-11a089027f8c"
   ],
   "news": [
-    "https://www.nme.com/news/music/phoebe-bridgers-all-points-east-2027-line-up-tickets-tour-london-3974184?utm_source=rss&utm_medium=rss&utm_campaign=phoebe-bridgers-all-points-east-2027-line-up-tickets-tour-london",
     "https://www.intermedia.ru/news/407667",
     "https://www.intermedia.ru/news/407672",
     "https://www.nme.com/news/music/uche-yara-the-cover-playlist-3974207?utm_source=rss&utm_medium=rss&utm_campaign=uche-yara-the-cover-playlist",
@@ -691,7 +690,8 @@
     "https://www.intermedia.ru/news/408381",
     "https://www.nme.com/news/music/westside-cowboy-gurriers-lime-garden-lead-stacked-dot-to-dot-2027-line-up-3977010",
     "https://stereogum.com/2522004/macy-gray-is-releasing-her-new-album-in-a-microdrama/news/",
-    "https://www.intermedia.ru/news/408389"
+    "https://www.intermedia.ru/news/408389",
+    "https://www.nme.com/news/music/lana-del-rey-shares-thanksgiving-update-on-incoming-new-albums-it-feels-meant-to-be-it-makes-me-wonder-where-i-would-even-go-after-this-3977104"
   ],
   "releases": [
     "1.0.6",
@@ -705,7 +705,7 @@
     "RU-2026-11-18"
   ],
   "askIndex": 4,
-  "lastNewsSource": "InterMedia",
+  "lastNewsSource": "NME",
   "lastReleaseAt": 1795034616608,
   "cams": [
     "1573776572",
@@ -975,6 +975,5 @@
   "featCta": 123,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 1,
-  "lastAutoKey": "2026-11-27T11",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "lastAutoKey": "2026-11-27T12"
 }
