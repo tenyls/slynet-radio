@@ -296,7 +296,6 @@
     "dd462b37-5792-402b-a1a2-4dd70c3971ee"
   ],
   "news": [
-    "https://www.nme.com/news/music/uche-yara-the-cover-playlist-3974207?utm_source=rss&utm_medium=rss&utm_campaign=uche-yara-the-cover-playlist",
     "https://www.intermedia.ru/news/407671",
     "https://www.intermedia.ru/news/407669",
     "https://www.intermedia.ru/news/407673",
@@ -695,7 +694,8 @@
     "https://www.intermedia.ru/news/408389",
     "https://www.nme.com/news/music/lana-del-rey-shares-thanksgiving-update-on-incoming-new-albums-it-feels-meant-to-be-it-makes-me-wonder-where-i-would-even-go-after-this-3977104",
     "https://www.billboard.com/culture/product-recommendations/nfl-black-friday-game-2026-den-pit-watch-live-online-free-1236386330/",
-    "https://pitchfork.com/story/olivia-rodrigo-delivers-another-christmas-song/"
+    "https://pitchfork.com/story/olivia-rodrigo-delivers-another-christmas-song/",
+    "https://www.billboard.com/music/rock/the-killers-dave-keuning-stroke-recovery-instagram-1236390473/"
   ],
   "releases": [
     "1.0.6",
@@ -709,7 +709,7 @@
     "RU-2026-11-18"
   ],
   "askIndex": 4,
-  "lastNewsSource": "Pitchfork",
+  "lastNewsSource": "Billboard",
   "lastReleaseAt": 1795034616608,
   "cams": [
     "1573776572",
@@ -981,6 +981,5 @@
   "featCta": 125,
   "vkPhotoTry": "photos.getMessagesUploadServer 15: Access denied: group messages are disabled",
   "showIndex": 2,
-  "lastAutoKey": "2026-11-28T06",
-  "vkError": "опубликовано без картинки: wall.post 100: One of the parameters specified was missing or invalid: Violated: link_photo_sizing_rule. No photo given"
+  "lastAutoKey": "2026-11-28T07"
 }
